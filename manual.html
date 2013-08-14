@@ -1,0 +1,207 @@
+<html>
+<head>
+<title></title>
+</head>
+<body>
+<h1>Out-Of-Core Sparse Voxel Octree Builder - PoC Implementation</h1>
+<p>Proof of Concept Implementation</br>
+Jeroen Baert - Department of Computer Science, KU Leuven, Belgium</p>
+
+<div id="toc">
+<h2>Table of Contents</h2>
+</div>
+
+	
+<div id="contents">
+<h1>Introduction</h1>
+<p>This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, <em>Out Of Core Construction of Sparse Voxel Octrees</em>. The paper and additional material can be found on the <a href="http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/">project page</a>.</p>
+
+<h1>Code / Dependencies</h1>
+<p>The current release contains <strong>x64 binaries for windows</strong>, and a Visual Studio 2012 project if you want to build the tools yourself. There's a free <a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products">VS Studio 2012 Express edition</a> available.</br>
+The code should compile on Linux as well, but I'm currently not supporting this. I will accept patches to fix Linux compilation issues, though.</br>
+</br>
+The only <strong>dependency</strong> for compiling from source is the <a href="http://gfx.cs.princeton.edu/proj/trimesh2/">Trimesh2 library</a> by Szymon Rusinkiewicz, which is used for input/output of triangle meshes and the vector math. It has been statically linked in the binaries.</p>
+<p>
+There are two tools distributed in this release:
+<ul>
+<li><strong>tri_convert:</strong> Tool to convert any .ply, .off, .3ds, .obj, .sm or .ray file to a simple .tri format, described in this manual.</li>
+<li><strong>svo_builder:</strong> Out-Of-Core SVO Builder: Partitioning, Voxelizing and SVO Building rolled into one.</li>
+</ul>
+</p>
+<h2>Modes: Geometry-only / Normal vector voxelization</h2>
+This release supports binary-only SVO building (only geometry, the default mode presented in the paper) and - experimental, as an example - SVO building with a normal vector payload per voxel, for rendering purposes. Throughout all executables, the tools for binary voxelization are postfixed with <em>_binary</em>. During compilation, you can define the preprocessor directive <em>#BINARY_VOXELIZATION</em> to generate the version you want.
+
+<h1>Octree File Format</h1>
+<p>The .octree file format is a very simple straightforward format which only contains the basic SVO information. It is not optimized for GPU streaming or compact storage, but is easy to parse and convert to whatever you need in your SVO adventures.</br>
+It consists of a <strong>text-based header</strong> (extension <em>.octree</em>) containing the relevant SVO info and two <strong>binary data files</strong>, with extensions <em>.octreenodes</em> and <em>.octreedata</em>, containing the octree nodes and actual node data payload respectively. This seperation of the SVO from the actual data is done to seperate hot from cold data, since the payload of course grows cubically when you store more properties in a voxel.</br>
+
+<h2>Octree header</h2>
+A typical <em>.octree</em> header file is text-based and looks like this. All keyword - values lines are separated by a newline:
+<div style="background-color:#ddd;">
+<pre>
+#octreeheader 1
+gridlength 1024
+n_nodes 1474721
+n_data 2
+end
+</pre>
+</div>
+All elements are required.
+<ul>
+<li><strong>#octreeheader &lt;version_number&gt;:</strong> (int) Octree version number. </li>
+<li><strong>gridlength &lt;n&gt;:</strong> (int) Length of one side of the cubical voxel grid. Should be a power of 2. </li>
+<li><strong>n_nodes &lt;n&gt;:</strong> (int) The total amount of SVO nodes.</li>
+<li><strong>n_data &lt;n&gt;:</strong> (int) The total amount of data payloads. This is <strong>not</strong> automatically the same as <em>n_nodes</em>, you can have several nodes point to the same data.</li>
+<li><strong>END:</strong> Indicating the end of the header file.</li>
+</ul>
+
+<h2>Octree node file</h2>
+<p>An <em>.octreenodes</em> file is a very simple binary file which describes the big flat array of octree nodes. In the nodes, there are only child pointers, but it is trivial to extend the code to also store parent pointers. The child pointers are constructed from a base address combined with a child offset, since all nonempty children of a certain node are guaranteed by the algorithm to be stored next to eachother. </p>
+<ul>
+<li><strong>children base address: </strong> (size_t, 64 bits) The base address of the children of this node. </li>
+<li><strong>child offsets:</strong> (8 * 8 bit char = 64 bits) Children offsets for each of the 8 children. Each is a number between -1 and 7.</li>
+<ul>
+<li>If the number is >= 0, add it to the children base address the get the actual child address.</li>
+<li>A child offset of -1 is interpreted as a NULL pointer : there's no child there.</li>
+</ul>
+<li><strong>data address:</strong> (size_t, 64 bits) Index of data payload in data array described in the <em>.octreedata</em> file (see further).</li>
+</ul>
+
+<table border="1" bordercolor="#000000" style="text-align:center; background-color:#CCCCCC" cellpadding="2" cellspacing="1">
+    <tr>
+		<th style="background-color:#99CCFF" colspan="2">children base address (64 bits)</th>
+		<th style="background-color:#99CCFF" colspan="2">child offsets (8 * 8 bits)</th>
+		<th style="background-color:#99CCFF" colspan="2">data address (64 bits)</th>
+	</tr>
+	<tr>
+		<td>children base address (upper)</td>
+		<td>children base address (lower)</td>
+		<td>child offsets (0-3)</td>
+		<td>child offsets (4-7)</td>
+		<td>data address (upper)</td>
+		<td>data address (lower)</td>
+		<td>...</td>
+	</tr>
+</table>
+
+<h1>Tri File Format</h1>
+<p>The .tri file format is a very simple internal format to make abstraction of all the pitfalls and peculiarities of the plethora of model input formats in the wild. It basicly lists all triangles as one long list, with optional triangle properties (normals, ...) right behind the triangle definition. It was created with regards to streamability: all triangle information is stored sequentially, so you don't need to load the whole file in memory to process triangles. It's <em>not</em> as space-efficient as other formats, but is very easy to understand and parse.</p>
+
+<p>The .tri file format consists of a <strong>text-based header</strong> (extension <em>.tri</em>) containing the relevant model info and a <strong>binary data file</strong> (extension <em>.tridata</em>) containing the actual model data. </br>
+
+<h2>Tri Header</h2>
+A typical <em>.tri</em> header file is text-based and looks like this. All keyword - values lines are separated by a newline:
+<div style="background-color:#ddd;">
+<pre>
+#tri 1
+ntriangles 8254150
+geo_only 1
+bbox  -2540.83 -2586 -15957 2699.43 2654.25 -10716.8
+END
+</pre>
+</div>
+All elements are required.
+<ul>
+<li><strong>#tri &lt;version_number&gt;:</strong> (int) Tri version number. </li>
+<li><strong>ntriangles &lt;n&gt;:</strong> (size_t) Total number of triangles. </li>
+<li><strong>geo_only &lt;0 or 1&gt;:</strong> (bool) Indicate whether or not the data is geometry-only (for binary voxelization). </li>
+<li><strong>bbox &lt;min_x min_y min_z max_x max_y max_z&gt;:</strong> (floats) Minimum and maximum vector of bounding box of the mesh. Bounding box must be cubical, or your model will be stretched during voxelization.</li>
+<li><strong>END:</strong> Indicating the end of the header file.</li>
+</ul>
+
+<h2>Tri data file</h2>
+<p>A <em>.tridata</em> file is a very simple binary file which just contains a list of the x, y and z coordinates of the triangle vertices (<em>v0</em>, <em>v1</em> and <em>v2</em>), followed by the optional payload per triangle (normal, texture information, ...).</p>
+<p>In case of <strong>geometry-only</strong> (or, confusingly called <em>binary</em>, as in <em>binary</em> voxelization) .tridata files, the layout per triangle looks like this. Each cell is 32 bits (a float): </p>
+
+<table border="1" bordercolor="#000000" style="text-align:center; background-color:#CCCCCC" cellpadding="2" cellspacing="1">
+    <tr>
+		<th style="background-color:#99CCFF" colspan="3">vertex 0 (3 x 32 bits)</th>
+		<th style="background-color:#99CCFF" colspan="3">vertex 1 (3 x 32 bits)</th>
+		<th style="background-color:#99CCFF" colspan="3">vertex 2 (3 x 32 bits)</th>
+	</tr>
+	<tr>
+		<td>v0 <strong>x</strong></td>
+		<td>v0 <strong>y</strong></td>
+		<td>v0 <strong>z</strong></td>
+		<td>v1 <strong>x</strong></td>
+		<td>v1 <strong>y</strong></td>
+		<td>v1 <strong>z</strong></td>
+		<td>v2 <strong>x</strong></td>
+		<td>v2 <strong>y</strong></td>
+		<td>v2 <strong>z</strong></td>
+		<td>...</td>
+	</tr>
+</table>
+
+<p>In case of .tridata files <strong>with a normal vector <em>n</em> payload</strong>, the layout per triangle looks like this. We just store one normal per triangle, to save space, but with an easy modification, you could store a normal for each vertex. Each cell is 32 bits (a float): </p>
+<table border="1" bordercolor="#000000" style="text-align:center; background-color:#CCCCCC" cellpadding="2" cellspacing="1">
+    <tr>
+		<th style="background-color:#99CCFF" colspan="3">vertex 0 (3 x 32 bits)</th>
+		<th style="background-color:#99CCFF" colspan="3">vertex 1 (3 x 32 bits)</th>
+		<th style="background-color:#99CCFF" colspan="3">vertex 2 (3 x 32 bits)</th>
+		<th style="background-color:#99CCFF" colspan="3">normal vector (3 x 32 bits)</th>
+	</tr>
+	<tr>
+		<td>v0 <strong>x</strong></td>
+		<td>v0 <strong>y</strong></td>
+		<td>v0 <strong>z</strong></td>
+		<td>v1 <strong>x</strong></td>
+		<td>v1 <strong>y</strong></td>
+		<td>v1 <strong>z</strong></td>
+		<td>v2 <strong>x</strong></td>
+		<td>v2 <strong>y</strong></td>
+		<td>v2 <strong>z</strong></td>
+		<td>n <strong>x</strong></td>
+		<td>n <strong>y</strong></td>
+		<td>n <strong>z</strong></td>
+		<td>...</td>
+	</tr>
+</table>
+
+
+</div>
+
+
+<script type="text/javascript">
+// TOC generator script
+// (from http://blog.magnetiq.com/post/497600148/automatic-table-of-contents-generation)
+window.onload = function () {
+	var toc = "";
+	var level = 0;
+	document.getElementById("contents").innerHTML =
+		document.getElementById("contents").innerHTML.replace(
+			/<h([\d])>([^<]+)<\/h([\d])>/gi,
+			function (str, openLevel, titleText, closeLevel) {
+				if (openLevel != closeLevel) {
+					return str;
+				}
+
+				if (openLevel > level) {
+					toc += (new Array(openLevel - level + 1))
+                        .join("<ul>");
+				} else if (openLevel < level) {
+					toc += (new Array(level - openLevel + 1))
+                        .join("</ul>");
+				}
+
+				level = parseInt(openLevel);
+
+				var anchor = titleText.replace(/ /g, "_");
+				toc += "<li><a href=\"#" + anchor + "\">"
+                    + titleText + "</a></li>";
+
+				return "<h" + openLevel + "><a name=\"" + anchor
+                    + "\">" + titleText + "</a></h" + closeLevel
+                    + ">";
+			}
+		);
+	if (level) {
+		toc += (new Array(level + 1)).join("</ul>");
+	}
+
+	document.getElementById("toc").innerHTML += toc;
+};
+</script>
+
+</body>
+</html>
