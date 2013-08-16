@@ -56,7 +56,7 @@ All elements are required.
 </ul>
 
 <h2>Octree node file</h2>
-<p>An <em>.octreenodes</em> file is a very simple binary file which describes the big flat array of octree nodes. In the nodes, there are only child pointers, but it is trivial to extend the code to also store parent pointers. The child pointers are constructed from a base address combined with a child offset, since all nonempty children of a certain node are guaranteed by the algorithm to be stored next to eachother. </p>
+<p>An <em>.octreenodes</em> file is a very simple binary file which describes the big flat array of octree nodes. In the nodes, there are only child pointers, but it is trivial to extend the code to also store parent pointers. The child pointers are constructed from a base address combined with a child offset, since all nonempty children of a certain node are guaranteed by the algorithm to be stored next to eachother. As described in the .octreeheader, the .octreenodes file contains <em>n_nodes</em> nodes.</p>
 <ul>
 <li><strong>children base address: </strong> (size_t, 64 bits) The base address of the children of this node. </li>
 <li><strong>child offsets:</strong> (8 * 8 bit char = 64 bits) Children offsets for each of the 8 children. Each is a number between -1 and 7.</li>
@@ -80,6 +80,33 @@ All elements are required.
 		<td>child offsets (4-7)</td>
 		<td>data address (upper)</td>
 		<td>data address (lower)</td>
+		<td>...</td>
+	</tr>
+</table>
+
+<h2>Octree data file</h2>
+<p>An <em>.octreedata</em> file is a binary file representing the big flat array of data payloads. Nodes in the octree refer to their data payload by using a 64-bit pointer, which corresponds to the index in this data array. The first data payload in this array is always the one representing an empty payload. Nodes refer to this if they have no payload (internal nodes in the tree, ...). The current payload contains opacity, color and a representative normal per voxel. This can be easily extended with more appearance data. I refer to the <a href="http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/"><em>'Appearance'</em></a> section in our paper. As described in the .octreeheader, the .octreedata file contains <em>n_data</em> nodes.</p>
+
+<ul>
+<li><strong>opacity: </strong> (float, 32 bits) Opacity, of this voxel payload, between 0 and 1.</li>
+<li><strong>color:</strong> (3 * 32 bit float = 96 bits) RGB color, three values between 0 and 1.</li>
+<li><strong>normal vector:</strong> (3 * 32 bit float = 96 bits) X,y and z components of normal vector of this voxel payload.</li>
+</ul>
+
+<table border="1" bordercolor="#000000" style="text-align:center; background-color:#CCCCCC" cellpadding="2" cellspacing="1">
+    <tr>
+		<th style="background-color:#99CCFF" colspan="1">opacity (32 bits)</th>
+		<th style="background-color:#99CCFF" colspan="3">RGB color (3 * 32 bits = 96 bits)</th>
+		<th style="background-color:#99CCFF" colspan="3">normal vector (3 * 32 bits = 96 bits)</th>
+	</tr>
+	<tr>
+		<td>opacity</td>
+		<td>R</td>
+		<td>G</td>
+		<td>B</td>
+		<td>n_x</td>
+		<td>n_y</td>
+		<td>n_z</td>
 		<td>...</td>
 	</tr>
 </table>
