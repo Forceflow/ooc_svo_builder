@@ -18,7 +18,7 @@ gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), fast_
 	b_max_morton = mortonEncode(gridlength-1,gridlength-1,gridlength-1);
 	writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
-	writeDataPoint(data_out, DataPoint(), b_data_pos); // second data point is NULL, we refer to this if binary voxelization only
+	writeDataPoint(data_out, DataPoint(), b_data_pos); // second data point is NULL, all voxels refer to this if binary voxelization only
 #endif
 }
 

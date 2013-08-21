@@ -3,6 +3,10 @@
 using namespace std;
 using namespace trimesh;
 
+// Implementation of http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.6294 (Huang et al.)
+// by Jeroen Baert - jeroen.baert@cs.kuleuven.be
+// Adapted for mortoncode -based subgrids
+//
 void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, float unitlength, VoxelData** data, size_t &nfilled){
 	// clear partition
 	memset(*data,0,(morton_end-morton_start)*sizeof(VoxelData));
@@ -16,7 +20,6 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 
 	// voxelize every triangle
 	while(reader.hasNext()) {
-		
 		// read triangle
 		Triangle t;
 

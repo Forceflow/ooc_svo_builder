@@ -3,10 +3,11 @@
 using namespace std;
 using namespace trimesh;
 
+// Fiddle with buffer sizes here: these are defined as number of triangles
 #define input_buffersize 8192
 #define output_buffersize 8192
 
-// Estimate amount of partitions we need, given the requested gridsize and the overall memory limit.
+// Estimate the optimal amount of partitions we need, given the requested gridsize and the overall memory limit.
 size_t estimate_partitions(const size_t gridsize, const size_t memory_limit){
 	cout << "Estimating best partition count ..." << endl;
 	uint64_t required = (gridsize*gridsize*gridsize*sizeof(VoxelData)) /1024 /1024;
@@ -25,6 +26,7 @@ size_t estimate_partitions(const size_t gridsize, const size_t memory_limit){
 	return numpartitions;
 }
 
+// Remove the temporary .trip files we made
 void removeTripFiles(TripInfo &trip_info){
 	string filename = trip_info.base_filename + string(".trip");
 	remove(filename.c_str());
@@ -66,7 +68,6 @@ if(verbose){
 		cout << "  worldspace coordinates from (" << bbox_world.min[0] << "," << bbox_world.min[1] << "," << bbox_world.min[2] << ") to (" 
 			<< bbox_world.max[0] << "," << bbox_world.max[1] << "," << bbox_world.max[2] << ")" << endl;
 }
-
 
 		// create buffer for partition
 		filename = tri_info.base_filename + to_string(gridsize) + string("_") + to_string(n_partitions) + string("_") + to_string(i) + string(".tripdata");
