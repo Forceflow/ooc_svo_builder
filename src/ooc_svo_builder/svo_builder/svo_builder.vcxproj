@@ -251,7 +251,6 @@
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="OctreeBuilder.cpp" />
     <ClCompile Include="partitioner.cpp" />
     <ClCompile Include="voxelizer.cpp" />
