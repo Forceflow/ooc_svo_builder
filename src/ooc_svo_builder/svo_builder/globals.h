@@ -14,7 +14,7 @@ extern Timer algo_timer;
 extern Timer io_timer_in;
 extern Timer io_timer_out;
 
-// be verbose about what we do?
+// global flag: be verbose about what we do?
 extern bool verbose;
 
 #endif // GLOBALS_H_

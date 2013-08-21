@@ -2,8 +2,9 @@
 #define INTERSECTION_H_
 
 #include <TriMesh.h>
-#include "geometry_primitives.h"
 #include <cassert>
+#include <tri_util.h>
+#include "geometry_primitives.h"
 
 // Intersection methods
 
