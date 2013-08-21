@@ -1,0 +1,230 @@
+#include <TriMesh.h>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <trip_tools.h>
+#include <TriReader.h>
+#include "globals.h"
+#include "voxelizer.h"
+#include "OctreeBuilder.h"
+#include "partitioner.h"
+
+#if _WIN32 || _WIN64
+#if _WIN64
+#define ENVIRONMENT64
+#else
+#define ENVIRONMENT32
+#endif
+#endif
+
+using namespace std;
+
+// program params
+string filename = "";
+size_t gridsize = 1024;
+size_t memory_limit = 2048;
+bool verbose = false;
+
+// trip header info
+TriInfo tri_info;
+TripInfo trip_info;
+
+// buffer_size
+size_t input_buffersize = 100000;
+
+// timers
+Timer main_timer;
+Timer algo_timer;
+Timer io_timer_in;
+Timer io_timer_out;
+
+void printInfo(){
+	cout << "-------------------------------------------------------------" << endl;
+#ifdef BINARY_VOXELIZATION
+	cout << "Out-Of-Core SVO Builder 1.0 - Geometry only version"<< endl;
+#else
+	cout << "Out-Of-Core SVO Builder 1.0 - Geometry+normals version"<< endl;
+#endif
+#ifdef _WIN32 || _WIN64
+	cout << "Windows ";
+#endif
+#ifdef __linux__
+	cout << "Linux ";
+#endif
+#ifdef ENVIRONMENT64
+	cout << "64-bit version" << endl;
+#endif
+#ifdef ENVIRONMENT32
+	cout << "32-bit version" << endl;
+#endif
+	cout << "Jeroen Baert - jeroen.baert@cs.kuleuven.be - www.forceflow.be" << endl;
+	cout << "-------------------------------------------------------------" << endl << endl;
+}
+
+void printInvalid(){
+	std::cout << "Not enough or invalid arguments, please try again.\n" << endl; 
+	std::cout << "At the bare minimum, I need a path to a .TRI file" << endl; 
+	std::cout << "For Example: voxelicious.exe -f /home/jeroen/bunny.tri" << endl;
+	std::cout << "" << endl;
+	std::cout << "All program options:" << endl;
+	std::cout << "" << endl;
+	std::cout << "-f <filename.tri>     Path to a tri input file." << endl;
+	std::cout << "-s <gridsize>         Voxel gridsize, should be a power of 2. Default 512." << endl;
+	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
+	std::cout << "-v                    Be very verbose." << endl;
+}
+
+// Parse command-line params and so some basic error checking on them
+void parseParameters(int argc, char* argv[], string& filename, size_t& gridsize, size_t& memory_limit, bool& verbose){
+	cout << "Reading program parameters ..." << endl;
+	// Input argument validation
+	if(argc < 3){printInvalid(); exit(0);}
+	for (int i = 1; i < argc; i++) {
+		// parse filename
+		if (string(argv[i]) == "-f") {
+			filename = argv[i + 1]; 
+			size_t check_tri = filename.find(".tri");
+			if(check_tri == string::npos){
+				cout << "Data filename does not end in .tri - I only support that file format" << endl; printInvalid();exit(0);
+			}
+			i++;
+		} else if (string(argv[i]) == "-s") {
+			gridsize = atoi(argv[i + 1]); 
+			if(!isPowerOf2(gridsize)){
+				cout << "Requested gridsize is not a power of 2" << endl; printInvalid();exit(0);
+			}
+			i++;
+		} else if (string(argv[i]) == "-l") {
+			memory_limit = atoi(argv[i + 1]); 
+			if(memory_limit <= 1){
+				cout << "Requested memory limit is nonsensical. Use a value 1>= 0" << endl; printInvalid();exit(0);
+			}
+			i++;
+		} else if (string(argv[i]) == "-v") {
+			verbose = true;
+			i++;
+		}
+		else {
+			printInvalid(); exit(0);
+		}
+	}
+	if(verbose){
+		cout << "  filename: " << filename << endl;
+		cout << "  gridsize: " << gridsize << endl;
+		cout << "  memory limit: " << memory_limit << endl;
+		cout << "  verbosity: " << verbose << endl;
+	}
+}
+
+// Printout total time of running Timers (for debugging purposes)
+void printTimerInfo(){
+	double diff = main_timer.getTotalTimeSeconds() - (algo_timer.getTotalTimeSeconds() + io_timer_in.getTotalTimeSeconds() + io_timer_out.getTotalTimeSeconds());
+	cout << "Total MAIN time      : " << main_timer.getTotalTimeSeconds() << endl;
+	cout << "Total IO IN time     : " <<  io_timer_in.getTotalTimeSeconds() << " s." << endl;
+	cout << "Total algorithm time : " <<  algo_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "Total IO OUT time    : " <<  io_timer_out.getTotalTimeSeconds() << " s." << endl;
+	cout << "Total misc time      : " <<  diff << " s." << endl;
+}
+
+int main(int argc, char *argv[]){
+	// Setup timers
+	main_timer = Timer();
+	algo_timer = Timer();
+	io_timer_in = Timer();
+	io_timer_out = Timer();
+	main_timer.start();
+
+	// Parse program parameters
+	printInfo();
+	parseParameters(argc, argv, filename, gridsize, memory_limit, verbose);
+
+	// Parse TRI header
+	io_timer_in.start();
+	if(parseTriHeader(filename,tri_info) != 1) { exit(0); }
+	if(verbose){tri_info.print();}
+	io_timer_in.stop();
+
+	// Check if the user is using the correct executable for type of tri file
+#ifdef BINARY_VOXELIZATION
+	if(!tri_info.geometry_only){
+		cout << "You're using a .tri file which contains more than just geometry with a geometry-only SVO Builder! Regenerate that .tri file using tri_convert_binary." << endl;exit(0);
+	}
+#else
+	if(tri_info.geometry_only){
+		cout << "You're using a .tri file which contains only geometry with the geometry+normals SVO Builder! Regenerate that .tri file using tri_convert." << endl;exit(0);
+	}
+#endif
+
+
+	// Do partitioning and store results/file refs in TripInfo
+	size_t n_partitions = estimate_partitions(gridsize,memory_limit);
+	cout << "Partitioning data into " << n_partitions << " partitions ... "; cout.flush();
+	algo_timer.start(); // TIMING
+	TripInfo trip_info = partition(tri_info,n_partitions,gridsize);
+	algo_timer.stop(); // TIMING
+	cout << "done." << endl;
+
+	// Parse TRIP header
+	io_timer_in.start(); // TIMING
+	if(parseTripHeader(trip_info.base_filename + string(".trip"),trip_info) != 1) { exit(0); }
+	if(verbose) {trip_info.print();}
+	io_timer_in.stop(); // TIMING
+
+	// General voxelization calculations (stuff we need throughout voxelization process)
+	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float) trip_info.gridsize;
+	uint64_t morton_part = (trip_info.gridsize*trip_info.gridsize*trip_info.gridsize) / trip_info.n_partitions;
+	VoxelData* partitiondata = new VoxelData[(size_t)morton_part];
+	size_t nfilled = 0;
+
+	// create Octreebuilder which will output our SVO
+	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename,trip_info.gridsize,true,false);
+
+	// Start voxelisation and SVO building per partition
+	algo_timer.start(); // TIMING
+	for(size_t i = 0; i < trip_info.n_partitions; i++){
+		if(trip_info.part_tricounts[i] > 0) { // if this partition contains triangles
+			cout << "Voxelizing partition " << i << " ..." << endl;
+			// morton codes for this partition
+			uint64_t start = i*morton_part;
+			uint64_t end = (i+1)*morton_part;
+
+			// open file to read triangles
+			std::string part_data_filename = trip_info.base_filename + string("_") + to_string(i) + string(".tripdata");
+			TriReader reader = TriReader(part_data_filename,trip_info.part_tricounts[i],min(trip_info.part_tricounts[i],input_buffersize));
+			if(verbose){cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl;}
+
+			// voxelize partition
+			size_t nfilled_before = nfilled;
+			voxelize_partition(reader,start,end,unitlength,&partitiondata,nfilled);
+			if(verbose){cout << "  found " << nfilled-nfilled_before << " new voxels." << endl;}
+
+			// build SVO
+			cout << "Building SVO for partition " << i << " ..." << endl;
+			uint64_t morton_number;
+			DataPoint d;
+			for(size_t j = 0; j < morton_part; j++){
+				if(partitiondata[j].filled){
+					morton_number = start+j;
+					d = DataPoint();
+					d.opacity = 1.0; // this voxel is filled
+#ifndef BINARY_VOXELIZATION
+					d.normal = partitiondata[j].normal;
+#endif
+					// generating colors should go here.
+					builder.addDataPoint(morton_number, d);
+				}
+			}	
+		}
+	}
+	builder.finalizeTree(); //finalize SVO so it gets written to disk
+	algo_timer.stop(); // TIMING
+	cout << "done" << endl;
+
+	// Removing .trip files which are left by partitioner
+	io_timer_out.start(); // TIMING
+	removeTripFiles(trip_info);
+	io_timer_out.stop(); // TIMING
+
+	main_timer.stop();
+	if(verbose){printTimerInfo();}
+}
