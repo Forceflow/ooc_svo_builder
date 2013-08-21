@@ -1,22 +1,10 @@
 <html>
 <head>
-<title></title>
+<title>ooc_svo_builder manual - v1.0</title>
 </head>
+
 <body>
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-4119495-10', 'kuleuven.be');
-  ga('send', 'pageview');
-
-</script>
-
-<h1>Out-Of-Core Sparse Voxel Octree Builder v0.3 - PoC Implementation</h1>
-<p>Proof of Concept Implementation</br>
+<h1>Out-Of-Core Sparse Voxel Octree Builder v1.0 - Implementation</h1>
 Jeroen Baert - Department of Computer Science, KU Leuven, Belgium</br>
 jeroen.baert (at) cs.kuleuven.be - <a href="http://www.forceflow.be">website</a> - <a href="http://www.twitter.com/jbaert">@jbaert</a></p>
 
@@ -37,7 +25,7 @@ document.writeln("</p>");
 <p>This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, <em>Out Of Core Construction of Sparse Voxel Octrees</em>. The paper and additional material can be found on the <a href="http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/">project page</a>.</p>
 
 <h1>Code / Dependencies</h1>
-<p>The current release contains <strong>x64 binaries for windows</strong>, and a Visual Studio 2012 project if you want to build the tools yourself. There's a free <a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products">VS Studio 2012 Express edition</a> available.</br>
+<p>The current release contains <strong>x64 binaries for windows</strong>, and a Visual Studio 2012 project and sources hosted <a href="https://github.com/Forceflow/ooc_svo_builder">on Github here</a> if you want to build the tools yourself. There's a free <a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products">VS Studio 2012 Express edition</a> available.</br>
 The code should compile on Linux as well, but I'm currently not supporting this with makefiles. I will accept patches to fix Linux compilation issues, though, and move to cmake soon.</br>
 </br>
 The only <strong>dependency</strong> for compiling from source is the <a href="http://gfx.cs.princeton.edu/proj/trimesh2/">Trimesh2 library</a> by Szymon Rusinkiewicz, which is used for input/output of triangle meshes and the vector math. It has been statically linked in the binaries.</p>
@@ -279,6 +267,20 @@ window.onload = function () {
 	document.getElementById("toc").innerHTML += toc;
 };
 </script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-4119495-10', 'kuleuven.be');
+  ga('send', 'pageview');
+
+</script>
+
+
+
 
 </body>
 </html>
