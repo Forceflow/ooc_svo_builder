@@ -3,8 +3,8 @@
 
 #include <string>
 #include <fstream>
-#include "tri_util.h"
 #include <stdio.h>
+#include "tri_util.h"
 
 using namespace std;
 

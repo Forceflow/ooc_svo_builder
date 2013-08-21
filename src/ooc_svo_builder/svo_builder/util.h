@@ -1,12 +1,12 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include <TriMesh.h>
 #include <time.h>
 #include <vector>
-#include <tri_util.h>
+#include <TriMesh.h>
 
 using namespace trimesh;
+using namespace std;
 
 // Various math/helper stuff
 

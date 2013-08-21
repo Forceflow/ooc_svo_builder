@@ -1,12 +1,12 @@
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
-#include <tri_util.h>
-#include <tri_tools.h>
-#include "intersection.h"
-#include "globals.h"
 #include <stdio.h>
 #include <vector>
+#include <tri_util.h>
+#include <tri_tools.h>
+#include "globals.h"
+#include "intersection.h"
 
 using namespace std;
 using namespace trimesh;
@@ -14,14 +14,13 @@ using namespace trimesh;
 // A Buffer which checks triangles against a bounding box, and writes them in batches to a given file/stream if they fit.
 class Buffer{
 public:
-	//ofstream file;
-	FILE* file;
-	AABox<vec3> bbox_world;
-	size_t n_triangles;
+	FILE* file; // the file we'll write our triangles to
+	AABox<vec3> bbox_world; // bounding box of the morton grid this buffer represents, in world coords
+	size_t n_triangles; // number of triangles already in
 	
 	// Buffered
-	vector<Triangle> triangle_buffer;
-	size_t buffer_max;
+	vector<Triangle> triangle_buffer; // triangle buffer
+	size_t buffer_max; // maximum of tris we buffer before writing to disk
 
 	Buffer();
 	Buffer(const std::string &filename, AABox<vec3> bbox_world, size_t buffer_max);
@@ -32,6 +31,29 @@ public:
 private:
 	void flush();
 };
+
+// default constructor
+inline Buffer::Buffer() : bbox_world(AABox<vec3>(vec3(0,0,0),vec3(1,1,1))), n_triangles(0), buffer_max(1024), file(NULL){
+}
+
+// full constructor
+inline Buffer::Buffer(const std::string &filename, AABox<vec3> bbox_world, size_t buffer_max): bbox_world(bbox_world), n_triangles(0), buffer_max(buffer_max), file(NULL) {
+#ifdef VERBOSE
+	cout << "  opening file : " << filename << endl;
+#endif
+	// prepare buffer
+	triangle_buffer.reserve(buffer_max);
+	// prepare file
+	file = fopen(filename.c_str(), "wb");
+}
+
+//destructor
+inline Buffer::~Buffer(){
+	if(buffer_max != 0){
+		flush();
+	}
+	fclose(file);
+}
 
 // Flush the buffer and write everything to disk
 inline void Buffer::flush(){

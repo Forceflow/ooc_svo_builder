@@ -2,6 +2,7 @@
 #define OCTREE_BUILDER_H_
 
 #include "globals.h"
+#include <tri_util.h>
 #include "util.h"
 #include "Node.h"
 #include "morton.h"
