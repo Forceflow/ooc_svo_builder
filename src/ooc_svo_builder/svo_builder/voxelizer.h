@@ -11,6 +11,7 @@
 
 using namespace std;
 
+// This struct defines VoxelData for our voxelizer - this is defined different depending on compile project
 #ifdef BINARY_VOXELIZATION
 struct VoxelData{
 	bool filled;

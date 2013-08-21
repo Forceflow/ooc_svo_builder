@@ -7,6 +7,8 @@
 
 using namespace trimesh;
 
+// Simple timer to measure time, using CLOCKS_PER_SEC
+// Should work on all platforms, sacrificing some precision.
 struct Timer {
 	clock_t Begin;
 	Timer(){
