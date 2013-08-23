@@ -2,9 +2,8 @@
 
 // OctreeBuilder constructor: this initializes the builder and sets up the output files, ready to go
 OctreeBuilder::OctreeBuilder(std::string basefilename, size_t gridlength, bool fast_empty, bool generate_levels) :
-gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), fast_empty(fast_empty), generate_levels(generate_levels){
+	gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), fast_empty(fast_empty), generate_levels(generate_levels), octreeheader_name(basefilename + string(".octree")) {
 	// Open output files
-	octreeheader_name = basefilename + string(".octree");
 	string nodes_name = basefilename + string(".octreenodes");
 	string data_name = basefilename + string(".octreedata");
 	node_out = fopen(nodes_name.c_str(), "wb");
@@ -38,14 +37,10 @@ void OctreeBuilder::finalizeTree(){
 	writeNode(node_out, b_buffers[0][0], b_node_pos);
 
 	// write header
-	OctreeInfo i;
-	i.gridlength = gridlength;
-	i.n_data = b_data_pos;
-	i.n_nodes = b_node_pos;
-	i.version = 1;
+	OctreeInfo octree_info(1,gridlength,b_node_pos,b_data_pos);
 
 	algo_timer.stop(); io_timer_out.start(); // TIMING
-	writeOctreeHeader(octreeheader_name,i);
+	writeOctreeHeader(octreeheader_name,octree_info);
 	algo_timer.stop(); io_timer_out.start(); // TIMING
 
 	// close files
