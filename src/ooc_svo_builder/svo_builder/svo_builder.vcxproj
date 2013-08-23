@@ -148,6 +148,7 @@
     <ClInclude Include="morton.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="OctreeBuilder.h" />
+    <ClInclude Include="octree_io.h" />
     <ClInclude Include="partitioner.h" />
     <ClInclude Include="voxelizer.h" />
     <ClInclude Include="util.h" />

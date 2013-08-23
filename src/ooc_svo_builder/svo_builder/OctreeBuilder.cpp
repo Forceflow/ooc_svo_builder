@@ -14,10 +14,13 @@ OctreeBuilder::OctreeBuilder(std::string basefilename, size_t gridlength, bool f
 	for(int i = 0; i < b_maxdepth+1; i++){
 		b_buffers[i].reserve(8);
 	}
-	b_max_morton = mortonEncode(gridlength-1,gridlength-1,gridlength-1);
+	b_max_morton = mortonEncode(int(gridlength-1),int(gridlength-1),int(gridlength-1));
+
+	algo_timer.stop(); io_timer_out.start(); // TIMING
 	writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
 	writeDataPoint(data_out, DataPoint(), b_data_pos); // second data point is NULL, all voxels refer to this if binary voxelization only
+	io_timer_out.stop(); algo_timer.start(); // TIMING
 #endif
 }
 
@@ -34,7 +37,9 @@ void OctreeBuilder::finalizeTree(){
 		}
 	}
 	// write root node
+	algo_timer.stop(); io_timer_out.start(); // TIMING
 	writeNode(node_out, b_buffers[0][0], b_node_pos);
+	io_timer_out.stop(); algo_timer.start(); // TIMING
 
 	// write header
 	OctreeInfo octree_info(1,gridlength,b_node_pos,b_data_pos);
@@ -55,11 +60,15 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 	for(int k = 0; k<8; k++){
 		if(!buffer[k].isNull()){
 			if(first_stored_child){
+					algo_timer.stop(); io_timer_out.start(); // TIMING
 					parent.children_base = writeNode(node_out,buffer[k],b_node_pos);
+					io_timer_out.stop(); algo_timer.start(); // TIMING
 					parent.children_offset[k] = 0;
 					first_stored_child = false;
 			} else {
+				algo_timer.stop(); io_timer_out.start(); // TIMING
 				parent.children_offset[k] = writeNode(node_out,buffer[k],b_node_pos) - parent.children_base;
+				io_timer_out.stop(); algo_timer.start(); // TIMING
 			}
 		} else {
 			parent.children_offset[k] = NOCHILD;
@@ -82,7 +91,9 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 		d.normal = normalize(tonormalize);
 		d.opacity = d.opacity / notnull;
 		// set it in the parent node
+		algo_timer.stop(); io_timer_out.start(); // TIMING
 		parent.data = writeDataPoint(data_out, d, b_data_pos);
+		io_timer_out.stop(); algo_timer.start(); // TIMING
 		parent.data_cache = d;
 	}
 	return parent;
@@ -127,7 +138,9 @@ void OctreeBuilder::addDataPoint(uint64_t morton_number, DataPoint point){
 #ifdef BINARY_VOXELIZATION
 		node.data = 1; 
 #else
+		algo_timer.stop(); io_timer_out.start(); // TIMING
 		node.data = writeDataPoint(data_out, point, b_data_pos); // store data
+		io_timer_out.stop(); algo_timer.start(); // TIMING
 #endif
 		node.data_cache = point; // store data as cache
 	} 
