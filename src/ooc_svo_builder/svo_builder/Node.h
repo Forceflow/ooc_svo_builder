@@ -5,8 +5,11 @@
 
 #include "DataPoint.h"
 #include <string>
+#ifdef __APPLE__
+#include <tr1/cstdint>
+#else
 #include <cstdint>
-
+#endif //
 #define NOCHILD -1
 
 // An SVO node. Only contains child pointers, extend this if you want parent pointers as well
