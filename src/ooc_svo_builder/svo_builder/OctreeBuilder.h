@@ -4,29 +4,14 @@
 #include "globals.h"
 #include <tri_util.h>
 #include "util.h"
-#include "Node.h"
 #include "morton.h"
 #include <stdio.h>
 #include <fstream>
 #include <assert.h>
+#include "octree_io.h"
 
 using namespace std;
 using namespace trimesh;
-
-// Internal format to represent an octree
-struct OctreeInfo {
-	int version;
-	size_t gridlength;
-	size_t n_nodes;
-	size_t n_data;
-
-	OctreeInfo() : version(1), gridlength(1024), n_nodes(0), n_data(0) {}
-	OctreeInfo(int version, size_t gridlength, size_t n_nodes, size_t n_data) : version(version), gridlength(gridlength), n_nodes(n_nodes), n_data(n_data) {} 
-};
-
-size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos);
-size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos);
-void writeOctreeHeader(const std::string &filename, const OctreeInfo &i);
 
 // Octreebuilder class. You pass this class DataPoints, it builds an octree from them.
 class OctreeBuilder {
@@ -100,51 +85,10 @@ inline void OctreeBuilder::fastAddEmpty(size_t budget){
 	while (budget > 0){
 		int buffer = computeBestFillBuffer(budget);
 		addEmptyDataPoint(buffer);
-		size_t budget_hit = pow(8.0,b_maxdepth-buffer);
+		size_t budget_hit = (size_t) pow(8.0,b_maxdepth-buffer);
 		budget = budget - budget_hit;
 	}
 
-}
-
-// Write a data point to file
-inline size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos){
-
-	algo_timer.stop(); io_timer_out.start(); // TIMING
-
-	fwrite(& d.opacity, sizeof(float), 1, data_out);
-	fwrite(& d.color[0], sizeof(float), 3, data_out);
-	fwrite(& d.normal[0], sizeof(float), 3, data_out);
-
-	io_timer_out.stop(); algo_timer.start(); // TIMING
-
-	b_data_pos++;
-	return b_data_pos-1;
-}
-
-// Write an octree node to file
-inline size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos){
-
-	algo_timer.stop(); io_timer_out.start(); // TIMING
-
-	fwrite(& n.children_base, sizeof(size_t), 1, node_out);
-	fwrite(& n.children_offset[0], sizeof(char), 8, node_out);
-	fwrite(& n.data, sizeof(size_t), 1, node_out);
-
-	io_timer_out.stop(); algo_timer.start(); // TIMING
-
-	b_node_pos++;
-	return b_node_pos-1;
-}
-
-inline void writeOctreeHeader(const std::string &filename, const OctreeInfo &i){
-	ofstream outfile;
-	outfile.open(filename.c_str(), ios::out);
-	outfile << "#octreeheader 1" << endl;
-	outfile << "gridlength " << i.gridlength << endl;
-	outfile << "n_nodes " << i.n_nodes << endl;
-	outfile << "n_data " << i.n_data << endl;
-	outfile << "end" << endl;
-	outfile.close();
 }
 
 #endif  // OCTREE_BUILDER_H_
