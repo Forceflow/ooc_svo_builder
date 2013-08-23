@@ -20,7 +20,8 @@ struct OctreeInfo {
 	size_t n_nodes;
 	size_t n_data;
 
-	OctreeInfo(){} 
+	OctreeInfo() : version(1), gridlength(1024), n_nodes(0), n_data(0) {}
+	OctreeInfo(int version, size_t gridlength, size_t n_nodes, size_t n_data) : version(version), gridlength(gridlength), n_nodes(n_nodes), n_data(n_data) {} 
 };
 
 size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos);
@@ -96,9 +97,8 @@ inline int OctreeBuilder::computeBestFillBuffer(size_t budget){
 
 // A method to quickly add empty nodes
 inline void OctreeBuilder::fastAddEmpty(size_t budget){
-	int buffer;
 	while (budget > 0){
-		buffer = computeBestFillBuffer(budget);
+		int buffer = computeBestFillBuffer(budget);
 		addEmptyDataPoint(buffer);
 		size_t budget_hit = pow(8.0,b_maxdepth-buffer);
 		budget = budget - budget_hit;
