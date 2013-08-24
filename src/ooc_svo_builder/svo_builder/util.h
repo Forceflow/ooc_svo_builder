@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include <vector>
+#include <sstream>
 #include <TriMesh.h>
 
 using namespace trimesh;
