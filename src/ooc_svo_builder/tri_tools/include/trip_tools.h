@@ -39,8 +39,6 @@ struct TripInfo {
 	}
 };
 
-// inline stuff
-
 inline int parseTripHeader(const std::string &filename, TripInfo &t){
 	ifstream file;
 	file.open(filename.c_str(), ios::in);
