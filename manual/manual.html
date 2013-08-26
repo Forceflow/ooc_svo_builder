@@ -53,8 +53,8 @@ There are two tools distributed in this release:
 This release supports binary-only SVO building (only geometry, the default mode presented in the paper) and - experimental, as an example - SVO building with a normal vector payload per voxel, for rendering purposes. Throughout all executables, the tools for binary voxelization are postfixed with <em>_binary</em>. During compilation, you can define the preprocessor directive <em>#BINARY_VOXELIZATION</em> to generate the version you want.
 
 <h1>Usage / Examples</h1>
-<h2>tri_convert: Converting a model to <em>.tri</em> format</h2>
-<p>The out-of-core octree builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model, you've got to convert it to the <em>.tri format</em> using the tri_convert tool. See <a href="#Tri_File_Format">Tri file format</a> for more information. tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only <em>.tri</em> file generation, use <em>tri_convert_binary</em>, for <em>.tri</em> file generation with a normal vector payload, use <em>tri_convert</em>.</p>
+<h2>tri_convert: Converting a model to .tri format</h2>
+<p>The out-of-core octree builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model, you've got to convert it to the <em>.tri format</em> using the tri_convert tool. The bounding box of the model will be padded to be cubical. See <a href="#Tri_File_Format">Tri file format</a> for more information. tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only <em>.tri</em> file generation, use <em>tri_convert_binary</em>, for <em>.tri</em> file generation with a normal vector payload, use <em>tri_convert</em>.</p>
 <p><strong>Syntax</strong>: <em>tri_convert(_binary)</em> -f (path to model file)</br>
 <strong>Example</strong>: <em>tri_convert(_binary)</em> -f /home/jeroen/bunny.ply</p>
 <p>This will generate a <em>.tri</em> + <em>.tridata</em> file pair with the same name as the model file in the same directory. In the case of the example: bunny.tri and bunny.tridata.</p>
@@ -72,8 +72,8 @@ This release supports binary-only SVO building (only geometry, the default mode 
 </ul>
 <p><strong>Examples</strong></p>
 <ul>
-<li><em>octree_builder_binary -f bunny.tri</em> : Will generate a geometry-only SVO file bunny.octree for a 1024^3 grid, using 2048 Mb of system memory.</li>
-<li><em>octree_builder -f bunny.tri -s 2048 -l 1024 -v</em> : Will generate a normal-vector-payload SVO file bunny.octree for a 2048^3 grid, using 1024 Mb of system memory, and be verbose about it.</li>
+<li><em>svo_builder_binary -f bunny.tri</em> : Will generate a geometry-only SVO file bunny.octree for a 1024^3 grid, using 2048 Mb of system memory.</li>
+<li><em>svo_builder -f bunny.tri -s 2048 -l 1024 -v</em> : Will generate a normal-vector-payload SVO file bunny.octree for a 2048^3 grid, using 1024 Mb of system memory, and be verbose about it.</li>
 </ul>
 
 <h1>Octree File Format</h1>
