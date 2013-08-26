@@ -30,9 +30,9 @@ public:
 
 	FILE* node_out;
 	FILE* data_out;
-	string octreeheader_name;
+	string base_filename;
 
-	OctreeBuilder(std::string basefilename, size_t gridlength, bool fast_empty, bool generate_levels);
+	OctreeBuilder(std::string base_filename, size_t gridlength, bool fast_empty, bool generate_levels);
 	void addDataPoint(uint64_t morton_number, DataPoint point);
 	void finalizeTree();
 

@@ -11,17 +11,27 @@
 // Internal format to represent an octree
 struct OctreeInfo {
 	int version;
+	string base_filename;
 	size_t gridlength;
 	size_t n_nodes;
 	size_t n_data;
 
-	OctreeInfo() : version(1), gridlength(1024), n_nodes(0), n_data(0) {}
-	OctreeInfo(int version, size_t gridlength, size_t n_nodes, size_t n_data) : version(version), gridlength(gridlength), n_nodes(n_nodes), n_data(n_data) {} 
+	OctreeInfo() : version(1), base_filename(string("")), gridlength(1024), n_nodes(0), n_data(0) {}
+	OctreeInfo(int version, string base_filename, size_t gridlength, size_t n_nodes, size_t n_data) : version(version), base_filename(base_filename), gridlength(gridlength), n_nodes(n_nodes), n_data(n_data) {} 
+
+	void print(){
+		cout << "  version: " << version << endl;
+		cout << "  base_filename: " << base_filename << endl;
+		cout << "  grid length: " << gridlength << endl;
+		cout << "  n_nodes: " << n_nodes << endl;
+		cout << "  n_data: " << n_data << endl;
+	}
 };
 
 size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos);
 size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos);
 void writeOctreeHeader(const std::string &filename, const OctreeInfo &i);
+int parseOctreeHeader(const std::string &filename, OctreeInfo &i);
 
 // Write a data point to file
 inline size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos){
@@ -41,6 +51,7 @@ inline size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos){
 	return b_node_pos-1;
 }
 
+// Write an octree header to a file
 inline void writeOctreeHeader(const std::string &filename, const OctreeInfo &i){
 	ofstream outfile;
 	outfile.open(filename.c_str(), ios::out);
@@ -48,8 +59,33 @@ inline void writeOctreeHeader(const std::string &filename, const OctreeInfo &i){
 	outfile << "gridlength " << i.gridlength << endl;
 	outfile << "n_nodes " << i.n_nodes << endl;
 	outfile << "n_data " << i.n_data << endl;
-	outfile << "end" << endl;
+	outfile << "END" << endl;
 	outfile.close();
+}
+
+// Parse a given octree header, store info in OctreeInfo struct
+inline int parseOctreeHeader(const std::string &filename, OctreeInfo &i){
+	cout << "  reading octree header from " << filename << " ... " << endl;
+	ifstream headerfile;
+	headerfile.open(filename.c_str(), ios::in);
+
+	string line; bool done = false;
+	headerfile >> line >> i.version;
+	if (line.compare("#octreeheader") != 0) {cout << "    Error: first line reads [" << line << "] instead of [#octreeheader]" << endl; return 0;}
+
+	while(headerfile.good() && !done) {
+		headerfile >> line;
+		if (line.compare("END") == 0) done = true; // when we encounter data keyword, we're at the end of the ASCII header
+		else if (line.compare("gridlength") == 0) {headerfile >> i.gridlength;}
+		else if (line.compare("n_nodes") == 0) {headerfile >> i.n_nodes;}
+		else if (line.compare("n_data") == 0) {headerfile >> i.n_data;}
+		else { cout << "  unrecognized keyword [" << line << "], skipping" << endl;
+			char c; do { c = headerfile.get(); } while(headerfile.good() && (c != '\n'));
+		}
+	}
+
+	headerfile.close();
+	return 1;
 }
 
 #endif
