@@ -1,10 +1,16 @@
 #!/bin/bash
 
-COMPILE="g++ -c -std=c++11 -I../tri_tools/include/ -I ../../../../trimesh2/include/"
-COMPILE_BINARY="g++ -c -std=c++11 -I../tri_tools/include/ -I ../../../../trimesh2/include/ -D BINARY_VOXELIZATION"
+## SPECIFY TRIMESH LOCATION HERE (and do a make there first)
+TRIMESH_DIR=/home/jeroen/development/trimesh2
+
+## COMPILE AND LINK DEFINITIONS
+COMPILE="g++ -c -std=c++11 -I../tri_tools/include/ -I ${TRIMESH_DIR}/include/"
+COMPILE_BINARY="g++ -c -std=c++11 -I../tri_tools/include/ -I ${TRIMESH_DIR}/include/ -D BINARY_VOXELIZATION"
 LINK="g++ -o svo_builder"
 LINK_BINARY="g++ -o svo_builder_binary"
 
+#############################################################################################
+## BUILDING STARTS HERE
 
 ## CLEAN
 echo "Removing old versions ..."
