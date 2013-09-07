@@ -37,6 +37,17 @@ struct TripInfo {
 			cout << "  partition " << i << " - tri_count: " << part_tricounts[i] << endl;
 		}
 	}
+        
+        bool filesExist(){
+            string header = base_filename + string(".trip");
+            for(size_t i = 0; i< n_partitions; i++){
+                string part_data_filename = base_filename + string("_") + to_string(i) + string(".tripdata");
+                if(!file_exists(part_data_filename)){
+                    return false;
+                }
+            }
+            return (file_exists(header));
+        }
 };
 
 inline int parseTripHeader(const std::string &filename, TripInfo &t){
