@@ -80,7 +80,7 @@ if(verbose){
 TripInfo partition(TriInfo& tri_info, size_t n_partitions, size_t gridsize){
 	// Open tri_data stream
 	TriReader reader = TriReader(tri_info.base_filename + string(".tridata"), tri_info.n_triangles, input_buffersize);
-	
+        
 	// Create Mortonbuffers
 	vector<Buffer*> buffers;
 	createBuffers(tri_info, n_partitions, gridsize, buffers);
