@@ -37,17 +37,17 @@ struct TripInfo {
 			cout << "  partition " << i << " - tri_count: " << part_tricounts[i] << endl;
 		}
 	}
-        
-        bool filesExist(){
-            string header = base_filename + string(".trip");
-            for(size_t i = 0; i< n_partitions; i++){
-                string part_data_filename = base_filename + string("_") + to_string(i) + string(".tripdata");
-                if(!file_exists(part_data_filename)){
-                    return false;
-                }
-            }
-            return (file_exists(header));
-        }
+
+	bool filesExist(){
+		string header = base_filename + string(".trip");
+		for(size_t i = 0; i< n_partitions; i++){
+			string part_data_filename = base_filename + string("_") + to_string(i) + string(".tripdata");
+			if(!file_exists(part_data_filename)){
+				return false;
+			}
+		}
+		return (file_exists(header));
+	}
 };
 
 inline int parseTripHeader(const std::string &filename, TripInfo &t){
@@ -107,7 +107,7 @@ inline void writeTripHeader(const std::string &filename, const TripInfo &t){
 	outfile << "gridsize " << t.gridsize << endl;
 	outfile << "n_triangles " << t.n_triangles << endl;
 	outfile << "bbox  " << t.mesh_bbox.min[0] << " " << t.mesh_bbox.min[1] << " " << t.mesh_bbox.min[2] << " " << t.mesh_bbox.max[0] << " " 
-			<< t.mesh_bbox.max[1] << " " << t.mesh_bbox.max[2] << endl;
+		<< t.mesh_bbox.max[1] << " " << t.mesh_bbox.max[2] << endl;
 #ifdef BINARY_VOXELIZATION
 	outfile << "geo_only " << 1 << endl;
 #else
