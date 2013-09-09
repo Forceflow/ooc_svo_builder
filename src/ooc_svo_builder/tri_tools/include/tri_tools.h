@@ -18,7 +18,7 @@ struct TriInfo{
 
 	TriInfo() : base_filename(""), version(version), geometry_only(geometry_only), n_triangles(0), mesh_bbox(AABox<vec3>()) {} // default constructor
 
-        // print out Tri information
+	// print out Tri information
 	void print(){
 		cout << "  base_filename: " << base_filename << endl;
 		cout << "  tri version: " << version << endl;
@@ -27,13 +27,13 @@ struct TriInfo{
 		cout << "  bbox min: " << mesh_bbox.min[0] << " " << mesh_bbox.min[1] << " " << mesh_bbox.min[2] << endl;
 		cout << "  bbox max: " << mesh_bbox.max[0] << " " << mesh_bbox.max[1] << " " << mesh_bbox.max[2] << endl;
 	}
-        
-        // check if all files required by Tri exist
-        bool filesExist(){
-            string header = base_filename + string(".tri");
-            string tridata = base_filename + string(".tridata");
-            return (file_exists(header) && file_exists(tridata));
-        }
+
+	// check if all files required by Tri exist
+	bool filesExist(){
+		string header = base_filename + string(".tri");
+		string tridata = base_filename + string(".tridata");
+		return (file_exists(header) && file_exists(tridata));
+	}
 };
 
 // FSTREAM IO for Triangles
@@ -106,11 +106,11 @@ inline void writeTriangles(FILE* f, Triangle &t, size_t howmany){
 inline int parseTriHeader(std::string filename, TriInfo &t){
 	ifstream file;
 	file.open(filename.c_str(), ios::in);
-        
-        if(! file){
-            cout << "  Error: file " << filename << " does not exist." << endl;
-            return 0;
-        }
+
+	if(! file){
+		cout << "  Error: file " << filename << " does not exist." << endl;
+		return 0;
+	}
 
 	t.base_filename = filename.substr(0,filename.find_last_of("."));
 
@@ -153,7 +153,7 @@ inline void writeTriHeader(const std::string &filename, const TriInfo &t){
 	outfile << "ntriangles " << t.n_triangles << endl;
 	outfile << "geo_only " << t.geometry_only << endl;
 	outfile << "bbox  " << t.mesh_bbox.min[0] << " " << t.mesh_bbox.min[1] << " " << t.mesh_bbox.min[2] << " " << t.mesh_bbox.max[0] << " " 
-			<< t.mesh_bbox.max[1] << " " << t.mesh_bbox.max[2] << endl;
+		<< t.mesh_bbox.max[1] << " " << t.mesh_bbox.max[2] << endl;
 	outfile << "END" << endl;
 	outfile.close();
 }
