@@ -101,7 +101,7 @@ inline int parseOctreeHeader(const std::string &filename, OctreeInfo &i){
 		else if (line.compare("n_nodes") == 0) {headerfile >> i.n_nodes;}
 		else if (line.compare("n_data") == 0) {headerfile >> i.n_data;}
 		else { cout << "  unrecognized keyword [" << line << "], skipping" << endl;
-			char c; do { c = headerfile.get(); } while(headerfile.good() && (c != '\n'));
+		char c; do { c = headerfile.get(); } while(headerfile.good() && (c != '\n'));
 		}
 	}
 
