@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include "tri_tools.h"
+#include "file_tools.h"
 
 using namespace std;
 using namespace trimesh;

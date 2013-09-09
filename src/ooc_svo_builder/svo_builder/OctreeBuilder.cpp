@@ -96,6 +96,7 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 		io_timer_out.stop(); algo_timer.start(); // TIMING
 		parent.data_cache = d;
 	}
+
 	return parent;
 }
 
