@@ -115,6 +115,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\file_tools.h" />
     <ClInclude Include="include\trip_tools.h" />
     <ClInclude Include="include\TriReader.h" />
     <ClInclude Include="include\tri_tools.h" />

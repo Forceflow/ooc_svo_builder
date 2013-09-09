@@ -5,6 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include "tri_util.h"
+#include "file_tools.h"
 
 using namespace std;
 

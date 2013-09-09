@@ -123,17 +123,14 @@ void parseParameters(int argc, char* argv[], string& filename, size_t& gridsize,
 			i++;
 		} else if (string(argv[i]) == "-v") {
 			verbose = true;
-			i++;
 		} else if (string(argv[i]) == "-levels") {
 			generate_levels = true;
-			i++;
 		} else if (string(argv[i]) == "-colors") {
 #ifdef BINARY_VOXELIZATION
 			cout << "You asked to generate colors, but we're only doing binary voxelisation." << endl;
 #else
 			generate_colors = true;
 #endif
-			i++;
 		} else if (string(argv[i]) == "-h") {
 			printHelp(); exit(0);
 		} else {
@@ -178,6 +175,7 @@ int main(int argc, char *argv[]) {
 
 	// Parse TRI header
 	io_timer_in.start();
+	cout << "Parsing tri header " << filename << " ..." << endl;
 	if (parseTriHeader(filename, tri_info) != 1) {
 		exit(0); // something went wrong in parsing the header - exiting.
 	}

@@ -9,12 +9,9 @@
 // Intersection methods
 
 inline void computeBoundingBox(const vec3 &v0, const vec3 &v1, const vec3 &v2, AABox<vec3> &box){
-	box.min[0] = min(v0[0],min(v1[0],v2[0]));
-	box.min[1] = min(v0[1],min(v1[1],v2[1]));
-	box.min[2] = min(v0[2],min(v1[2],v2[2]));
-	box.max[0] = max(v0[0],max(v1[0],v2[0]));
-	box.max[1] = max(v0[1],max(v1[1],v2[1]));
-	box.max[2] = max(v0[2],max(v1[2],v2[2]));
+	// TriMesh library has componentwise min/max, use that
+	box.min = min(v0,min(v1,v2));
+	box.max = max(v0,max(v1,v2));
 }
 
 inline bool isPointBetweenParallelPlanes(const vec3 &point, const Plane &a, const Plane &b){
