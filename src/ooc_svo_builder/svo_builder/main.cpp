@@ -27,6 +27,7 @@ string filename = "";
 size_t gridsize = 1024;
 size_t memory_limit = 2048;
 bool generate_colors = false;
+bool generate_levels = false;
 bool verbose = false;
 
 // trip header info
@@ -73,7 +74,8 @@ void printHelp() {
 	std::cout << "-f <filename.tri>     Path to a .tri input file." << endl;
 	std::cout << "-s <gridsize>         Voxel gridsize, should be a power of 2. Default 512." << endl;
 	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
-	std::cout << "-c                    Generate linear color scale for voxels." << endl;
+	std::cout << "-levels               Generate intermediary voxel levels by averaging voxel data" << endl;
+	std::cout << "-colors               Generate linear color scale for voxels." << endl;
 	std::cout << "-v                    Be very verbose." << endl;
 	std::cout << "-h                    Print help and exit." << endl;
 }
@@ -122,7 +124,10 @@ void parseParameters(int argc, char* argv[], string& filename, size_t& gridsize,
 		} else if (string(argv[i]) == "-v") {
 			verbose = true;
 			i++;
-		} else if (string(argv[i]) == "-c") {
+		} else if (string(argv[i]) == "-levels") {
+			generate_levels = true;
+			i++;
+		} else if (string(argv[i]) == "-colors") {
 #ifdef BINARY_VOXELIZATION
 			cout << "You asked to generate colors, but we're only doing binary voxelisation." << endl;
 #else
@@ -140,6 +145,7 @@ void parseParameters(int argc, char* argv[], string& filename, size_t& gridsize,
 		cout << "  gridsize: " << gridsize << endl;
 		cout << "  memory limit: " << memory_limit << endl;
 		cout << "  generate colors: " << generate_colors << endl;
+		cout << "  generate levels: " << generate_levels << endl;
 		cout << "  verbosity: " << verbose << endl;
 	}
 }
@@ -197,8 +203,7 @@ int main(int argc, char *argv[]) {
 
 	// Do partitioning and store results/file refs in TripInfo
 	size_t n_partitions = estimate_partitions(gridsize, memory_limit);
-	cout << "Partitioning data into " << n_partitions << " partitions ... ";
-	cout.flush();
+	cout << "Partitioning data into " << n_partitions << " partitions ... "; cout.flush();
 	algo_timer.start(); // TIMING
 	TripInfo trip_info = partition(tri_info, n_partitions, gridsize);
 	algo_timer.stop(); // TIMING
@@ -225,7 +230,7 @@ int main(int argc, char *argv[]) {
 	size_t nfilled = 0;
 
 	// create Octreebuilder which will output our SVO
-	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, true, false);
+	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, true, generate_levels);
 
 	// Start voxelisation and SVO building per partition
 	algo_timer.start(); // TIMING
