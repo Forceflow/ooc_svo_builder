@@ -27,5 +27,8 @@
     <ClInclude Include="include\TriReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\file_tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

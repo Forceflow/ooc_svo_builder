@@ -27,6 +27,6 @@ struct VoxelData{
 };
 #endif
 
-void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, float unitlength, VoxelData** data, size_t &nfilled);
+void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, VoxelData** data, size_t &nfilled);
 
 #endif // VOXELIZER_H_
