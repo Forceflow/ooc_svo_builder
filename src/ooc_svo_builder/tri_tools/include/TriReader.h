@@ -18,7 +18,7 @@ class TriReader{
 	Triangle* buffer;
 
 	FILE* file;
-        
+
 public:
 	TriReader();
 	TriReader(const TriReader&);
