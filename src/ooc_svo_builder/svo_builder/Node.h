@@ -4,13 +4,14 @@
 #pragma once
 
 #include "DataPoint.h"
-#include <string>
 #ifdef __APPLE__
 #include <tr1/cstdint>
 #else
 #include <cstdint>
 #endif //
+
 #define NOCHILD -1
+#define NODATA 0
 
 // An SVO node. Only contains child pointers, extend this if you want parent pointers as well
 class Node
@@ -30,7 +31,8 @@ public:
 	bool isNull() const;
 };
 
-inline Node::Node() : data(0), children_base(0), data_cache(DataPoint()) {
+// Default constructor
+inline Node::Node() : data(0), children_base(0), data_cache(DataPoint()){
 	for(int i = 0; i<8; i++){
 		children_offset[i] = NOCHILD;
 	}
@@ -38,10 +40,7 @@ inline Node::Node() : data(0), children_base(0), data_cache(DataPoint()) {
 
 // Check if this Node has a child at position i
 inline bool Node::hasChild(int i) const{
-	if(children_offset[i] == NOCHILD){
-		return false;
-	}
-	return true;
+	return !(children_offset[i] == NOCHILD);
 }
 
 // Get the full index of the child at position i
@@ -60,12 +59,17 @@ inline bool Node::isNull() const{
 
 // If this node doesn;t have any children, it's a leaf node
 inline bool Node::isLeaf() const{
-	for(int i = 0; i<8; i++){if(children_offset[i] != NOCHILD){return false;}}
+	for(int i = 0; i<8; i++){
+		if(children_offset[i] != NOCHILD){
+			return false;
+		}
+	}
 	return true;
 }
 
+// If the data pointer is NODATA, there is no data
 inline bool Node::hasData() const{
-	return !(data == 0);
+	return !(data == NODATA);
 }
 
 #endif /* NODE_H_ */

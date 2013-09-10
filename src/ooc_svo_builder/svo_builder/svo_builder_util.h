@@ -55,7 +55,7 @@ struct Timer {
 		clock_t End = clock();
 		Elapsed = Elapsed + (End - Start);
 	}
-	double getTotalTimeSeconds(){
+	double getTotalTimeSeconds() const{
 		return ((double) Elapsed)/ ((double) CLOCKS_PER_SEC);
 	}
 };

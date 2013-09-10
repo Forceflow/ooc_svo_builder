@@ -15,7 +15,7 @@ public:
 	DataPoint();
 	DataPoint(float opacity, vec3 color);
 	DataPoint(float opacity, vec3 color, vec3 normal);
-	bool isEmpty();
+	bool isEmpty() const;
 };
 
 
@@ -28,7 +28,7 @@ inline DataPoint::DataPoint(float opacity, vec3 color) : opacity(opacity), color
 inline DataPoint::DataPoint(float opacity, vec3 color, vec3 normal) : opacity(opacity), color(color), normal(normal){
 }
 
-inline bool DataPoint::isEmpty(){
+inline bool DataPoint::isEmpty() const{
 	return (opacity == 0.0f);
 }
 

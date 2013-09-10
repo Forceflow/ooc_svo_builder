@@ -17,7 +17,7 @@ public:
 	FILE* file; // the file we'll write our triangles to
 	AABox<vec3> bbox_world; // bounding box of the morton grid this buffer represents, in world coords
 	size_t n_triangles; // number of triangles already in
-	
+
 	// Buffered
 	vector<Triangle> triangle_buffer; // triangle buffer
 	size_t buffer_max; // maximum of tris we buffer before writing to disk
@@ -79,6 +79,5 @@ inline void Buffer::processTriangle(Triangle &t, const AABox<vec3> &bbox){
 		n_triangles++;
 	}
 }
-
 
 #endif // BUFFER_H_

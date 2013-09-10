@@ -1,12 +1,12 @@
 #ifndef PARTITIONER_H_
 #define PARTITIONER_H_
 
-#include "Buffer.h"
-#include "morton.h"
 #include <tri_tools.h>
 #include <trip_tools.h>
 #include <file_tools.h>
 #include <TriReader.h>
+#include "Buffer.h"
+#include "morton.h"
 #include "voxelizer.h"
 
 // Partitioning-related stuff
