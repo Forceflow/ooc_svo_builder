@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="util.h">
+    <ClInclude Include="tri_convert_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
