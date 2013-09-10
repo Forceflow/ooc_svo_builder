@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
 			uint64_t end = (i + 1) * morton_part;
 
 			// open file to read triangles
-			std::string part_data_filename = trip_info.base_filename + string("_") + to_string(i) + string(".tripdata");
+			std::string part_data_filename = trip_info.base_filename + string("_") + val_to_string(i) + string(".tripdata");
 			TriReader reader = TriReader(part_data_filename, trip_info.part_tricounts[i], min(trip_info.part_tricounts[i], input_buffersize));
 			if (verbose) {
 				cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl;

@@ -33,7 +33,7 @@ void removeTripFiles(const TripInfo &trip_info){
 	remove(filename.c_str());
 	// remove tripdata files
 	for(size_t i = 0; i < trip_info.n_partitions; i++){
-		filename = trip_info.base_filename + string("_") + to_string(i) + string(".tripdata");
+		filename = trip_info.base_filename + string("_") + val_to_string(i) + string(".tripdata");
 		remove(filename.c_str());
 	}
 }
@@ -70,7 +70,7 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 		}
 
 		// create buffer for partition
-		filename = tri_info.base_filename + to_string(gridsize) + string("_") + to_string(n_partitions) + string("_") + to_string(i) + string(".tripdata");
+		filename = tri_info.base_filename + val_to_string(gridsize) + string("_") + val_to_string(n_partitions) + string("_") + val_to_string(i) + string(".tripdata");
 		buffers[i] = new Buffer(filename,bbox_world,output_buffersize);
 	}
 }
@@ -79,14 +79,14 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 TripInfo partition_one(const TriInfo& tri_info, const size_t gridsize){
 	// Just copy files
 	string src = tri_info.base_filename + string(".tridata");
-	string dst = tri_info.base_filename + to_string(gridsize) + string("_") + to_string(1) + string("_") + to_string(0) + string(".tripdata");
+	string dst = tri_info.base_filename + to_string(gridsize) + string("_") + val_to_string(1) + string("_") + val_to_string(0) + string(".tripdata");
 	copy_file(src,dst);
 
 	// Write header
 	TripInfo trip_info = TripInfo(tri_info);
 	trip_info.part_tricounts.resize(1);
 	trip_info.part_tricounts[0] = tri_info.n_triangles;
-	trip_info.base_filename = tri_info.base_filename + to_string(gridsize) + string("_") + to_string(1);
+	trip_info.base_filename = tri_info.base_filename + val_to_string(gridsize) + string("_") + val_to_string(1);
 	std::string header = trip_info.base_filename + string(".trip");
 	trip_info.gridsize = gridsize;
 	trip_info.n_partitions = 1;
@@ -134,7 +134,7 @@ TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const siz
 	}
 
 	// Write trip header
-	trip_info.base_filename = tri_info.base_filename + to_string(gridsize) + string("_") + to_string(n_partitions);
+	trip_info.base_filename = tri_info.base_filename + val_to_string(gridsize) + string("_") + val_to_string(n_partitions);
 	std::string header = trip_info.base_filename + string(".trip");
 	trip_info.gridsize = gridsize;
 	trip_info.n_partitions = n_partitions;
