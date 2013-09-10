@@ -1,6 +1,7 @@
 #ifndef TRI_UTIL_H_
 #define TRI_UTIL_H_
 #include <TriMesh.h>
+#include <sstream>
 
 using namespace std;
 using namespace trimesh;
@@ -10,7 +11,7 @@ using namespace trimesh;
 // Custom value to string method to avoid C++11 dependency causing fopenmp problems in OSX
 template <typename T>
 string val_to_string( T Number ) {
-	ostringstream ss;
+	stringstream ss;
 	ss << Number;
 	return ss.str();
 }
