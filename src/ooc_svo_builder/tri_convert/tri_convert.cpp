@@ -16,15 +16,15 @@ using namespace trimesh;
 #endif
 #endif
 
-// meshes - collect them
-vector<TriMesh *> meshes;
+// Program version
+string version = "1.1";
 
 void printInfo(){
 	cout << "-------------------------------------------------------------" << endl;
 #ifdef BINARY_VOXELIZATION
-	cout << "Tri Converter 1.0 - BINARY VOXELIZATION"<< endl;
+	cout << "Tri Converter " << version << " - BINARY VOXELIZATION"<< endl;
 #else
-	cout << "Tri Converter 1.0 - GEOMETRY+NORMALS"<< endl;
+	cout << "Tri Converter " << version << " - GEOMETRY+NORMALS"<< endl;
 #endif
 #ifdef _WIN32 || _WIN64
 	cout << "Windows ";
@@ -74,7 +74,6 @@ int main(int argc, char *argv[]){
 	themesh->need_faces();
 	themesh->need_bbox();
 	themesh->need_normals();
-	meshes.push_back(themesh);
 	AABox<vec3> mesh_bbox = createMeshBBCube(themesh);
 
 	// Moving mesh to origin
