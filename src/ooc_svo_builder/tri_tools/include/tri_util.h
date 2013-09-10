@@ -1,6 +1,7 @@
 #ifndef TRI_UTIL_H_
 #define TRI_UTIL_H_
 #include <TriMesh.h>
+#include <sstream>
 
 using namespace std;
 using namespace trimesh;
