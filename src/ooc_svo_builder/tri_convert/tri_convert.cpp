@@ -16,15 +16,19 @@ using namespace trimesh;
 #endif
 #endif
 
-// meshes - collect them
-vector<TriMesh *> meshes;
+// Program version
+string version = "1.1";
+
+// Program parameters
+string filename = "";
+bool use_shading_normals = false;
 
 void printInfo(){
 	cout << "-------------------------------------------------------------" << endl;
 #ifdef BINARY_VOXELIZATION
-	cout << "Tri Converter 1.0 - BINARY VOXELIZATION"<< endl;
+	cout << "Tri Converter " << version << " - BINARY VOXELIZATION"<< endl;
 #else
-	cout << "Tri Converter 1.0 - GEOMETRY+NORMALS"<< endl;
+	cout << "Tri Converter " << version << " - GEOMETRY+NORMALS"<< endl;
 #endif
 #ifdef _WIN32 || _WIN64
 	cout << "Windows ";
@@ -48,13 +52,16 @@ void printInvalid(){
 	std::cout << "For Example: tri_convert.exe -f /home/jeroen/bunny.ply" << endl;
 }
 
-void parseParameters(int argc, char* argv[], string& filename){
+void parseProgramParameters(int argc, char* argv[], string& filename){
 	// Input argument validation
-	if(argc<3){printInvalid(); exit(0);}
+	if(argc<3){// not enough argumentts
+		printInvalid(); exit(0);
+	} 
 	for (int i = 1; i < argc; i++) {
 			// parse filename
 			if (string(argv[i]) == "-f") {
-				filename = argv[i + 1]; i++;
+				filename = argv[i + 1]; 
+				i++;
 			} else {
 				printInvalid(); exit(0);
 			}
@@ -65,30 +72,27 @@ int main(int argc, char *argv[]){
 	printInfo();
 
 	// Parse parameters
-	string filename = "";
-	parseParameters(argc,argv,filename);
+	parseProgramParameters(argc,argv,filename);
 
 	// Read mesh
-	cout << "Reading mesh from " << filename << endl;
 	TriMesh *themesh = TriMesh::read(filename.c_str());
 	themesh->need_faces();
 	themesh->need_bbox();
 	themesh->need_normals();
-	meshes.push_back(themesh);
 	AABox<vec3> mesh_bbox = createMeshBBCube(themesh);
 
 	// Moving mesh to origin
-	cout << "Moving mesh to origin ... "; Timer timer = Timer();
+	cout << "Moving mesh to origin ... "; 
+	Timer timer = Timer();
 	for(size_t i = 0; i < themesh->vertices.size() ; i++){ themesh->vertices[i] = themesh->vertices[i] - mesh_bbox.min;}
 	cout << "done in " << timer.getTimeMilliseconds() << " ms." << endl;
 
 	// Write mesh to format we can stream in
 	string base = filename.substr(0,filename.find_last_of("."));
-	std::string tri_out_name = base+ ".tridata";
-	std::string tri_header_out_name = base + ".tri";
+	std::string tri_header_out_name = base + string(".tri");
+	std::string tri_out_name = base + string(".tridata");
 
-	ofstream tri_out;
-	tri_out.open(tri_out_name.c_str(), ios::out |ios::binary);
+	FILE* tri_out = fopen(tri_out_name.c_str(), "wb");
 
 	cout << "Writing mesh triangles ... "; timer.reset();
 	Triangle t;
@@ -108,7 +112,7 @@ int main(int argc, char *argv[]){
 	cout << "done in " << timer.getTimeMilliseconds() << " ms." << endl;
 
 	// Prepare tri_info and write header
-	cout << "Writing header ... ";
+	cout << "Writing header to " << tri_header_out_name << " ... " << endl;
 	TriInfo tri_info;
 	tri_info.version = 1;
 	tri_info.mesh_bbox = mesh_bbox;
@@ -120,4 +124,5 @@ int main(int argc, char *argv[]){
 #endif
 	writeTriHeader(tri_header_out_name, tri_info);
 	tri_info.print();
+	cout << "Done." << endl;
 }
