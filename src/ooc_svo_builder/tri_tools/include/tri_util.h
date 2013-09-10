@@ -5,6 +5,16 @@
 using namespace std;
 using namespace trimesh;
 
+// Various helper methods / structs
+
+// Custom value to string method to avoid C++11 dependency causing fopenmp problems in OSX
+template <typename T>
+string val_to_string( T Number ) {
+	ostringstream ss;
+	ss << Number;
+	return ss.str();
+}
+
 template <typename T>
 struct AABox {
 	T min;

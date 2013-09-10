@@ -42,7 +42,7 @@ struct TripInfo {
 	bool filesExist(){
 		string header = base_filename + string(".trip");
 		for(size_t i = 0; i< n_partitions; i++){
-			string part_data_filename = base_filename + string("_") + to_string(i) + string(".tripdata");
+			string part_data_filename = base_filename + string("_") + val_to_string(i) + string(".tripdata");
 			if(!file_exists(part_data_filename)){
 				return false;
 			}
