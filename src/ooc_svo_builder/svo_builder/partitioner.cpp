@@ -79,7 +79,7 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 TripInfo partition_one(const TriInfo& tri_info, const size_t gridsize){
 	// Just copy files
 	string src = tri_info.base_filename + string(".tridata");
-	string dst = tri_info.base_filename + to_string(gridsize) + string("_") + val_to_string(1) + string("_") + val_to_string(0) + string(".tripdata");
+	string dst = tri_info.base_filename + val_to_string(gridsize) + string("_") + val_to_string(1) + string("_") + val_to_string(0) + string(".tripdata");
 	copy_file(src,dst);
 
 	// Write header
