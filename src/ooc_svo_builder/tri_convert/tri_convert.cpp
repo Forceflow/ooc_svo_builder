@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 #include <tri_tools.h>
-#include "util.h"
+#include "tri_convert_util.h"
 
 using namespace std;
 using namespace trimesh;

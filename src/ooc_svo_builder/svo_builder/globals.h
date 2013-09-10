@@ -4,7 +4,7 @@
 // global header containing timers (this is a bit ugly, but it's a quick and surefire way to measure performance)
 #include <fstream>
 #include <iostream>
-#include "util.h"
+#include "svo_builder_util.h"
 
 using namespace std;
 
