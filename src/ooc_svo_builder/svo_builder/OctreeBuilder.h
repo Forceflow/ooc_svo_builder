@@ -3,7 +3,7 @@
 
 #include "globals.h"
 #include <tri_util.h>
-#include "util.h"
+#include "svo_builder_util.h"
 #include "morton.h"
 #include <stdio.h>
 #include <fstream>

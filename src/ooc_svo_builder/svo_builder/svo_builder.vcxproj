@@ -151,7 +151,7 @@
     <ClInclude Include="octree_io.h" />
     <ClInclude Include="partitioner.h" />
     <ClInclude Include="voxelizer.h" />
-    <ClInclude Include="util.h" />
+    <ClInclude Include="svo_builder_util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OctreeBuilder.cpp" />
