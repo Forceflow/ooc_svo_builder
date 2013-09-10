@@ -10,20 +10,27 @@ using namespace trimesh;
 // Simple timer to measure time, using CLOCKS_PER_SEC
 // Should work on all platforms, sacrificing some precision.
 struct Timer {
-	clock_t Begin;
+	clock_t Start;
+	clock_t Elapsed;
 	Timer(){
-		Begin = clock() * CLOCKS_PER_SEC;
+		Elapsed = 0;
+		Start = clock();
 	}
 	void reset(){
-		Begin = clock() * CLOCKS_PER_SEC;
+		Start = clock();
 	}
-	double getTimeMicroSeconds(){
-		clock_t End = clock() * CLOCKS_PER_SEC;
-		return (End - Begin);
+	void resetTotal(){
+		Elapsed = 0;
 	}
-	double getTimeMilliseconds(){
-		clock_t End = clock() * CLOCKS_PER_SEC;
-		return (End - Begin)/1000;
+	void start(){
+		Start = clock();
+	}
+	void stop(){
+		clock_t End = clock();
+		Elapsed = Elapsed + (End - Start);
+	}
+	double getTotalTimeSeconds() const{
+		return ((double) Elapsed)/ ((double) CLOCKS_PER_SEC);
 	}
 };
 

@@ -85,7 +85,7 @@ int main(int argc, char *argv[]){
 	cout << "Moving mesh to origin ... "; 
 	Timer timer = Timer();
 	for(size_t i = 0; i < themesh->vertices.size() ; i++){ themesh->vertices[i] = themesh->vertices[i] - mesh_bbox.min;}
-	cout << "done in " << timer.getTimeMilliseconds() << " ms." << endl;
+	cout << "done in " << timer.getTotalTimeSeconds() << " s." << endl;
 
 	// Write mesh to format we can stream in
 	string base = filename.substr(0,filename.find_last_of("."));
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]){
 		writeTriangle(tri_out,t);
 #endif
 	}
-	cout << "done in " << timer.getTimeMilliseconds() << " ms." << endl;
+	cout << "done in " << timer.getTotalTimeSeconds() << " ms." << endl;
 
 	// Prepare tri_info and write header
 	cout << "Writing header to " << tri_header_out_name << " ... " << endl;
