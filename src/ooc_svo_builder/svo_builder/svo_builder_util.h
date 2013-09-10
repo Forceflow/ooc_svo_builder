@@ -33,13 +33,6 @@ inline int isPowerOf2(unsigned int x){
   return ((x != 0) && !(x & (x - 1)));
 }
 
-template <typename T>
-string to_string( T Number ) {
-	ostringstream ss;
-	ss << Number;
-	return ss.str();
-}
-
 // Simple timer to measure time, using CLOCKS_PER_SEC
 // Should work on all platforms, sacrificing some precision.
 struct Timer {
