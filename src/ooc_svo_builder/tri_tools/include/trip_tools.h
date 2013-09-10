@@ -25,7 +25,7 @@ struct TripInfo {
 	// construct from TriInfo
 	TripInfo(const TriInfo &t) : base_filename(t.base_filename), version(t.version), geometry_only(t.geometry_only), gridsize(0), mesh_bbox(t.mesh_bbox), n_triangles(t.n_triangles), n_partitions(0) {} 
 
-	void print(){
+	void print() const{
 		cout << "  base_filename: " << base_filename << endl;
 		cout << "  trip version: " << version << endl;
 		cout << "  geometry only: " << geometry_only << endl;
@@ -39,7 +39,7 @@ struct TripInfo {
 		}
 	}
 
-	bool filesExist(){
+	bool filesExist() const{
 		string header = base_filename + string(".trip");
 		for(size_t i = 0; i< n_partitions; i++){
 			string part_data_filename = base_filename + string("_") + val_to_string(i) + string(".tripdata");

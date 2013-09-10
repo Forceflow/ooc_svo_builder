@@ -20,7 +20,7 @@ struct TriInfo{
 	TriInfo() : base_filename(""), version(version), geometry_only(geometry_only), n_triangles(0), mesh_bbox(AABox<vec3>()) {} // default constructor
 
 	// print out Tri information
-	void print(){
+	void print() const{
 		cout << "  base_filename: " << base_filename << endl;
 		cout << "  tri version: " << version << endl;
 		cout << "  geometry only: " << geometry_only << endl;
@@ -30,7 +30,7 @@ struct TriInfo{
 	}
 
 	// check if all files required by Tri exist
-	bool filesExist(){
+	bool filesExist() const{
 		string header = base_filename + string(".tri");
 		string tridata = base_filename + string(".tridata");
 		return (file_exists(header) && file_exists(tridata));
