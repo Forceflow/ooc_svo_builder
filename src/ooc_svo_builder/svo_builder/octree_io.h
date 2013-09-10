@@ -21,7 +21,7 @@ struct OctreeInfo {
 	OctreeInfo() : version(1), base_filename(string("")), gridlength(1024), n_nodes(0), n_data(0) {}
 	OctreeInfo(int version, string base_filename, size_t gridlength, size_t n_nodes, size_t n_data) : version(version), base_filename(base_filename), gridlength(gridlength), n_nodes(n_nodes), n_data(n_data) {} 
 
-	void print(){
+	void print() const{
 		cout << "  version: " << version << endl;
 		cout << "  base_filename: " << base_filename << endl;
 		cout << "  grid length: " << gridlength << endl;

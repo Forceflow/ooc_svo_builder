@@ -1,13 +1,13 @@
 #ifndef OCTREE_BUILDER_H_
 #define OCTREE_BUILDER_H_
 
-#include "globals.h"
-#include <tri_util.h>
-#include "svo_builder_util.h"
-#include "morton.h"
 #include <stdio.h>
 #include <fstream>
 #include <assert.h>
+#include <tri_util.h>
+#include "globals.h"
+#include "svo_builder_util.h"
+#include "morton.h"
 #include "octree_io.h"
 
 using namespace std;
@@ -33,16 +33,16 @@ public:
 	string base_filename;
 
 	OctreeBuilder(std::string base_filename, size_t gridlength, bool fast_empty, bool generate_levels);
-	void addDataPoint(uint64_t morton_number, DataPoint point);
+	void addDataPoint(const uint64_t morton_number, const DataPoint& point);
 	void finalizeTree();
 
 private:
 	bool isBufferEmpty(const vector<Node> &buffer);
 	Node groupNodes(const vector<Node> &buffer);
-	void addEmptyDataPoint(int buffer);
+	void addEmptyDataPoint(const int buffer);
 	int highestNonEmptyBuffer();
-	int computeBestFillBuffer(size_t budget);
-	void fastAddEmpty(size_t budget);
+	int computeBestFillBuffer(const size_t budget);
+	void fastAddEmpty(const size_t budget);
 };
 
 // Check if a buffer contains non-empty nodes
@@ -69,26 +69,24 @@ inline int OctreeBuilder::highestNonEmptyBuffer(){
 }
 
 // Compute the best fill buffer given the budget
-inline int OctreeBuilder::computeBestFillBuffer(size_t budget){
+inline int OctreeBuilder::computeBestFillBuffer(const size_t budget){
 	// which power of 8 fits in budget?
 	int budget_buffer_suggestion = b_maxdepth-findPowerOf8(budget);
 	// if our current guess is already b_maxdepth, return that, no need to test further
 	if(budget_buffer_suggestion == b_maxdepth){return b_maxdepth;}
-	// check highest empty buffer : there's a possibility to up the ante
-	int highest_nonempty_buffer = highestNonEmptyBuffer();
-	// best fill buffer is minimum of these
-	return max(budget_buffer_suggestion, highest_nonempty_buffer);
+	// best fill buffer is maximum of suggestion and highest non_empty buffer
+	return max(budget_buffer_suggestion, highestNonEmptyBuffer());
 }
 
 // A method to quickly add empty nodes
-inline void OctreeBuilder::fastAddEmpty(size_t budget){
-	while (budget > 0){
-		int buffer = computeBestFillBuffer(budget);
+inline void OctreeBuilder::fastAddEmpty(const size_t budget){
+	size_t r_budget = budget;
+	while (r_budget > 0){
+		int buffer = computeBestFillBuffer(r_budget);
 		addEmptyDataPoint(buffer);
 		size_t budget_hit = (size_t) pow(8.0,b_maxdepth-buffer);
-		budget = budget - budget_hit;
+		r_budget = r_budget - budget_hit;
 	}
-
 }
 
 #endif  // OCTREE_BUILDER_H_

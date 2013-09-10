@@ -22,7 +22,7 @@ using namespace std;
 // Program version
 string version = "1.1";
 
-// program parameters
+// Program parameters
 string filename = "";
 size_t gridsize = 1024;
 size_t memory_limit = 2048;
@@ -87,7 +87,7 @@ void printInvalid() {
 }
 
 // Parse command-line params and so some basic error checking on them
-void parseParameters(int argc, char* argv[], string& filename, size_t& gridsize, size_t& memory_limit, bool& verbose) {
+void parseProgramParameters(int argc, char* argv[], string& filename, size_t& gridsize, size_t& memory_limit, bool& verbose) {
 	cout << "Reading program parameters ..." << endl;
 	// Input argument validation
 	if (argc < 3) {
@@ -147,6 +147,7 @@ void parseParameters(int argc, char* argv[], string& filename, size_t& gridsize,
 	}
 }
 
+// Initialize all performance timers
 void setupTimers() {
 	main_timer = Timer();
 	algo_timer = Timer();
@@ -171,7 +172,7 @@ int main(int argc, char *argv[]) {
 
 	// Parse program parameters
 	printInfo();
-	parseParameters(argc, argv, filename, gridsize, memory_limit, verbose);
+	parseProgramParameters(argc, argv, filename, gridsize, memory_limit, verbose);
 
 	// Parse TRI header
 	io_timer_in.start();
@@ -216,9 +217,7 @@ int main(int argc, char *argv[]) {
 		cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
 		exit(0); // not all required files exist - exiting.
 	}
-	if (verbose) {
-		trip_info.print();
-	}
+	if (verbose) {trip_info.print();}
 	io_timer_in.stop(); // TIMING
 
 	// General voxelization calculations (stuff we need throughout voxelization process)
@@ -242,16 +241,12 @@ int main(int argc, char *argv[]) {
 			// open file to read triangles
 			std::string part_data_filename = trip_info.base_filename + string("_") + val_to_string(i) + string(".tripdata");
 			TriReader reader = TriReader(part_data_filename, trip_info.part_tricounts[i], min(trip_info.part_tricounts[i], input_buffersize));
-			if (verbose) {
-				cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl;
-			}
+			if (verbose) {cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl;}
 
 			// voxelize partition
 			size_t nfilled_before = nfilled;
 			voxelize_partition(reader, start, end, unitlength, &partitiondata, nfilled);
-			if (verbose) {
-				cout << "  found " << nfilled - nfilled_before << " new voxels." << endl;
-			}
+			if (verbose) {cout << "  found " << nfilled - nfilled_before << " new voxels." << endl;}
 
 			// build SVO
 			cout << "Building SVO for partition " << i << " ..." << endl;
@@ -266,12 +261,12 @@ int main(int argc, char *argv[]) {
 					d.normal = partitiondata[j].normal;
 #endif
 					// TODO: generating colors should go here.
-					builder.addDataPoint(morton_number, d);
+					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
 				}
 			}
 		}
 	}
-	builder.finalizeTree(); //finalize SVO so it gets written to disk
+	builder.finalizeTree(); // finalize SVO so it gets written to disk
 	algo_timer.stop(); // TIMING
 	cout << "done" << endl;
 
@@ -281,7 +276,5 @@ int main(int argc, char *argv[]) {
 	io_timer_out.stop(); // TIMING
 
 	main_timer.stop();
-	if (verbose) {
-		printTimerInfo();
-	}
+	if (verbose) {printTimerInfo();}
 }
