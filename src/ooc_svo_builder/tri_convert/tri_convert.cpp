@@ -125,7 +125,6 @@ int main(int argc, char *argv[]){
 		}
 #endif
 		writeTriangle(tri_out,t);
-
 	}
 	cout << "done in " << timer.getTotalTimeSeconds() << " ms." << endl;
 
