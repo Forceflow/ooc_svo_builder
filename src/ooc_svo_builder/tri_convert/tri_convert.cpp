@@ -46,7 +46,7 @@ void printInfo(){
 	cout << "-------------------------------------------------------------" << endl << endl;
 }
 
-void printHelp() {
+void printHelp(){
 	std::cout << "Example: tri_convert -f /home/jeroen/bunny.ply" << endl;
 	std::cout << "" << endl;
 	std::cout << "All available program options:" << endl;
@@ -63,11 +63,10 @@ void printInvalid(){
 
 void parseProgramParameters(int argc, char* argv[]){
 	// Input argument validation
-	if(argc<3){// not enough arguments
+	if(argc<3){ // not enough arguments
 		printInvalid(); exit(0);
 	} 
 	for (int i = 1; i < argc; i++) {
-			// parse filename
 			if (string(argv[i]) == "-f") {
 				filename = argv[i + 1]; 
 				i++;
@@ -91,15 +90,17 @@ int main(int argc, char *argv[]){
 
 	// Read mesh
 	TriMesh *themesh = TriMesh::read(filename.c_str());
-	themesh->need_faces();
-	themesh->need_bbox();
-	themesh->need_normals();
-	AABox<vec3> mesh_bbox = createMeshBBCube(themesh);
+	themesh->need_faces(); // unpack triangle strips so we have faces
+	themesh->need_bbox(); // compute the bounding box
+	themesh->need_normals(); // check if there are normals
+	AABox<vec3> mesh_bbox = createMeshBBCube(themesh); // pad the mesh BBOX out to be a cube
 
 	// Moving mesh to origin
 	cout << "Moving mesh to origin ... "; 
 	Timer timer = Timer();
-	for(size_t i = 0; i < themesh->vertices.size() ; i++){ themesh->vertices[i] = themesh->vertices[i] - mesh_bbox.min;}
+	for(size_t i = 0; i < themesh->vertices.size() ; i++){
+		themesh->vertices[i] = themesh->vertices[i] - mesh_bbox.min;
+	}
 	cout << "done in " << timer.getTotalTimeSeconds() << " s." << endl;
 
 	// Write mesh to format we can stream in
@@ -116,16 +117,15 @@ int main(int argc, char *argv[]){
 		t.v0 = themesh->vertices[themesh->faces[i][0]];
 		t.v1 = themesh->vertices[themesh->faces[i][1]];
 		t.v2 = themesh->vertices[themesh->faces[i][2]];
-#ifdef BINARY_VOXELIZATION
-		writeTriangle(tri_out,t);
-#else
+#ifndef BINARY_VOXELIZATION
 		if(recompute_normals){
 			t.normal = computeFaceNormal(themesh,i);
 		} else {
 			t.normal = getShadingFaceNormal(themesh,i);
 		}
-		writeTriangle(tri_out,t);
 #endif
+		writeTriangle(tri_out,t);
+
 	}
 	cout << "done in " << timer.getTotalTimeSeconds() << " ms." << endl;
 
