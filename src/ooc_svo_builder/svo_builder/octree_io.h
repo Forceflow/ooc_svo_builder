@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <fstream>
+#include <file_tools.h>
 #include "Node.h"
 #include "DataPoint.h"
 
@@ -27,6 +28,14 @@ struct OctreeInfo {
 		cout << "  grid length: " << gridlength << endl;
 		cout << "  n_nodes: " << n_nodes << endl;
 		cout << "  n_data: " << n_data << endl;
+	}
+
+	// check if all files required by Tri exist
+	bool filesExist() const{
+		string header = base_filename + string(".octree");
+		string nodes = base_filename + string(".octreenodes");
+		string data = base_filename + string(".octreedata");
+		return (file_exists(header) && file_exists(nodes) && file_exists(data));
 	}
 };
 

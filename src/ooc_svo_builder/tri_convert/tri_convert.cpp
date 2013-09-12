@@ -21,7 +21,7 @@ string version = "1.1";
 
 // Program parameters
 string filename = "";
-bool use_shading_normals = false;
+bool recompute_normals = false;
 
 void printInfo(){
 	cout << "-------------------------------------------------------------" << endl;
@@ -46,46 +46,62 @@ void printInfo(){
 	cout << "-------------------------------------------------------------" << endl << endl;
 }
 
-void printInvalid(){
-	std::cout << "Not enough or invalid arguments, please try again.\n" << endl; 
-	std::cout << "At the bare minimum, I need a path to a .PLY, .OBJ, .3DS, SM, RAY or .OFF file" << endl; 
-	std::cout << "For Example: tri_convert.exe -f /home/jeroen/bunny.ply" << endl;
+void printHelp(){
+	std::cout << "Example: tri_convert -f /home/jeroen/bunny.ply" << endl;
+	std::cout << "" << endl;
+	std::cout << "All available program options:" << endl;
+	std::cout << "" << endl;
+	std::cout << "-f <filename>         Path to a model input file (.ply, .obj, .3ds, .sm, .ray or .off)." << endl;
+	std::cout << "-r                    Recompute face normals." << endl;
+	std::cout << "-h                    Print help and exit." << endl;
 }
 
-void parseProgramParameters(int argc, char* argv[], string& filename){
+void printInvalid(){
+	std::cout << "Not enough or invalid arguments, please try again.\n" << endl; 
+	printHelp();
+}
+
+void parseProgramParameters(int argc, char* argv[]){
 	// Input argument validation
-	if(argc<3){// not enough argumentts
+	if(argc<3){ // not enough arguments
 		printInvalid(); exit(0);
 	} 
 	for (int i = 1; i < argc; i++) {
-			// parse filename
 			if (string(argv[i]) == "-f") {
 				filename = argv[i + 1]; 
 				i++;
+			} else if (string(argv[i]) == "-r") {
+				recompute_normals = true;
+			} else if(string(argv[i]) == "-h") {
+				printHelp(); exit(0);
 			} else {
 				printInvalid(); exit(0);
 			}
 	}
+	cout << "  filename: " << filename << endl;
+	cout << "  recompute normals: " << recompute_normals << endl;
 }
 
 int main(int argc, char *argv[]){
 	printInfo();
 
 	// Parse parameters
-	parseProgramParameters(argc,argv,filename);
+	parseProgramParameters(argc,argv);
 
 	// Read mesh
 	TriMesh *themesh = TriMesh::read(filename.c_str());
-	themesh->need_faces();
-	themesh->need_bbox();
-	themesh->need_normals();
-	AABox<vec3> mesh_bbox = createMeshBBCube(themesh);
+	themesh->need_faces(); // unpack triangle strips so we have faces
+	themesh->need_bbox(); // compute the bounding box
+	themesh->need_normals(); // check if there are normals
+	AABox<vec3> mesh_bbox = createMeshBBCube(themesh); // pad the mesh BBOX out to be a cube
 
 	// Moving mesh to origin
 	cout << "Moving mesh to origin ... "; 
 	Timer timer = Timer();
-	for(size_t i = 0; i < themesh->vertices.size() ; i++){ themesh->vertices[i] = themesh->vertices[i] - mesh_bbox.min;}
-	cout << "done in " << timer.getTimeMilliseconds() << " ms." << endl;
+	for(size_t i = 0; i < themesh->vertices.size() ; i++){
+		themesh->vertices[i] = themesh->vertices[i] - mesh_bbox.min;
+	}
+	cout << "done in " << timer.getTotalTimeSeconds() << " s." << endl;
 
 	// Write mesh to format we can stream in
 	string base = filename.substr(0,filename.find_last_of("."));
@@ -101,15 +117,16 @@ int main(int argc, char *argv[]){
 		t.v0 = themesh->vertices[themesh->faces[i][0]];
 		t.v1 = themesh->vertices[themesh->faces[i][1]];
 		t.v2 = themesh->vertices[themesh->faces[i][2]];
-#ifdef BINARY_VOXELIZATION
-		writeTriangle(tri_out,t);
-#else
-		t.normal = computeFaceNormal(themesh,i);
-		//t.normal = getShadingFaceNormal(themesh,i);
-		writeTriangle(tri_out,t);
+#ifndef BINARY_VOXELIZATION
+		if(recompute_normals){
+			t.normal = computeFaceNormal(themesh,i);
+		} else {
+			t.normal = getShadingFaceNormal(themesh,i);
+		}
 #endif
+		writeTriangle(tri_out,t);
 	}
-	cout << "done in " << timer.getTimeMilliseconds() << " ms." << endl;
+	cout << "done in " << timer.getTotalTimeSeconds() << " ms." << endl;
 
 	// Prepare tri_info and write header
 	cout << "Writing header to " << tri_header_out_name << " ... " << endl;
