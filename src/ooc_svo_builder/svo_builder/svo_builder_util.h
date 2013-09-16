@@ -5,11 +5,19 @@
 #include <vector>
 #include <sstream>
 #include <TriMesh.h>
+#include "morton.h"
 
 using namespace trimesh;
 using namespace std;
 
 // Various math/helper stuff
+
+// helper method to convert morton number to RGB color, for debug coloring purposes
+inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
+	int x,y,z;
+	mortonDecode(morton_number,z,y,x);
+	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
+}
 
 inline int findPowerOf8(size_t n){
 	if(n == 0){return 0;}
