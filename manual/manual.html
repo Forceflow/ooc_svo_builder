@@ -68,6 +68,14 @@ This release supports binary-only SVO building (only geometry, the default mode 
 <li><strong>-f (path to <em>.tri</em> file)</strong> : The path to the <em>.tri</em> file you want to build an SVO from. (Required)</li>
 <li><strong>-s (gridsize)</strong> : The grid size resolution for the SVO. Should be a power of 2. (Default: 1024)</li>
 <li><strong>-l (memory limit)</strong> : The memory limit for the SVO builder, in Mb. This is where the <em>out-of-core</em> part kicks in, of course. The tool will automatically select the most optimal partition size depending on the given memory limit. (Default: 2048)</li>
+<li><strong>-levels</strong> Generate intermediare SVO levels by averaging data from lower levels. You can use this if you not only want the leaf nodes to be filled with actual voxel data. (Default: off)</li>
+<li><strong>-c (color_mode)</strong> Generate colors for the voxels. Options for color mode: (Default: none)</li>
+<ul>
+<li><em>none</em> : Give all voxels the default white color.</li>
+<li><em>linear</em> : Give colors a linear RGB color related to their position in the grid. </li>
+<li><em>normal</em> : Get colors for voxels from sample normals of original triangles. </li>
+</ul>
+</li>
 <li><strong>-v</strong> Be very verbose, for debugging purposes.</li>
 </ul>
 <p><strong>Examples</strong></p>
