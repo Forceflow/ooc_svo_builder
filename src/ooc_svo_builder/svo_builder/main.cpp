@@ -74,7 +74,7 @@ void printHelp() {
 	std::cout << "-s <gridsize>         Voxel gridsize, should be a power of 2. Default 512." << endl;
 	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
 	std::cout << "-levels               Generate intermediary voxel levels by averaging voxel data" << endl;
-	std::cout << "-color <option>       Coloring of voxels (Options: none (default), linear, normal)" << endl;
+	std::cout << "-c <option>           Coloring of voxels (Options: none (default), linear, normal)" << endl;
 	std::cout << "-v                    Be very verbose." << endl;
 	std::cout << "-h                    Print help and exit." << endl;
 }
@@ -124,7 +124,7 @@ void parseProgramParameters(int argc, char* argv[], string& filename, size_t& gr
 			verbose = true;
 		} else if (string(argv[i]) == "-levels") {
 			generate_levels = true;
-		} else if (string(argv[i]) == "-color") {
+		} else if (string(argv[i]) == "-c") {
 			string color_input = string(argv[i+1]);
 #ifdef BINARY_VOXELIZATION
 			cout << "You asked to generate colors, but we're only doing binary voxelisation." << endl;
