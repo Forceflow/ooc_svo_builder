@@ -266,8 +266,12 @@ int main(int argc, char *argv[]) {
 					d.opacity = 1.0; // this voxel is filled
 #ifndef BINARY_VOXELIZATION
 					d.normal = partitiondata[j].normal;
-					if(color_generation == COLOR_LINEAR){
+					// generate colors for the voxels (for debugging purposes)
+					if(color_generation == COLOR_LINEAR){ // linear color scale
 						d.color = mortonToRGB(morton_number, gridsize);
+					} else if (color_generation == COLOR_NORMAL){ // color models using their normals
+						vec3 normal = normalize(d.normal);
+						d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
 					}
 #endif
 					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
