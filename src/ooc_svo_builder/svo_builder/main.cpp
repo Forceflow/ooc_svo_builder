@@ -19,6 +19,8 @@
 
 using namespace std;
 
+enum ColorGen {COLOR_NONE, COLOR_LINEAR, COLOR_NORMAL};
+
 // Program version
 string version = "1.1";
 
@@ -26,7 +28,7 @@ string version = "1.1";
 string filename = "";
 size_t gridsize = 1024;
 size_t memory_limit = 2048;
-bool generate_colors = false;
+ColorGen color_generation = COLOR_NONE;
 bool generate_levels = false;
 bool verbose = false;
 
@@ -38,10 +40,7 @@ TripInfo trip_info;
 size_t input_buffersize = 102400;
 
 // timers
-Timer main_timer;
-Timer algo_timer;
-Timer io_timer_in;
-Timer io_timer_out;
+Timer main_timer, algo_timer, io_timer_in, io_timer_out;
 
 void printInfo() {
 	cout << "--------------------------------------------------------------------" << endl;
@@ -75,7 +74,7 @@ void printHelp() {
 	std::cout << "-s <gridsize>         Voxel gridsize, should be a power of 2. Default 512." << endl;
 	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
 	std::cout << "-levels               Generate intermediary voxel levels by averaging voxel data" << endl;
-	std::cout << "-colors               Generate linear color scale for voxels." << endl;
+	std::cout << "-color <option>       Coloring of voxels (Options: none (default), linear, normal)" << endl;
 	std::cout << "-v                    Be very verbose." << endl;
 	std::cout << "-h                    Print help and exit." << endl;
 }
@@ -125,12 +124,20 @@ void parseProgramParameters(int argc, char* argv[], string& filename, size_t& gr
 			verbose = true;
 		} else if (string(argv[i]) == "-levels") {
 			generate_levels = true;
-		} else if (string(argv[i]) == "-colors") {
+		} else if (string(argv[i]) == "-color") {
+			string color_input = string(argv[i+1]);
 #ifdef BINARY_VOXELIZATION
 			cout << "You asked to generate colors, but we're only doing binary voxelisation." << endl;
 #else
-			generate_colors = true;
+			if(color_input == "linear") {
+				color_generation = COLOR_LINEAR;
+			} else if(color_input == "normal") { 
+				color_generation = COLOR_NORMAL;
+			} else {
+				cout << "Unrecognized color switch: " << color_input << ", so reverting to no colors." << endl;
+			}
 #endif
+			i++;
 		} else if (string(argv[i]) == "-h") {
 			printHelp(); exit(0);
 		} else {
@@ -141,7 +148,7 @@ void parseProgramParameters(int argc, char* argv[], string& filename, size_t& gr
 		cout << "  filename: " << filename << endl;
 		cout << "  gridsize: " << gridsize << endl;
 		cout << "  memory limit: " << memory_limit << endl;
-		cout << "  generate colors: " << generate_colors << endl;
+		cout << "  generate colors: " << color_generation << endl;
 		cout << "  generate levels: " << generate_levels << endl;
 		cout << "  verbosity: " << verbose << endl;
 	}
@@ -158,7 +165,7 @@ void setupTimers() {
 // Printout total time of running Timers (for debugging purposes)
 void printTimerInfo() {
 	double diff = main_timer.getTotalTimeSeconds() - (algo_timer.getTotalTimeSeconds() + io_timer_in.getTotalTimeSeconds() + io_timer_out.getTotalTimeSeconds());
-	cout << "Total MAIN time      : " << main_timer.getTotalTimeSeconds() << endl;
+	cout << "Total MAIN time      : " << main_timer.getTotalTimeSeconds() << " s." << endl;
 	cout << "Total IO IN time     : " << io_timer_in.getTotalTimeSeconds() << " s." << endl;
 	cout << "Total algorithm time : " << algo_timer.getTotalTimeSeconds() << " s." << endl;
 	cout << "Total IO OUT time    : " << io_timer_out.getTotalTimeSeconds() << " s." << endl;
@@ -259,8 +266,10 @@ int main(int argc, char *argv[]) {
 					d.opacity = 1.0; // this voxel is filled
 #ifndef BINARY_VOXELIZATION
 					d.normal = partitiondata[j].normal;
+					if(color_generation == COLOR_LINEAR){
+						d.color = mortonToRGB(morton_number, gridsize);
+					}
 #endif
-					// TODO: generating colors should go here.
 					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
 				}
 			}
