@@ -42,9 +42,11 @@ struct TripInfo {
 	bool filesExist() const{
 		string header = base_filename + string(".trip");
 		for(size_t i = 0; i< n_partitions; i++){
-			string part_data_filename = base_filename + string("_") + val_to_string(i) + string(".tripdata");
-			if(!file_exists(part_data_filename)){
-				return false;
+			if(part_tricounts[i] > 0){ // we only require the file to be there if it contains any triangles.
+				string part_data_filename = base_filename + string("_") + val_to_string(i) + string(".tripdata");
+				if(!file_exists(part_data_filename)){
+					return false;
+				}
 			}
 		}
 		return (file_exists(header));
