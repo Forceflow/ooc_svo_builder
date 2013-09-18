@@ -19,7 +19,9 @@ OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool 
 		algo_timer.stop(); io_timer_out.start(); // TIMING
 		writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
-		writeDataPoint(data_out, DataPoint(), b_data_pos); // second data point is NULL, all voxels refer to this if binary voxelization only
+		// second data point is NULL, all voxels refer to this if binary voxelization only
+		// This point has no color and opacity of 0.0 - will not show up in rendering
+		writeDataPoint(data_out, DataPoint(), b_data_pos); 
 #endif
 		io_timer_out.stop(); algo_timer.start(); // TIMING
 }
