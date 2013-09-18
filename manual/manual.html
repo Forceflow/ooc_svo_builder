@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>ooc_svo_builder manual - v1.0</title>
+<title>ooc_svo_builder manual - v1.1</title>
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -17,7 +17,7 @@
 </head>
 
 <body>
-<h1>Out-Of-Core Sparse Voxel Octree Builder v1.0 - Implementation</h1>
+<h1>Out-Of-Core Sparse Voxel Octree Builder v1.1 - Implementation</h1>
 Jeroen Baert - Department of Computer Science, KU Leuven, Belgium</br>
 jeroen.baert (at) cs.kuleuven.be - <a href="http://www.forceflow.be">website</a> - <a href="http://www.twitter.com/jbaert">@jbaert</a></p>
 
@@ -38,8 +38,13 @@ document.writeln("</p>");
 <p>This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, <em>Out Of Core Construction of Sparse Voxel Octrees</em>. The paper and additional material can be found on the <a href="http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/">project page</a>.</p>
 
 <h1>Code / Dependencies</h1>
-<p>The current release contains <strong>x64 binaries for windows</strong>, and a Visual Studio 2012 project and sources hosted <a href="https://github.com/Forceflow/ooc_svo_builder">on Github here</a> if you want to build the tools yourself. There's a free <a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products">VS Studio 2012 Express edition</a> available.</br>
-The code should compile on Linux as well, but I'm currently not supporting this with makefiles. I will accept patches to fix Linux compilation issues, though, and move to cmake soon.</br>
+<p>The current ooc_svo_builder release consists of:</p>
+<ul>
+<li>Precompiled <a href="https://github.com/Forceflow/ooc_svo_builder/releases">binaries</a> for Win64 and Linux64</li>
+<li>Source code <a href="https://github.com/Forceflow/ooc_svo_builder">on Github</a>.</li>
+<li>Visual Studio 2012 project files, Linux build scripts (sh) and Cmake files for OSX included.</li>
+</ul>
+For Linux and OSX, the standard gcc/clang toolchain will do. For Windows64, VS2012 is required - there's a free <a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products">VS Studio 2012 Express edition</a> available.</br>
 </br>
 The only <strong>dependency</strong> for compiling from source is the <a href="http://gfx.cs.princeton.edu/proj/trimesh2/">Trimesh2 library</a> by Szymon Rusinkiewicz, which is used for input/output of triangle meshes and the vector math. It has been statically linked in the binaries.</p>
 <p>
