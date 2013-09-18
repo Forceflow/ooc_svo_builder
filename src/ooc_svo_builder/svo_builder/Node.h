@@ -4,11 +4,6 @@
 #pragma once
 
 #include "DataPoint.h"
-#ifdef __APPLE__
-#include <tr1/cstdint>
-#else
-#include <cstdint>
-#endif //
 
 #define NOCHILD -1
 #define NODATA 0
