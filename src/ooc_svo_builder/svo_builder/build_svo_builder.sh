@@ -4,10 +4,10 @@
 TRIMESH_DIR=/home/jeroen/development/trimesh2
 
 ## COMPILE AND LINK DEFINITIONS
-COMPILE="g++ -c -O3 -std=c++11 -I../tri_tools/include/ -I ${TRIMESH_DIR}/include/"
-COMPILE_BINARY="g++ -c -O3 -std=c++11 -I../tri_tools/include/ -I ${TRIMESH_DIR}/include/ -D BINARY_VOXELIZATION"
-LINK="g++ -o svo_builder"
-LINK_BINARY="g++ -o svo_builder_binary"
+COMPILE="g++ -g -c -O3 -I../tri_tools/include/ -I ${TRIMESH_DIR}/include/"
+COMPILE_BINARY="g++ -c -O3 -I../tri_tools/include/ -I ${TRIMESH_DIR}/include/ -D BINARY_VOXELIZATION"
+LINK="g++ -g -o svo_builder"
+LINK_BINARY="g++ -g -o svo_builder_binary"
 
 #############################################################################################
 ## BUILDING STARTS HERE
