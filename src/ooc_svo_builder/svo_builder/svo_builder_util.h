@@ -19,6 +19,15 @@ inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
 
+// TODO: make this more general
+inline vec3 averageVec3(const vec3 v0, const vec3 v1, const vec3 v2){
+	vec3 answer;
+	answer[0] = (v0[0] + v1[0] + v2[0]) / 3.0f;
+	answer[1] = (v0[1] + v1[1] + v2[2]) / 3.0f;
+	answer[2] = (v0[2] + v1[2] + v2[3]) / 3.0f;
+	return answer;
+}
+
 inline int findPowerOf8(size_t n){
 	if(n == 0){return 0;}
 	int highest_index = 0;
