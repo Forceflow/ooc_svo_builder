@@ -39,68 +39,36 @@ struct TriInfo{
 
 // FSTREAM IO for Triangles
 inline void readTriangle(ifstream &file, Triangle &t){
-#ifdef BINARY_VOXELIZATION
-	file.read(reinterpret_cast<char*> (& t.v0[0]), 9*sizeof(float));
-#else
-	file.read(reinterpret_cast<char*> (& t.v0[0]), 12*sizeof(float));
-#endif
+	file.read(reinterpret_cast<char*> (& t.v0[0]), TRIANGLE_SIZE*sizeof(float));
 }
 
 inline void readTriangles(ifstream &file, Triangle &t, size_t howmany){
-#ifdef BINARY_VOXELIZATION
-	file.read(reinterpret_cast<char*> (& t.v0[0]), howmany*9*sizeof(float));
-#else
-	file.read(reinterpret_cast<char*> (& t.v0[0]), howmany*12*sizeof(float));
-#endif
+	file.read(reinterpret_cast<char*> (& t.v0[0]), howmany*TRIANGLE_SIZE*sizeof(float));
 }
 
 inline void writeTriangle(ofstream &file, Triangle &t){
-#ifdef BINARY_VOXELIZATION
-	file.write(reinterpret_cast<char*> (& t.v0[0]), 9*sizeof(float));
-#else
-	file.write(reinterpret_cast<char*> (& t.v0[0]), 12*sizeof(float));
-#endif
+	file.write(reinterpret_cast<char*> (& t.v0[0]), TRIANGLE_SIZE*sizeof(float));
 }
 
 inline void writeTriangles(ofstream &file, Triangle &t, size_t howmany){
-#ifdef BINARY_VOXELIZATION
-	file.write(reinterpret_cast<char*> (& t.v0[0]), howmany*9*sizeof(float));
-#else
-	file.write(reinterpret_cast<char*> (& t.v0[0]), howmany*12*sizeof(float));
-#endif
+	file.write(reinterpret_cast<char*> (& t.v0[0]), howmany*TRIANGLE_SIZE*sizeof(float));
 }
 
 // STDIO IO for Triangles
 inline void readTriangle(FILE* f, Triangle &t){
-#ifdef BINARY_VOXELIZATION
-	fread(&t, 9*sizeof(float), 1, f);
-#else
-	fread(&t, 12*sizeof(float), 1, f);
-#endif
+	fread(&t, TRIANGLE_SIZE*sizeof(float), 1, f);
 }
 
 inline void readTriangles(FILE* f, Triangle &t, size_t howmany){
-#ifdef BINARY_VOXELIZATION
-	fread(&t, 9*sizeof(float), howmany, f);
-#else
-	fread(&t, 12*sizeof(float), howmany, f);
-#endif
+	fread(&t, TRIANGLE_SIZE*sizeof(float), howmany, f);
 }
 
 inline void writeTriangle(FILE* f, Triangle &t){
-#ifdef BINARY_VOXELIZATION
-	fwrite(&t, 9*sizeof(float), 1, f);
-#else
-	fwrite(&t, 12*sizeof(float), 1, f);
-#endif
+	fwrite(&t, TRIANGLE_SIZE*sizeof(float), 1, f);
 }
 
 inline void writeTriangles(FILE* f, Triangle &t, size_t howmany){
-#ifdef BINARY_VOXELIZATION
-	fwrite(&t, 9*sizeof(float), howmany, f);
-#else
-	fwrite(&t, 12*sizeof(float), howmany, f);
-#endif
+	fwrite(&t, TRIANGLE_SIZE*sizeof(float), howmany, f);
 }
 
 // Parsing a .tri header filem store info in TriInfo struct

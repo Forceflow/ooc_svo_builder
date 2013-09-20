@@ -74,7 +74,7 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 #ifdef BINARY_VOXELIZATION
 								(*data)[index-morton_start] = VoxelData(true);
 #else
-								(*data)[index-morton_start] = VoxelData(true, t.normal);
+							(*data)[index-morton_start] = VoxelData(true, t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color));
 #endif
 							nfilled++;
 							continue;
@@ -86,7 +86,7 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 #ifdef BINARY_VOXELIZATION
 								(*data)[index-morton_start] = VoxelData(true);
 #else
-								(*data)[index-morton_start] = VoxelData(true, t.normal);
+								(*data)[index-morton_start] = VoxelData(true, t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color));
 #endif
 							nfilled++;
 							continue;
@@ -107,7 +107,7 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 #ifdef BINARY_VOXELIZATION
 								(*data)[index-morton_start] = VoxelData(true);
 #else
-								(*data)[index-morton_start] = VoxelData(true, t.normal);
+								(*data)[index-morton_start] = VoxelData(true, t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color));
 #endif
 								nfilled++;
 								continue;

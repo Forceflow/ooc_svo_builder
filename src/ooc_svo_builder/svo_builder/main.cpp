@@ -19,7 +19,7 @@
 
 using namespace std;
 
-enum ColorGen {COLOR_NONE, COLOR_LINEAR, COLOR_NORMAL};
+enum ColorType {COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL};
 
 // Program version
 string version = "1.1";
@@ -28,7 +28,8 @@ string version = "1.1";
 string filename = "";
 size_t gridsize = 1024;
 size_t memory_limit = 2048;
-ColorGen color_generation = COLOR_NONE;
+ColorType color = COLOR_FROM_MODEL;
+vec3 fixed_color = vec3(1.0f,1.0f,1.0f); // fixed color is white
 bool generate_levels = false;
 bool verbose = false;
 
@@ -74,7 +75,7 @@ void printHelp() {
 	std::cout << "-s <gridsize>         Voxel gridsize, should be a power of 2. Default 512." << endl;
 	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
 	std::cout << "-levels               Generate intermediary voxel levels by averaging voxel data" << endl;
-	std::cout << "-c <option>           Coloring of voxels (Options: none (default), linear, normal)" << endl;
+	std::cout << "-c <option>           Coloring of voxels (Options: from_model (default), fixed, linear, normal)" << endl;
 	std::cout << "-v                    Be very verbose." << endl;
 	std::cout << "-h                    Print help and exit." << endl;
 }
@@ -86,7 +87,7 @@ void printInvalid() {
 }
 
 // Parse command-line params and so some basic error checking on them
-void parseProgramParameters(int argc, char* argv[], string& filename, size_t& gridsize, size_t& memory_limit, bool& verbose) {
+void parseProgramParameters(int argc, char* argv[]) {
 	cout << "Reading program parameters ..." << endl;
 	// Input argument validation
 	if (argc < 3) {
@@ -130,9 +131,9 @@ void parseProgramParameters(int argc, char* argv[], string& filename, size_t& gr
 			cout << "You asked to generate colors, but we're only doing binary voxelisation." << endl;
 #else
 			if(color_input == "linear") {
-				color_generation = COLOR_LINEAR;
+				color = COLOR_LINEAR;
 			} else if(color_input == "normal") { 
-				color_generation = COLOR_NORMAL;
+				color = COLOR_NORMAL;
 			} else {
 				cout << "Unrecognized color switch: " << color_input << ", so reverting to no colors." << endl;
 			}
@@ -148,7 +149,7 @@ void parseProgramParameters(int argc, char* argv[], string& filename, size_t& gr
 		cout << "  filename: " << filename << endl;
 		cout << "  gridsize: " << gridsize << endl;
 		cout << "  memory limit: " << memory_limit << endl;
-		cout << "  generate colors: " << color_generation << endl;
+		cout << "  color type: " << color << endl;
 		cout << "  generate levels: " << generate_levels << endl;
 		cout << "  verbosity: " << verbose << endl;
 	}
@@ -179,7 +180,7 @@ int main(int argc, char *argv[]) {
 
 	// Parse program parameters
 	printInfo();
-	parseProgramParameters(argc, argv, filename, gridsize, memory_limit, verbose);
+	parseProgramParameters(argc, argv);
 
 	// Parse TRI header
 	io_timer_in.start();
@@ -265,14 +266,22 @@ int main(int argc, char *argv[]) {
 					d = DataPoint();
 					d.opacity = 1.0; // this voxel is filled
 #ifndef BINARY_VOXELIZATION
+					// NORMALS
 					d.normal = partitiondata[j].normal;
-					// generate colors for the voxels (for debugging purposes)
-					if(color_generation == COLOR_LINEAR){ // linear color scale
+					
+					// COLORS
+					d.color = partitiondata[j].color;
+					// override colors: generate colors for the voxels (for debugging purposes)
+					if(color == COLOR_FIXED){
+						d.color = fixed_color;
+					} else if(color == COLOR_LINEAR){ // linear color scale
 						d.color = mortonToRGB(morton_number, gridsize);
-					} else if (color_generation == COLOR_NORMAL){ // color models using their normals
+					} else if (color == COLOR_NORMAL){ // color models using their normals
 						vec3 normal = normalize(d.normal);
 						d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
 					}
+
+
 #endif
 					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
 				}
