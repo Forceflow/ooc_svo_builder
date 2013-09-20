@@ -92,7 +92,10 @@ int main(int argc, char *argv[]){
 	TriMesh *themesh = TriMesh::read(filename.c_str());
 	themesh->need_faces(); // unpack triangle strips so we have faces
 	themesh->need_bbox(); // compute the bounding box
-	themesh->need_normals(); // check if there are normals
+#ifndef BINARY_VOXELIZATION
+	themesh->need_normals(); // check if there are normals, and if not, recompute them
+	// TODO: Check for colors here, inform user about decision
+#endif
 	AABox<vec3> mesh_bbox = createMeshBBCube(themesh); // pad the mesh BBOX out to be a cube
 
 	// Moving mesh to origin
@@ -118,10 +121,18 @@ int main(int argc, char *argv[]){
 		t.v1 = themesh->vertices[themesh->faces[i][1]];
 		t.v2 = themesh->vertices[themesh->faces[i][2]];
 #ifndef BINARY_VOXELIZATION
+		// COLLECT VERTEX COLORS
+		// TODO: Make this user-switchable (in case you want to ignore colors from mesh)
+		if(!themesh->colors.empty()){ // if this mesh has colors, we're going to use them
+			t.v0_color = themesh->colors[themesh->faces[i][0]];
+			t.v1_color = themesh->colors[themesh->faces[i][1]];
+			t.v2_color = themesh->colors[themesh->faces[i][2]];
+		} 
+		// COLLECT NORMALS
 		if(recompute_normals){
-			t.normal = computeFaceNormal(themesh,i);
+			t.normal = computeFaceNormal(themesh,i); // recompute normals
 		} else {
-			t.normal = getShadingFaceNormal(themesh,i);
+			t.normal = getShadingFaceNormal(themesh,i); // use mesh provided normals
 		}
 #endif
 		writeTriangle(tri_out,t);

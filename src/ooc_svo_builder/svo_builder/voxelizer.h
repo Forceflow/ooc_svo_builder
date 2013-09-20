@@ -10,8 +10,8 @@
 // Voxelization-related stuff
 
 using namespace std;
-
 // This struct defines VoxelData for our voxelizer - this is defined different depending on compile project
+// This is the main memory hogger: the less data you store here, the better.
 #ifdef BINARY_VOXELIZATION
 struct VoxelData{
 	bool filled;
@@ -22,8 +22,9 @@ struct VoxelData{
 struct VoxelData{
 	bool filled;
 	vec3 normal;
-	VoxelData(): filled(false),normal(vec3(0.0f,0.0f,0.0f)){}
-	VoxelData(bool filled, vec3 normal): filled(filled),normal(normal){}
+	vec3 color;
+	VoxelData(): filled(false), normal(vec3(0.0f,0.0f,0.0f)), color(vec3(0.0f,0.0f,0.0f)){}
+	VoxelData(bool filled, vec3 normal, vec3 color): filled(filled), normal(normal), color(color){}
 };
 #endif
 
