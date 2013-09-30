@@ -19,12 +19,12 @@ inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
 
-// TODO: make this more general
-inline vec3 averageVec3(const vec3 v0, const vec3 v1, const vec3 v2){
-	vec3 answer;
-	answer[0] = (v0[0] + v1[0] + v2[0]) / 3.0f;
-	answer[1] = (v0[1] + v1[1] + v2[2]) / 3.0f;
-	answer[2] = (v0[2] + v1[2] + v2[3]) / 3.0f;
+template <size_t D, class T>
+inline Vec<D,T> average3Vec(const Vec<D,T> v0, const Vec<D,T> v1, const Vec<D,T> v2){
+	Vec<D,T> answer;
+	for (size_t i = 0; i < D; i++){
+		answer[i] = (v0[i] + v1[i] + v2[i]) / 3.0f;
+	}
 	return answer;
 }
 
