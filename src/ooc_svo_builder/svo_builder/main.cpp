@@ -231,7 +231,19 @@ int main(int argc, char *argv[]) {
 	// General voxelization calculations (stuff we need throughout voxelization process)
 	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float) trip_info.gridsize;
 	uint64_t morton_part = (trip_info.gridsize * trip_info.gridsize * trip_info.gridsize) / trip_info.n_partitions;
-	VoxelData* partitiondata = new VoxelData[(size_t) morton_part];
+	
+	// Storage for voxel references (STATIC)
+#ifdef BINARY_VOXELIZATION
+	bool* voxels = new bool[(size_t) morton_part];
+#else
+	size_t* voxels = new size_t[(size_t) morton_part];
+#endif 
+	// Storage for voxel data (DYNAMIC)
+	vector<VoxelData> voxel_data;
+	
+
+	
+	
 	size_t nfilled = 0;
 
 	// create Octreebuilder which will output our SVO
