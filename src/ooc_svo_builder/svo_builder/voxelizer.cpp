@@ -70,7 +70,7 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 
 					assert(index-morton_start < (morton_end-morton_start));
 					
-					if(voxels[index-morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
+					if(! voxels[index-morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
 
 					vec3 middle_point = vec3((x+0.5f)*unitlength,(y+0.5f)*unitlength,(z+0.5f)*unitlength);
 					

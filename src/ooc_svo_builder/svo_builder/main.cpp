@@ -279,11 +279,11 @@ int main(int argc, char *argv[]) {
 					d = DataPoint();
 					d.opacity = 1.0; // this voxel is filled
 #ifndef BINARY_VOXELIZATION
+					VoxelData& current_data = voxel_data.at(voxels[j]);
 					// NORMALS
-					d.normal = partitiondata[j].normal;
-					
+					d.normal = current_data.normal;
 					// COLORS
-					d.color = partitiondata[j].color;
+					d.color = current_data.color;
 					// override colors: generate colors for the voxels (for debugging purposes)
 					if(color == COLOR_FIXED){
 						d.color = fixed_color;
