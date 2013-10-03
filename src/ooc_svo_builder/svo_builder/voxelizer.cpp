@@ -4,12 +4,19 @@ using namespace std;
 using namespace trimesh;
 
 // Implementation of http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.6294 (Huang et al.)
-// by Jeroen Baert - jeroen.baert@cs.kuleuven.be
 // Adapted for mortoncode -based subgrids
-//
-void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, VoxelData** data, size_t &nfilled){
-	// clear partition
-	memset(*data,0,(morton_end-morton_start)*sizeof(VoxelData));
+// 
+// by Jeroen Baert - jeroen.baert@cs.kuleuven.be
+
+#ifdef BINARY_VOXELIZATION
+void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
+	memset(voxels,0,(morton_end-morton_start)*sizeof(bool));
+#else
+void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
+	memset(voxels,0,(morton_end-morton_start)*sizeof(size_t));
+	voxel_data.clear();
+#endif
+
 	// compute partition min and max in grid coords
 	AABox<ivec3> p_bbox_grid;
 	mortonDecode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
@@ -63,7 +70,7 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 
 					assert(index-morton_start < (morton_end-morton_start));
 					
-					if((*data)[index-morton_start].filled){ continue; } // already marked, continue
+					if(voxels[index-morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
 
 					vec3 middle_point = vec3((x+0.5f)*unitlength,(y+0.5f)*unitlength,(z+0.5f)*unitlength);
 					
@@ -72,9 +79,10 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 						isPointInSphere(middle_point,sphere1) || 
 						isPointInSphere(middle_point,sphere2)){
 #ifdef BINARY_VOXELIZATION
-								(*data)[index-morton_start] = VoxelData(true);
+							voxels[index-morton_start] = true;
 #else
-							(*data)[index-morton_start] = VoxelData(true, t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color));
+							voxel_data.push_back(VoxelData(t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color)));
+							voxels[index-morton_start] = voxel_data.size()-1;
 #endif
 							nfilled++;
 							continue;
@@ -84,9 +92,10 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 						isPointinCylinder(middle_point,cyl1) ||
 						isPointinCylinder(middle_point,cyl2)){
 #ifdef BINARY_VOXELIZATION
-								(*data)[index-morton_start] = VoxelData(true);
+							voxels[index-morton_start] = true;
 #else
-								(*data)[index-morton_start] = VoxelData(true, t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color));
+							voxel_data.push_back(VoxelData(t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color)));
+							voxels[index-morton_start] = voxel_data.size()-1;
 #endif
 							nfilled++;
 							continue;
@@ -101,13 +110,14 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 					//construct G and H and check if point is between these planes
 					if(isPointBetweenParallelPlanes(middle_point,Plane(S.normal, S.D+tc),Plane(S.normal,S.D-tc))){
 						float s1 = (S.normal CROSS (t.v1-t.v0)) DOT (middle_point-t.v0); // (normal of E1) DOT (vector middlepoint->point on surf)
-						float s2 = (S.normal CROSS (t.v2-t.v1)) DOT (middle_point-t.v1); // (normal of E2) DOT (vector middlepoint->point on surf)
-						float s3 = (S.normal CROSS (t.v0-t.v2)) DOT (middle_point-t.v2); // (normal of E3) DOT (vector middlepoint->point on surf)
+						float s2 = (S.normal CROSS (t.v2-t.v1)) DOT (middle_point-t.v1);
+						float s3 = (S.normal CROSS (t.v0-t.v2)) DOT (middle_point-t.v2);
 						if( ((s1<=0) == (s2<=0)) && ((s2<=0) == (s3<=0)) ){
 #ifdef BINARY_VOXELIZATION
-								(*data)[index-morton_start] = VoxelData(true);
+							voxels[index-morton_start] = true;
 #else
-								(*data)[index-morton_start] = VoxelData(true, t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color));
+							voxel_data.push_back(VoxelData(t.normal, averageVec3(t.v0_color,t.v1_color,t.v2_color)));
+							voxels[index-morton_start] = voxel_data.size()-1;
 #endif
 								nfilled++;
 								continue;

@@ -234,16 +234,13 @@ int main(int argc, char *argv[]) {
 	
 	// Storage for voxel references (STATIC)
 #ifdef BINARY_VOXELIZATION
-	bool* voxels = new bool[(size_t) morton_part];
+	bool* voxels = new bool[(size_t) morton_part]; // TODO: If you want tighter packing, check the Frankensteiny that is vector<bool>
 #else
 	size_t* voxels = new size_t[(size_t) morton_part];
-#endif 
 	// Storage for voxel data (DYNAMIC)
 	vector<VoxelData> voxel_data;
-	
+#endif 
 
-	
-	
 	size_t nfilled = 0;
 
 	// create Octreebuilder which will output our SVO
@@ -265,7 +262,11 @@ int main(int argc, char *argv[]) {
 
 			// voxelize partition
 			size_t nfilled_before = nfilled;
-			voxelize_partition(reader, start, end, unitlength, &partitiondata, nfilled);
+#ifdef BINARY_VOXELIZATION
+			voxelize_partition(reader, start, end, unitlength, voxels, nfilled);
+#else
+			voxelize_partition(reader, start, end, unitlength, voxels, voxel_data, nfilled);
+#endif
 			if (verbose) {cout << "  found " << nfilled - nfilled_before << " new voxels." << endl;}
 
 			// build SVO
@@ -273,7 +274,7 @@ int main(int argc, char *argv[]) {
 			uint64_t morton_number;
 			DataPoint d;
 			for (size_t j = 0; j < morton_part; j++) {
-				if (partitiondata[j].filled) {
+				if (! voxels[j] == EMPTY_VOXEL) {
 					morton_number = start + j;
 					d = DataPoint();
 					d.opacity = 1.0; // this voxel is filled
@@ -292,8 +293,6 @@ int main(int argc, char *argv[]) {
 						vec3 normal = normalize(d.normal);
 						d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
 					}
-
-
 #endif
 					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
 				}

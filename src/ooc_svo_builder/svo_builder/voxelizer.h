@@ -12,22 +12,19 @@
 using namespace std;
 // This struct defines VoxelData for our voxelizer - this is defined different depending on compile project
 // This is the main memory hogger: the less data you store here, the better.
-#ifdef BINARY_VOXELIZATION
 struct VoxelData{
-	bool filled;
-	VoxelData(): filled(false){}
-	VoxelData(bool filled): filled(filled){}
-};
-#else
-struct VoxelData{
-	bool filled;
 	vec3 normal;
 	vec3 color;
-	VoxelData(): filled(false), normal(vec3(0.0f,0.0f,0.0f)), color(vec3(0.0f,0.0f,0.0f)){}
-	VoxelData(bool filled, vec3 normal, vec3 color): filled(filled), normal(normal), color(color){}
+	VoxelData(): normal(vec3(0.0f,0.0f,0.0f)), color(vec3(0.0f,0.0f,0.0f)){}
+	VoxelData(vec3 normal, vec3 color): normal(normal), color(color){}
 };
-#endif
 
-void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, VoxelData** data, size_t &nfilled);
+#ifdef BINARY_VOXELIZATION
+#define EMPTY_VOXEL false // false means no voxel
+void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled);
+#else
+#define EMPTY_VOXEL 0 // false means no voxel
+void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled);
+#endif
 
 #endif // VOXELIZER_H_
