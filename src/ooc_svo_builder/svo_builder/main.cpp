@@ -38,7 +38,7 @@ TriInfo tri_info;
 TripInfo trip_info;
 
 // buffer_size
-size_t input_buffersize = 102400;
+size_t input_buffersize = 500000;
 
 // timers
 Timer main_timer, algo_timer, io_timer_in, io_timer_out;
@@ -237,8 +237,7 @@ int main(int argc, char *argv[]) {
 	bool* voxels = new bool[(size_t) morton_part]; // TODO: If you want tighter packing, check the Frankensteiny that is vector<bool>
 #else
 	size_t* voxels = new size_t[(size_t) morton_part];
-	// Storage for voxel data (DYNAMIC)
-	vector<VoxelData> voxel_data;
+	vector<VoxelData> voxel_data; // Storage for voxel data (DYNAMIC)
 #endif 
 
 	size_t nfilled = 0;
