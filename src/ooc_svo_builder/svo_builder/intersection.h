@@ -7,11 +7,8 @@
 #include "geometry_primitives.h"
 
 // Intersection methods
-
-inline void computeBoundingBox(const vec3 &v0, const vec3 &v1, const vec3 &v2, AABox<vec3> &box){
-	// TriMesh library has componentwise min/max, use that
-	box.min = min(v0,min(v1,v2));
-	box.max = max(v0,max(v1,v2));
+inline AABox<vec3> computeBoundingBox(const vec3 &v0, const vec3 &v1, const vec3 &v2){
+	return AABox<vec3>(min(v0,min(v1,v2)),max(v0,max(v1,v2)));
 }
 
 inline bool isPointBetweenParallelPlanes(const vec3 &point, const Plane &a, const Plane &b){
@@ -38,7 +35,7 @@ inline bool isPointinCylinder(const vec3 &point, const Cylinder &cyl){
 	}
 	vec3 dist = AX - dot*AB; 
 	float dist_squared = len2(dist);
-	if(dist_squared > cyl.radius_squared){
+	if(len2(dist) > cyl.radius_squared){
 		return false;
 	} else {
 		return true;
