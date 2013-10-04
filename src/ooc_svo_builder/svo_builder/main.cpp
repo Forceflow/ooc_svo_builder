@@ -38,7 +38,7 @@ TriInfo tri_info;
 TripInfo trip_info;
 
 // buffer_size
-size_t input_buffersize = 102400;
+size_t input_buffersize = 500000;
 
 // timers
 Timer main_timer, algo_timer, io_timer_in, io_timer_out;
@@ -231,7 +231,15 @@ int main(int argc, char *argv[]) {
 	// General voxelization calculations (stuff we need throughout voxelization process)
 	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float) trip_info.gridsize;
 	uint64_t morton_part = (trip_info.gridsize * trip_info.gridsize * trip_info.gridsize) / trip_info.n_partitions;
-	VoxelData* partitiondata = new VoxelData[(size_t) morton_part];
+	
+	// Storage for voxel references (STATIC)
+#ifdef BINARY_VOXELIZATION
+	bool* voxels = new bool[(size_t) morton_part]; // TODO: If you want tighter packing, check the Frankensteiny that is vector<bool>
+#else
+	size_t* voxels = new size_t[(size_t) morton_part];
+	vector<VoxelData> voxel_data; // Storage for voxel data (DYNAMIC)
+#endif 
+
 	size_t nfilled = 0;
 
 	// create Octreebuilder which will output our SVO
@@ -253,7 +261,11 @@ int main(int argc, char *argv[]) {
 
 			// voxelize partition
 			size_t nfilled_before = nfilled;
-			voxelize_partition(reader, start, end, unitlength, &partitiondata, nfilled);
+#ifdef BINARY_VOXELIZATION
+			voxelize_partition(reader, start, end, unitlength, voxels, nfilled);
+#else
+			voxelize_partition(reader, start, end, unitlength, voxels, voxel_data, nfilled);
+#endif
 			if (verbose) {cout << "  found " << nfilled - nfilled_before << " new voxels." << endl;}
 
 			// build SVO
@@ -261,16 +273,16 @@ int main(int argc, char *argv[]) {
 			uint64_t morton_number;
 			DataPoint d;
 			for (size_t j = 0; j < morton_part; j++) {
-				if (partitiondata[j].filled) {
+				if (! voxels[j] == EMPTY_VOXEL) {
 					morton_number = start + j;
 					d = DataPoint();
 					d.opacity = 1.0; // this voxel is filled
 #ifndef BINARY_VOXELIZATION
+					VoxelData& current_data = voxel_data.at(voxels[j]);
 					// NORMALS
-					d.normal = partitiondata[j].normal;
-					
+					d.normal = current_data.normal;
 					// COLORS
-					d.color = partitiondata[j].color;
+					d.color = current_data.color;
 					// override colors: generate colors for the voxels (for debugging purposes)
 					if(color == COLOR_FIXED){
 						d.color = fixed_color;
@@ -280,8 +292,6 @@ int main(int argc, char *argv[]) {
 						vec3 normal = normalize(d.normal);
 						d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
 					}
-
-
 #endif
 					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
 				}

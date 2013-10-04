@@ -10,7 +10,11 @@ using namespace trimesh;
 // Estimate the optimal amount of partitions we need, given the requested gridsize and the overall memory limit.
 size_t estimate_partitions(const size_t gridsize, const size_t memory_limit){
 	cout << "Estimating best partition count ..." << endl;
+#ifdef BINARY_VOXELIZATION
+	uint64_t required = (gridsize*gridsize*gridsize*sizeof(bool)) /1024 /1024;
+#else
 	uint64_t required = (gridsize*gridsize*gridsize*sizeof(VoxelData)) /1024 /1024;
+#endif
 	cout << "  to do this in-core I would need " << required << " Mb of system memory" << endl;
 	if(required <= memory_limit){
 		cout << "  memory limit of " << memory_limit << " Mb allows that" << endl;
@@ -113,11 +117,10 @@ TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 	while(reader.hasNext()) {
 		Triangle t; 
-		AABox<vec3> bbox;
 		algo_timer.stop(); io_timer_in.start(); // TIMING
 		reader.getTriangle(t);
 		io_timer_in.stop(); algo_timer.start(); // TIMING
-		computeBoundingBox(t.v0,t.v1,t.v2,bbox); // compute bounding box
+		AABox<vec3> bbox = computeBoundingBox(t.v0,t.v1,t.v2); // compute bounding box
 		for(size_t j = 0; j < n_partitions; j++){ // Test against all partitions
 			buffers[j]->processTriangle(t, bbox);
 		}
