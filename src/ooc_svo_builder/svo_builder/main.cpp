@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
 		if (trip_info.part_tricounts[i] > 0) { // if this partition contains triangles
 			cout << "Voxelizing partition " << i << " ..." << endl;
 			// morton codes for this partition
-			uint64_t start = i*morton_part;
+			uint64_t start = i * morton_part;
 			uint64_t end = (i + 1) * morton_part;
 
 			// open file to read triangles
@@ -295,11 +295,11 @@ int main(int argc, char *argv[]) {
 					// NORMALS
 					d.normal = current_data.normal;
 					// COLORS
-					d.color = current_data.color;
-					// override colors: generate colors for the voxels (for debugging purposes)
-					if(color == COLOR_FIXED){
+					if (color = COLOR_FROM_MODEL){
+						d.color = current_data.color;
+					} else if (color == COLOR_FIXED){
 						d.color = fixed_color;
-					} else if(color == COLOR_LINEAR){ // linear color scale
+					} else if (color == COLOR_LINEAR){ // linear color scale
 						d.color = mortonToRGB(morton_number, gridsize);
 					} else if (color == COLOR_NORMAL){ // color models using their normals
 						vec3 normal = normalize(d.normal);
