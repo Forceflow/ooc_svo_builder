@@ -63,7 +63,7 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 		for(int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
 			for(int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for(int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
-					uint64_t index = mortonEncode_for(z,y,x);
+					uint64_t index = mortonEncode_LUT(z,y,x);
 
 					assert(index-morton_start < (morton_end-morton_start));
 					
