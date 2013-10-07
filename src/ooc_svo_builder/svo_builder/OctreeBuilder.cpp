@@ -14,7 +14,7 @@ OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool 
 		for(int i = 0; i < b_maxdepth+1; i++){
 			b_buffers[i].reserve(8);
 		}
-		b_max_morton = mortonEncode(int(gridlength-1),int(gridlength-1),int(gridlength-1));
+		b_max_morton = mortonEncode_LUT(int(gridlength-1),int(gridlength-1),int(gridlength-1));
 
 		algo_timer.stop(); io_timer_out.start(); // TIMING
 		writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
@@ -48,7 +48,7 @@ void OctreeBuilder::finalizeTree(){
 
 	algo_timer.stop(); io_timer_out.start(); // TIMING
 	writeOctreeHeader(base_filename+string(".octree"),octree_info);
-	algo_timer.stop(); io_timer_out.start(); // TIMING
+	io_timer_out.stop(); algo_timer.start(); // TIMING
 
 	// close files
 	fclose(data_out);
