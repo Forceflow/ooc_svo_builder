@@ -9,6 +9,8 @@
 #include "OctreeBuilder.h"
 #include "partitioner.h"
 
+using namespace std;
+
 #if _WIN32 || _WIN64
 #if _WIN64
 #define ENVIRONMENT64
@@ -16,8 +18,6 @@
 #define ENVIRONMENT32
 #endif
 #endif
-
-using namespace std;
 
 enum ColorType {COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL};
 
@@ -173,16 +173,8 @@ void printTimerInfo() {
 	cout << "Total misc time      : " << diff << " s." << endl;
 }
 
-int main(int argc, char *argv[]) {
-	// Setup timers
-	setupTimers();
-	main_timer.start();
-
-	// Parse program parameters
-	printInfo();
-	parseProgramParameters(argc, argv);
-
-	// Parse TRI header
+// Tri header handling and error checking
+void readTriHeader(string& filename, TriInfo& tri_info){
 	io_timer_in.start();
 	cout << "Parsing tri header " << filename << " ..." << endl;
 	if (parseTriHeader(filename, tri_info) != 1) {
@@ -194,7 +186,6 @@ int main(int argc, char *argv[]) {
 	}
 	if (verbose) {tri_info.print();}
 	io_timer_in.stop();
-
 	// Check if the user is using the correct executable for type of tri file
 #ifdef BINARY_VOXELIZATION
 	if (!tri_info.geometry_only) {
@@ -207,6 +198,37 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 #endif
+}
+
+// Trip header handling and error checking
+void readTripHeader(string& filename, TripInfo& trip_info){
+	io_timer_in.start(); // TIMING
+	if (parseTripHeader(filename, trip_info) != 1) {
+		exit(0);
+	}
+	if (!trip_info.filesExist()) {
+		cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
+		exit(0); // not all required files exist - exiting.
+	}
+	if (verbose) {trip_info.print();}
+	io_timer_in.stop(); // TIMING
+}
+
+int main(int argc, char *argv[]) {
+	// Setup timers
+	setupTimers();
+	main_timer.start();
+
+#ifdef _WIN32 || _WIN64
+	_setmaxstdio(1024); // increase file descriptor limit in Windows
+#endif
+
+	// Parse program parameters
+	printInfo();
+	parseProgramParameters(argc, argv);
+
+	// Parse TRI header
+	readTriHeader(filename, tri_info);
 
 	// Do partitioning and store results/file refs in TripInfo
 	size_t n_partitions = estimate_partitions(gridsize, memory_limit);
@@ -217,16 +239,7 @@ int main(int argc, char *argv[]) {
 	cout << "done." << endl;
 
 	// Parse TRIP header
-	io_timer_in.start(); // TIMING
-	if (parseTripHeader(trip_info.base_filename + string(".trip"), trip_info) != 1) {
-		exit(0);
-	}
-	if (!trip_info.filesExist()) {
-		cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
-		exit(0); // not all required files exist - exiting.
-	}
-	if (verbose) {trip_info.print();}
-	io_timer_in.stop(); // TIMING
+	readTripHeader(trip_info.base_filename + string(".trip"), trip_info);
 
 	// General voxelization calculations (stuff we need throughout voxelization process)
 	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float) trip_info.gridsize;
@@ -251,7 +264,7 @@ int main(int argc, char *argv[]) {
 		if (trip_info.part_tricounts[i] > 0) { // if this partition contains triangles
 			cout << "Voxelizing partition " << i << " ..." << endl;
 			// morton codes for this partition
-			uint64_t start = i*morton_part;
+			uint64_t start = i * morton_part;
 			uint64_t end = (i + 1) * morton_part;
 
 			// open file to read triangles
@@ -282,11 +295,11 @@ int main(int argc, char *argv[]) {
 					// NORMALS
 					d.normal = current_data.normal;
 					// COLORS
-					d.color = current_data.color;
-					// override colors: generate colors for the voxels (for debugging purposes)
-					if(color == COLOR_FIXED){
+					if (color = COLOR_FROM_MODEL){
+						d.color = current_data.color;
+					} else if (color == COLOR_FIXED){
 						d.color = fixed_color;
-					} else if(color == COLOR_LINEAR){ // linear color scale
+					} else if (color == COLOR_LINEAR){ // linear color scale
 						d.color = mortonToRGB(morton_number, gridsize);
 					} else if (color == COLOR_NORMAL){ // color models using their normals
 						vec3 normal = normalize(d.normal);
