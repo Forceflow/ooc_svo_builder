@@ -9,6 +9,8 @@
 
 using namespace std;
 
+#define DATAPOINT_SIZE 7
+
 // File containing all the octree IO methods
 
 // Internal format to represent an octree
@@ -49,34 +51,34 @@ int parseOctreeHeader(const std::string &filename, OctreeInfo &i);
 
 // Write a data point to file
 inline size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos){
-	fwrite(& d.opacity, sizeof(float), 1, data_out);
-	fwrite(& d.color[0], sizeof(float), 3, data_out);
-	fwrite(& d.normal[0], sizeof(float), 3, data_out);
+	fwrite(& d.opacity, sizeof(float), DATAPOINT_SIZE, data_out);
+	//fwrite(& d.color[0], sizeof(float), 3, data_out);
+	//fwrite(& d.normal[0], sizeof(float), 3, data_out);
 	b_data_pos++;
 	return b_data_pos-1;
 }
 
 // Read a data point from a file
 inline void readDataPoint(FILE* f, DataPoint &d){
-	fread(& d.opacity, sizeof(float), 1, f);
-	fread(& d.color[0], sizeof(float), 3, f);
-	fread(& d.normal[0], sizeof(float), 3, f);
+	fread(& d.opacity, sizeof(float), DATAPOINT_SIZE, f);
+	//fread(& d.color[0], sizeof(float), 3, f);
+	//fread(& d.normal[0], sizeof(float), 3, f);
 }
 
 // Write an octree node to file
 inline size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos){
-	fwrite(& n.children_base, sizeof(size_t), 1, node_out);
-	fwrite(& n.children_offset[0], sizeof(char), 8, node_out);
-	fwrite(& n.data, sizeof(size_t), 1, node_out);
+	fwrite(& n.data, sizeof(size_t), 3, node_out);
+	//fwrite(& n.children_base, sizeof(size_t), 1, node_out);
+	//fwrite(& n.children_offset[0], sizeof(char), 8, node_out);
 	b_node_pos++;
 	return b_node_pos-1;
 }
 
 // Read a Node from a file
 inline void readNode(FILE* f, Node &n){
-	fread(& n.children_base, sizeof(size_t), 1, f);
-	fread(& n.children_offset[0], sizeof(char), 8, f);
-	fread(& n.data, sizeof(size_t), 1, f);
+	fread(& n.data, sizeof(size_t), 3, f);
+	//fread(& n.children_base, sizeof(size_t), 1, f);
+	//fread(& n.children_offset[0], sizeof(char), 8, f);
 }
 
 // Write an octree header to a file

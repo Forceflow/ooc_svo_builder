@@ -11,7 +11,7 @@ OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool 
 		// Setup building variables
 		b_maxdepth = log2((unsigned int) gridlength);
 		b_buffers.resize(b_maxdepth+1);
-		for(int i = 0; i < b_maxdepth+1; i++){
+		for(unsigned int i = 0; i < b_maxdepth+1; i++){
 			b_buffers[i].reserve(8);
 		}
 		b_max_morton = mortonEncode_LUT((unsigned int) gridlength-1, (unsigned int) gridlength-1, (unsigned int) gridlength-1);
@@ -81,7 +81,7 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 	if(generate_levels){
 		DataPoint d = DataPoint();
 		float notnull = 0.0f;
-		for(int i = 0; i < 8; i++){ // this node has no data: need to refine
+		for(unsigned int i = 0; i < 8; i++){ // this node has no data: need to refine
 			if(!buffer[i].isNull())
 				notnull++;
 			d.opacity += buffer[i].data_cache.opacity;

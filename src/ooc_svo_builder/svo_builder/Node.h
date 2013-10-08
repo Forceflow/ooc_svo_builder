@@ -12,9 +12,9 @@
 class Node
 {
 public:
+	size_t data;
 	size_t children_base;
 	char children_offset[8];
-	size_t data;
 
 	DataPoint data_cache; // only if you want to refine octree (clustering)
 

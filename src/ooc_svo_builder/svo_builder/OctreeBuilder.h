@@ -47,7 +47,7 @@ private:
 
 // Check if a buffer contains non-empty nodes
 inline bool OctreeBuilder::isBufferEmpty(const vector<Node> &buffer){
-	for(int k = 0; k<8; k++){
+	for(unsigned int k = 0; k<8; k++){
 		if(!buffer[k].isNull()){
 			return false;
 		}
@@ -58,7 +58,7 @@ inline bool OctreeBuilder::isBufferEmpty(const vector<Node> &buffer){
 // Find the highest non empty buffer, return its index
 inline int OctreeBuilder::highestNonEmptyBuffer(){
 	int highest_found = b_maxdepth; // highest means "lower in buffer id" here.
-	for(int k = b_maxdepth; k>=0; k--){
+	for(unsigned int k = b_maxdepth; k>=0; k--){
 		if(b_buffers[k].size() == 0){ // this buffer level is empty
 			highest_found--;
 		} else { // this buffer level is nonempty: break
