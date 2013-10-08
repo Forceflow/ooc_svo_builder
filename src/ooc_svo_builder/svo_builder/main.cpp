@@ -52,10 +52,10 @@ void printInfo() {
 	cout << "Out-Of-Core SVO Builder " << version << " - Geometry+normals version" << endl;
 #endif
 #ifdef _WIN32 || _WIN64
-	cout << "Windows ";
+	cout << "Windows " << endl;
 #endif
 #ifdef __linux__
-	cout << "Linux ";
+	cout << "Linux " << endl;
 #endif
 #ifdef ENVIRONMENT64
 	cout << "64-bit version" << endl;
