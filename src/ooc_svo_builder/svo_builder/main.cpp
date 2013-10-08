@@ -244,7 +244,8 @@ int main(int argc, char *argv[]) {
 	cout << "done." << endl;
 
 	// Parse TRIP header
-	readTripHeader(trip_info.base_filename + string(".trip"), trip_info);
+	string tripheader = trip_info.base_filename + string(".trip");
+	readTripHeader(tripheader, trip_info);
 
 	// General voxelization calculations (stuff we need throughout voxelization process)
 	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float) trip_info.gridsize;

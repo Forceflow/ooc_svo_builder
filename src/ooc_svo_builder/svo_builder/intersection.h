@@ -34,7 +34,6 @@ inline bool isPointinCylinder(const vec3 &point, const Cylinder &cyl){
 		return false;
 	}
 	vec3 dist = AX - dot*AB; 
-	float dist_squared = len2(dist);
 	if(len2(dist) > cyl.radius_squared){
 		return false;
 	} 
