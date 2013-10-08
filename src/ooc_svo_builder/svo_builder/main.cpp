@@ -8,6 +8,7 @@
 #include "voxelizer.h"
 #include "OctreeBuilder.h"
 #include "partitioner.h"
+//#include <omp.h>
 
 using namespace std;
 
@@ -222,6 +223,10 @@ int main(int argc, char *argv[]) {
 #ifdef _WIN32 || _WIN64
 	_setmaxstdio(1024); // increase file descriptor limit in Windows
 #endif
+
+	//// Get the number of processors in this system
+	//int iCPU = omp_get_num_procs();
+	//omp_set_num_threads(iCPU);
 
 	// Parse program parameters
 	printInfo();
