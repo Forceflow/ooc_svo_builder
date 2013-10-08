@@ -19,8 +19,8 @@ public:
 	DataPoint data_cache; // only if you want to refine octree (clustering)
 
 	Node();
-	bool hasChild(int i) const;
-	size_t getChildPos(int i) const;
+	bool hasChild(unsigned int i) const;
+	size_t getChildPos(unsigned int i) const;
 	bool isLeaf() const;
 	bool hasData() const;
 	bool isNull() const;
@@ -28,18 +28,18 @@ public:
 
 // Default constructor
 inline Node::Node() : data(0), children_base(0), data_cache(DataPoint()){
-	for(int i = 0; i<8; i++){
+	for(unsigned int i = 0; i<8; i++){
 		children_offset[i] = NOCHILD;
 	}
 }
 
 // Check if this Node has a child at position i
-inline bool Node::hasChild(int i) const{
+inline bool Node::hasChild(unsigned int i) const{
 	return !(children_offset[i] == NOCHILD);
 }
 
 // Get the full index of the child at position i
-inline size_t Node::getChildPos(int i) const{
+inline size_t Node::getChildPos(unsigned int i) const{
 	if(children_offset[i] == NOCHILD){
 		return 0;
 	} else {
@@ -54,7 +54,7 @@ inline bool Node::isNull() const{
 
 // If this node doesn;t have any children, it's a leaf node
 inline bool Node::isLeaf() const{
-	for(int i = 0; i<8; i++){
+	for(unsigned int i = 0; i<8; i++){
 		if(children_offset[i] != NOCHILD){
 			return false;
 		}
