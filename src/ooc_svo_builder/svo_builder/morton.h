@@ -9,7 +9,7 @@ using namespace std;
 uint64_t mortonEncode_LUT(unsigned int x, unsigned int y, unsigned int z);
 uint64_t mortonEncode_magicbits(unsigned int x, unsigned int y, unsigned int z);
 uint64_t mortonEncode_for(unsigned int x, unsigned int y, unsigned int z);
-void mortonDecode(uint64_t morton, int& x, int& y, int& z);
+void mortonDecode(uint64_t morton, unsigned int& x, unsigned int& y, unsigned int& z);
 
 // encode a given (x,y,z) coordinate to a 64-bit morton code
 
@@ -172,7 +172,7 @@ inline uint64_t mortonEncode_LUT(unsigned int x, unsigned int y, unsigned int z)
 }
 
 // decode a given 64-bit morton code to an integer (x,y,z) coordinate
-inline void mortonDecode(uint64_t morton, int& x, int& y, int& z){
+inline void mortonDecode(uint64_t morton, unsigned int& x, unsigned int& y, unsigned int& z){
 	x = 0;
 	y = 0;
 	z = 0;
