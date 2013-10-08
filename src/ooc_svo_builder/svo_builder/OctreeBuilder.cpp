@@ -14,7 +14,7 @@ OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool 
 		for(int i = 0; i < b_maxdepth+1; i++){
 			b_buffers[i].reserve(8);
 		}
-		b_max_morton = mortonEncode_LUT(unsigned int(gridlength-1),unsigned int(gridlength-1),unsigned int(gridlength-1));
+		b_max_morton = mortonEncode_LUT((unsigned int) gridlength-1, (unsigned int) gridlength-1, (unsigned int) gridlength-1);
 
 		algo_timer.stop(); io_timer_out.start(); // TIMING
 		writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
