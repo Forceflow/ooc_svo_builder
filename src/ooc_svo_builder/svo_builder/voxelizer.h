@@ -9,6 +9,8 @@
 
 // Voxelization-related stuff
 
+typedef Vec<3, unsigned int> uivec3;
+
 using namespace std;
 // This struct defines VoxelData for our voxelizer - this is defined different depending on compile project
 // This is the main memory hogger: the less data you store here, the better.

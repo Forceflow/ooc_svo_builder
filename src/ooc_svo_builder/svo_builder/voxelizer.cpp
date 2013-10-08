@@ -9,14 +9,18 @@ using namespace trimesh;
 
 #ifdef BINARY_VOXELIZATION
 void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
-	memset(voxels,0,(morton_end-morton_start)*sizeof(bool));
+	for(size_t i = 0; i < (morton_end-morton_start); i++){
+		voxels[i] = false;
+	}
 #else
 void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
-	memset(voxels,0,(morton_end-morton_start)*sizeof(size_t));
+	for(size_t i = 0; i < (morton_end-morton_start); i++){
+		voxels[i] = EMPTY_VOXEL;
+	}
 	voxel_data.clear();
 #endif
 	// compute partition min and max in grid coords
-	AABox<ivec3> p_bbox_grid;
+	AABox<uivec3> p_bbox_grid;
 	mortonDecode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
 	mortonDecode(morton_end-1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
 	// misc calc
@@ -34,21 +38,21 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 
 		// compute triangle bbox in world and grid
 		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0,t.v1,t.v2);
-		AABox<ivec3> t_bbox_grid;
-		t_bbox_grid.min[0] = (int) (t_bbox_world.min[0] * unit_div);
-		t_bbox_grid.min[1] = (int) (t_bbox_world.min[1] * unit_div);
-		t_bbox_grid.min[2] = (int) (t_bbox_world.min[2] * unit_div);
-		t_bbox_grid.max[0] = (int) (t_bbox_world.max[0] * unit_div);
-		t_bbox_grid.max[1] = (int) (t_bbox_world.max[1] * unit_div);
-		t_bbox_grid.max[2] = (int) (t_bbox_world.max[2] * unit_div);
+		AABox<uivec3> t_bbox_grid;
+		t_bbox_grid.min[0] = (unsigned int) (t_bbox_world.min[0] * unit_div);
+		t_bbox_grid.min[1] = (unsigned int) (t_bbox_world.min[1] * unit_div);
+		t_bbox_grid.min[2] = (unsigned int) (t_bbox_world.min[2] * unit_div);
+		t_bbox_grid.max[0] = (unsigned int) (t_bbox_world.max[0] * unit_div);
+		t_bbox_grid.max[1] = (unsigned int) (t_bbox_world.max[1] * unit_div);
+		t_bbox_grid.max[2] = (unsigned int) (t_bbox_world.max[2] * unit_div);
 
 		// clamp
-		t_bbox_grid.min[0]  = clampval<int>(t_bbox_grid.min[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
-		t_bbox_grid.min[1]  = clampval<int>(t_bbox_grid.min[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
-		t_bbox_grid.min[2]  = clampval<int>(t_bbox_grid.min[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
-		t_bbox_grid.max[0]  = clampval<int>(t_bbox_grid.max[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
-		t_bbox_grid.max[1]  = clampval<int>(t_bbox_grid.max[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
-		t_bbox_grid.max[2]  = clampval<int>(t_bbox_grid.max[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
+		t_bbox_grid.min[0]  = clampval<unsigned int>(t_bbox_grid.min[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
+		t_bbox_grid.min[1]  = clampval<unsigned int>(t_bbox_grid.min[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
+		t_bbox_grid.min[2]  = clampval<unsigned int>(t_bbox_grid.min[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
+		t_bbox_grid.max[0]  = clampval<unsigned int>(t_bbox_grid.max[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
+		t_bbox_grid.max[1]  = clampval<unsigned int>(t_bbox_grid.max[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
+		t_bbox_grid.max[2]  = clampval<unsigned int>(t_bbox_grid.max[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
 
 		// construct test objects (sphere, cilinders, planes)
 		Sphere sphere0 = Sphere(t.v0,radius);
@@ -60,9 +64,9 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 		Plane S = Plane(t.v0,t.v1,t.v2);
 
 		// test possible grid boxes for overlap
-		for(int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
-			for(int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
-				for(int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
+		for(unsigned int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
+			for(unsigned int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
+				for(unsigned int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
 					uint64_t index = mortonEncode_LUT(z,y,x);
 
 					assert(index-morton_start < (morton_end-morton_start));
@@ -135,7 +139,7 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 	voxel_data.clear();
 #endif
 	// compute partition min and max in grid coords
-	AABox<ivec3> p_bbox_grid;
+	AABox<uivec3> p_bbox_grid;
 	mortonDecode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
 	mortonDecode(morton_end-1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
 	float unit_div = 1.0f / unitlength;
