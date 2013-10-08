@@ -14,7 +14,7 @@ OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool 
 		for(int i = 0; i < b_maxdepth+1; i++){
 			b_buffers[i].reserve(8);
 		}
-		b_max_morton = mortonEncode_LUT(int(gridlength-1),int(gridlength-1),int(gridlength-1));
+		b_max_morton = mortonEncode_LUT(unsigned int(gridlength-1),unsigned int(gridlength-1),unsigned int(gridlength-1));
 
 		algo_timer.stop(); io_timer_out.start(); // TIMING
 		writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
@@ -59,7 +59,7 @@ void OctreeBuilder::finalizeTree(){
 Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 	Node parent = Node();
 	bool first_stored_child = true;
-	for(int k = 0; k<8; k++){
+	for(unsigned int k = 0; k<8; k++){
 		if(!buffer[k].isNull()){
 			if(first_stored_child){
 				algo_timer.stop(); io_timer_out.start(); // TIMING
@@ -69,7 +69,7 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 				first_stored_child = false;
 			} else {
 				algo_timer.stop(); io_timer_out.start(); // TIMING
-				parent.children_offset[k] = writeNode(node_out,buffer[k],b_node_pos) - parent.children_base;
+				parent.children_offset[k] = (char) (writeNode(node_out,buffer[k],b_node_pos) - parent.children_base);
 				io_timer_out.stop(); algo_timer.start(); // TIMING
 			}
 		} else {
@@ -106,7 +106,7 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 void OctreeBuilder::addEmptyDataPoint(const int buffer){
 	b_buffers[buffer].push_back(Node());
 	// REFINE BUFFERS: check from touched buffer, upwards
-	for(int d = buffer; d >= 0; d--){
+	for(unsigned int d = buffer; d >= 0; d--){
 		if(b_buffers[d].size() == 8){ // if we have 8 nodes
 			assert(d-1 >= 0);
 			if(isBufferEmpty(b_buffers[d])){
@@ -119,7 +119,7 @@ void OctreeBuilder::addEmptyDataPoint(const int buffer){
 			break; // break the for loop: no upper levels will need changing
 		}
 	}
-	b_current_morton = b_current_morton + pow(8.0,b_maxdepth-buffer); // because we're adding at a certain level
+	b_current_morton = (uint64_t) (b_current_morton + pow(8.0,b_maxdepth-buffer)); // because we're adding at a certain level
 }
 
 // Add a datapoint to the octree: this is the main method used to push datapoints
@@ -150,7 +150,7 @@ void OctreeBuilder::addDataPoint(const uint64_t morton_number, const DataPoint& 
 	b_buffers.at(b_maxdepth).push_back(node);
 
 	// REFINE BUFFERS: check all levels (bottom up) and group 8 nodes on a higher level
-	for(int d = b_maxdepth; d >= 0; d--){
+	for(unsigned int d = b_maxdepth; d >= 0; d--){
 		if(b_buffers[d].size() == 8){ // if we have 8 nodes
 			assert(d-1 >= 0);
 			if(isBufferEmpty(b_buffers[d])){

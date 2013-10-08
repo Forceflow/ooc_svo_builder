@@ -1,4 +1,5 @@
 #include "partitioner.h"
+#include <omp.h>
 
 using namespace std;
 using namespace trimesh;
@@ -13,7 +14,7 @@ size_t estimate_partitions(const size_t gridsize, const size_t memory_limit){
 #ifdef BINARY_VOXELIZATION
 	uint64_t required = (gridsize*gridsize*gridsize*sizeof(bool)) /1024 /1024;
 #else
-	uint64_t required = (gridsize*gridsize*gridsize*sizeof(VoxelData)) /1024 /1024;
+	uint64_t required = (gridsize*gridsize*gridsize*sizeof(size_t)) /1024 /1024;
 #endif
 	cout << "  to do this in-core I would need " << required << " Mb of system memory" << endl;
 	if(required <= memory_limit){
@@ -48,7 +49,7 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 	float unitlength = (tri_info.mesh_bbox.max[0] - tri_info.mesh_bbox.min[0]) / (float) gridsize;
 	uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
 
-	AABox<ivec3> bbox_grid;
+	AABox<uivec3> bbox_grid;
 	AABox<vec3> bbox_world;
 	std::string filename;
 
@@ -121,10 +122,28 @@ TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const siz
 		reader.getTriangle(t);
 		io_timer_in.stop(); algo_timer.start(); // TIMING
 		AABox<vec3> bbox = computeBoundingBox(t.v0,t.v1,t.v2); // compute bounding box
-		for(size_t j = 0; j < n_partitions; j++){ // Test against all partitions
+		for(int j = 0; j < n_partitions; j++){ // Test against all partitions
 			buffers[j]->processTriangle(t, bbox);
 		}
 	}
+
+//	vector<Triangle> triangle_buffer;
+//	while(reader.hasNext()) {
+//		triangle_buffer.clear();
+//		while(triangle_buffer.size() < 8192 && reader.hasNext()){
+//			triangle_buffer.push_back(reader.getTriangle());
+//		}
+//
+//		omp_set_num_threads(12);
+//#pragma omp parallel for
+//		for(int i = 0; i< triangle_buffer.size(); i++){
+//			Triangle t = triangle_buffer[i];
+//			AABox<vec3> bbox = computeBoundingBox(t.v0,t.v1,t.v2); // compute bounding box
+//			for(int j = 0; j < n_partitions; j++){ // Test against all partitions
+//				buffers[j]->processTriangle(t, bbox);
+//			}
+//		}
+//	}
 
 	// create TripInfo object to hold header info
 	TripInfo trip_info = TripInfo(tri_info);
