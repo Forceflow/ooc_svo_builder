@@ -281,9 +281,9 @@ int main(int argc, char *argv[]) {
 			// voxelize partition
 			size_t nfilled_before = nfilled;
 #ifdef BINARY_VOXELIZATION
-			voxelize_partition(reader, start, end, unitlength, voxels, nfilled);
+			voxelize_partition2(reader, start, end, unitlength, voxels, nfilled);
 #else
-			voxelize_partition(reader, start, end, unitlength, voxels, voxel_data, nfilled);
+			voxelize_partition2(reader, start, end, unitlength, voxels, voxel_data, nfilled);
 #endif
 			if (verbose) {cout << "  found " << nfilled - nfilled_before << " new voxels." << endl;}
 
