@@ -11,7 +11,7 @@ OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool 
 		// Setup building variables
 		b_maxdepth = log2((unsigned int) gridlength);
 		b_buffers.resize(b_maxdepth+1);
-		for(unsigned int i = 0; i < b_maxdepth+1; i++){
+		for(int i = 0; i < b_maxdepth+1; i++){
 			b_buffers[i].reserve(8);
 		}
 		b_max_morton = mortonEncode_LUT((unsigned int) gridlength-1, (unsigned int) gridlength-1, (unsigned int) gridlength-1);
@@ -59,7 +59,7 @@ void OctreeBuilder::finalizeTree(){
 Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 	Node parent = Node();
 	bool first_stored_child = true;
-	for(unsigned int k = 0; k<8; k++){
+	for(int k = 0; k<8; k++){
 		if(!buffer[k].isNull()){
 			if(first_stored_child){
 				algo_timer.stop(); io_timer_out.start(); // TIMING
@@ -81,7 +81,7 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 	if(generate_levels){
 		DataPoint d = DataPoint();
 		float notnull = 0.0f;
-		for(unsigned int i = 0; i < 8; i++){ // this node has no data: need to refine
+		for(int i = 0; i < 8; i++){ // this node has no data: need to refine
 			if(!buffer[i].isNull())
 				notnull++;
 			d.opacity += buffer[i].data_cache.opacity;
@@ -106,7 +106,7 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 void OctreeBuilder::addEmptyDataPoint(const int buffer){
 	b_buffers[buffer].push_back(Node());
 	// REFINE BUFFERS: check from touched buffer, upwards
-	for(unsigned int d = buffer; d >= 0; d--){
+	for(int d = buffer; d >= 0; d--){
 		if(b_buffers[d].size() == 8){ // if we have 8 nodes
 			assert(d-1 >= 0);
 			if(isBufferEmpty(b_buffers[d])){
@@ -150,7 +150,7 @@ void OctreeBuilder::addDataPoint(const uint64_t morton_number, const DataPoint& 
 	b_buffers.at(b_maxdepth).push_back(node);
 
 	// REFINE BUFFERS: check all levels (bottom up) and group 8 nodes on a higher level
-	for(unsigned int d = b_maxdepth; d >= 0; d--){
+	for(int d = b_maxdepth; d >= 0; d--){
 		if(b_buffers[d].size() == 8){ // if we have 8 nodes
 			assert(d-1 >= 0);
 			if(isBufferEmpty(b_buffers[d])){
