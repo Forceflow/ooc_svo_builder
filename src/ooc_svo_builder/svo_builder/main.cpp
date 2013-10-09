@@ -135,6 +135,8 @@ void parseProgramParameters(int argc, char* argv[]) {
 				color = COLOR_LINEAR;
 			} else if(color_input == "normal") { 
 				color = COLOR_NORMAL;
+			} else if(color_input == "fixed") { 
+				color = COLOR_FIXED;
 			} else {
 				cout << "Unrecognized color switch: " << color_input << ", so reverting to no colors." << endl;
 			}
@@ -301,7 +303,7 @@ int main(int argc, char *argv[]) {
 					// NORMALS
 					d.normal = current_data.normal;
 					// COLORS
-					if (color = COLOR_FROM_MODEL){
+					if (color == COLOR_FROM_MODEL){
 						d.color = current_data.color;
 					} else if (color == COLOR_FIXED){
 						d.color = fixed_color;
