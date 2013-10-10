@@ -175,7 +175,7 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		if(n[Z] > 0) { c[Z] = unitlength;} 
 		float d1 = n DOT (c - t.v0); 
 		float d2 = n DOT ((delta_p - c) - t.v0);
-		
+		// PROJECTION TEST PROPERTIES
 		// XY plane
 		vec2 n_xy_e0 = vec2(-1.0f*e0[Y], e0[X]);
 		vec2 n_xy_e1 = vec2(-1.0f*e1[Y], e1[X]);
@@ -185,9 +185,9 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 			n_xy_e1 = -1.0f * n_xy_e1;
 			n_xy_e2 = -1.0f * n_xy_e2;
 		}
-		float d_xy_e0 = (-1.0f * (n_xy_e0 DOT vec2(t.v0[X],t.v0[Y]))) + max(0.0f, delta_p[X]*n_xy_e0[X]) + max(0.0f, delta_p[Y]*n_xy_e0[Y]);
-		float d_xy_e1 = (-1.0f * (n_xy_e1 DOT vec2(t.v1[X],t.v1[Y]))) + max(0.0f, delta_p[X]*n_xy_e1[X]) + max(0.0f, delta_p[Y]*n_xy_e1[Y]);
-		float d_xy_e2 = (-1.0f * (n_xy_e2 DOT vec2(t.v2[X],t.v2[Y]))) + max(0.0f, delta_p[X]*n_xy_e2[X]) + max(0.0f, delta_p[Y]*n_xy_e2[Y]);
+		float d_xy_e0 = (-1.0f * (n_xy_e0 DOT vec2(t.v0[X],t.v0[Y]))) + max(0.0f, unitlength*n_xy_e0[0]) + max(0.0f, unitlength*n_xy_e0[1]);
+		float d_xy_e1 = (-1.0f * (n_xy_e1 DOT vec2(t.v1[X],t.v1[Y]))) + max(0.0f, unitlength*n_xy_e1[0]) + max(0.0f, unitlength*n_xy_e1[1]);
+		float d_xy_e2 = (-1.0f * (n_xy_e2 DOT vec2(t.v2[X],t.v2[Y]))) + max(0.0f, unitlength*n_xy_e2[0]) + max(0.0f, unitlength*n_xy_e2[1]);
 
 		// YZ plane
 		vec2 n_yz_e0 = vec2(-1.0f*e0[Z], e0[Y]);
@@ -198,22 +198,22 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 			n_yz_e1 = -1.0f * n_yz_e1;
 			n_yz_e2 = -1.0f * n_yz_e2;
 		}
-		float d_yz_e0 = (-1.0f * (n_yz_e0 DOT vec2(t.v0[Y],t.v0[Z]))) + max(0.0f, delta_p[Y]*n_yz_e0[Y]) + max(0.0f, delta_p[Z]*n_yz_e0[Z]);
-		float d_yz_e1 = (-1.0f * (n_yz_e1 DOT vec2(t.v1[Y],t.v1[Z]))) + max(0.0f, delta_p[Y]*n_yz_e1[Y]) + max(0.0f, delta_p[Z]*n_yz_e1[Z]);
-		float d_yz_e2 = (-1.0f * (n_yz_e2 DOT vec2(t.v2[Y],t.v2[Z]))) + max(0.0f, delta_p[Y]*n_yz_e2[Y]) + max(0.0f, delta_p[Z]*n_yz_e2[Z]);
+		float d_yz_e0 = (-1.0f * (n_yz_e0 DOT vec2(t.v0[Y],t.v0[Z]))) + max(0.0f, unitlength*n_yz_e0[0]) + max(0.0f, unitlength*n_yz_e0[1]);
+		float d_yz_e1 = (-1.0f * (n_yz_e1 DOT vec2(t.v1[Y],t.v1[Z]))) + max(0.0f, unitlength*n_yz_e1[0]) + max(0.0f, unitlength*n_yz_e1[1]);
+		float d_yz_e2 = (-1.0f * (n_yz_e2 DOT vec2(t.v2[Y],t.v2[Z]))) + max(0.0f, unitlength*n_yz_e2[0]) + max(0.0f, unitlength*n_yz_e2[1]);
 
-		// XZ plane
-		vec2 n_xz_e0 = vec2(-1.0f*e0[Z], e0[X]);
-		vec2 n_xz_e1 = vec2(-1.0f*e1[Z], e1[X]);
-		vec2 n_xz_e2 = vec2(-1.0f*e2[Z], e2[X]);
+		// ZX plane
+		vec2 n_zx_e0 = vec2(-1.0f*e0[X], e0[Z]);
+		vec2 n_zx_e1 = vec2(-1.0f*e1[X], e1[Z]);
+		vec2 n_zx_e2 = vec2(-1.0f*e2[X], e2[Z]);
 		if(n[Y] < 0.0f) { 
-			n_xz_e0 = -1.0f * n_xz_e0;
-			n_xz_e1 = -1.0f * n_xz_e1;
-			n_xz_e2 = -1.0f * n_xz_e2;
+			n_zx_e0 = -1.0f * n_zx_e0;
+			n_zx_e1 = -1.0f * n_zx_e1;
+			n_zx_e2 = -1.0f * n_zx_e2;
 		}
-		float d_xz_e0 = (-1.0f * (n_xz_e0 DOT vec2(t.v0[X],t.v0[Z]))) + max(0.0f, delta_p[X]*n_xz_e0[X]) + max(0.0f, delta_p[Z]*n_xz_e0[Z]);
-		float d_xz_e1 = (-1.0f * (n_xz_e1 DOT vec2(t.v1[X],t.v1[Z]))) + max(0.0f, delta_p[X]*n_xz_e1[X]) + max(0.0f, delta_p[Z]*n_xz_e1[Z]);
-		float d_xz_e2 = (-1.0f * (n_xz_e2 DOT vec2(t.v2[X],t.v2[Z]))) + max(0.0f, delta_p[X]*n_xz_e2[X]) + max(0.0f, delta_p[Z]*n_xz_e2[Z]);
+		float d_xz_e0 = (-1.0f * (n_zx_e0 DOT vec2(t.v0[Z],t.v0[X]))) + max(0.0f, unitlength*n_zx_e0[0]) + max(0.0f, unitlength*n_zx_e0[1]);
+		float d_xz_e1 = (-1.0f * (n_zx_e1 DOT vec2(t.v1[Z],t.v1[X]))) + max(0.0f, unitlength*n_zx_e1[0]) + max(0.0f, unitlength*n_zx_e1[1]);
+		float d_xz_e2 = (-1.0f * (n_zx_e2 DOT vec2(t.v2[Z],t.v2[X]))) + max(0.0f, unitlength*n_zx_e2[0]) + max(0.0f, unitlength*n_zx_e2[1]);
 
 		// compute triangle bbox in world and grid
 		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0,t.v1,t.v2);
@@ -237,19 +237,21 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		for(int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
 			for(int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for(int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
+
 					uint64_t index = mortonEncode_LUT(z,y,x);
+
 					assert(index-morton_start < (morton_end-morton_start));
+
 					if(! voxels[index-morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
 
 					// TRIANGLE PLANE THROUGH BOX TEST
 					vec3 p = vec3(x*unitlength,y*unitlength,z*unitlength);
 					float nDOTp = n DOT p;
-					if( (nDOTp + d1)*(nDOTp + d2) > 0.0f ){
+					if( (nDOTp + d1) * (nDOTp + d2) > 0.0f ){
 						continue; // plane does not intersect voxel box // ignore triangle
 					}
 
-					//// PROJECTION TESTS
-
+					////// PROJECTION TESTS
 					// XY
 					vec2 p_xy = vec2(p[X],p[Y]);
 					if (((n_xy_e0 DOT p_xy) + d_xy_e0) < 0.0f){
@@ -274,15 +276,15 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 						continue;
 					}
 
-					// XZ
-					vec2 p_xz = vec2(p[X],p[Z]);
-					if (((n_xz_e0 DOT p_xz) + d_xz_e0) < 0.0f){
+					// XZ	
+					vec2 p_zx = vec2(p[Z],p[X]);
+					if (((n_zx_e0 DOT p_zx) + d_xz_e0) < 0.0f){
 						continue;
 					}
-					if (((n_xz_e1 DOT p_xz) + d_xz_e1) < 0.0f){
+					if (((n_zx_e1 DOT p_zx) + d_xz_e1) < 0.0f){
 						continue;
 					}
-					if (((n_xz_e2 DOT p_xz) + d_xz_e2) < 0.0f){
+					if (((n_zx_e2 DOT p_zx) + d_xz_e2) < 0.0f){
 						continue;
 					}
 
