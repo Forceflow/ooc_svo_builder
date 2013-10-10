@@ -7,10 +7,14 @@ using namespace trimesh;
 // Adapted for mortoncode -based subgrids
 // by Jeroen Baert - jeroen.baert@cs.kuleuven.be
 
+#define X 0
+#define Y 1
+#define Z 2
+
 #ifdef BINARY_VOXELIZATION
 void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
 	for(size_t i = 0; i < (morton_end-morton_start); i++){
-		voxels[i] = false;
+		voxels[i] = EMPTY_VOXEL;
 	}
 #else
 void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
@@ -132,12 +136,14 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 
 #ifdef BINARY_VOXELIZATION
 void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
-	memset(voxels,0,(morton_end-morton_start)*sizeof(bool));
 #else
 void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
-	memset(voxels,0,(morton_end-morton_start)*sizeof(size_t));
 	voxel_data.clear();
 #endif
+	for(size_t i = 0; i < (morton_end-morton_start); i++){
+		voxels[i] = EMPTY_VOXEL;
+	}
+
 	// compute partition min and max in grid coords
 	AABox<uivec3> p_bbox_grid;
 	mortonDecode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
@@ -146,10 +152,6 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 	// COMMON PROPERTIES FOR ALL TRIANGLES
 	float unit_div = 1.0f / unitlength;
 	vec3 delta_p = vec3(unitlength,unitlength,unitlength);
-
-#define X 0
-#define Y 1
-#define Z 2
 
 	// voxelize every triangle
 	while(reader.hasNext()) {
@@ -174,15 +176,14 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		float d1 = n DOT (c - t.v0); 
 		float d2 = n DOT ((delta_p - c) - t.v0);
 		
-		
 		// XY plane
 		vec2 n_xy_e0 = vec2(-1.0f*e0[Y], e0[X]);
 		vec2 n_xy_e1 = vec2(-1.0f*e1[Y], e1[X]);
 		vec2 n_xy_e2 = vec2(-1.0f*e2[Y], e2[X]);
 		if(n[Z] < 0.0f) { 
-			n_xy_e0 = n_xy_e0 * -1.0f;
-			n_xy_e1 = n_xy_e1 * -1.0f;
-			n_xy_e2 = n_xy_e2 * -1.0f;
+			n_xy_e0 = -1.0f * n_xy_e0;
+			n_xy_e1 = -1.0f * n_xy_e1;
+			n_xy_e2 = -1.0f * n_xy_e2;
 		}
 		float d_xy_e0 = (-1.0f * (n_xy_e0 DOT vec2(t.v0[X],t.v0[Y]))) + max(0.0f, delta_p[X]*n_xy_e0[X]) + max(0.0f, delta_p[Y]*n_xy_e0[Y]);
 		float d_xy_e1 = (-1.0f * (n_xy_e1 DOT vec2(t.v1[X],t.v1[Y]))) + max(0.0f, delta_p[X]*n_xy_e1[X]) + max(0.0f, delta_p[Y]*n_xy_e1[Y]);
@@ -193,9 +194,9 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		vec2 n_yz_e1 = vec2(-1.0f*e1[Z], e1[Y]);
 		vec2 n_yz_e2 = vec2(-1.0f*e2[Z], e2[Y]);
 		if(n[X] < 0.0f) { 
-			n_yz_e0 = n_yz_e0 * -1.0f;
-			n_yz_e1 = n_yz_e1 * -1.0f;
-			n_yz_e2 = n_yz_e2 * -1.0f;
+			n_yz_e0 = -1.0f * n_yz_e0;
+			n_yz_e1 = -1.0f * n_yz_e1;
+			n_yz_e2 = -1.0f * n_yz_e2;
 		}
 		float d_yz_e0 = (-1.0f * (n_yz_e0 DOT vec2(t.v0[Y],t.v0[Z]))) + max(0.0f, delta_p[Y]*n_yz_e0[Y]) + max(0.0f, delta_p[Z]*n_yz_e0[Z]);
 		float d_yz_e1 = (-1.0f * (n_yz_e1 DOT vec2(t.v1[Y],t.v1[Z]))) + max(0.0f, delta_p[Y]*n_yz_e1[Y]) + max(0.0f, delta_p[Z]*n_yz_e1[Z]);
@@ -206,9 +207,9 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		vec2 n_xz_e1 = vec2(-1.0f*e1[Z], e1[X]);
 		vec2 n_xz_e2 = vec2(-1.0f*e2[Z], e2[X]);
 		if(n[Y] < 0.0f) { 
-			n_xz_e0 = n_xz_e0 * -1.0f;
-			n_xz_e1 = n_xz_e1 * -1.0f;
-			n_xz_e2 = n_xz_e2 * -1.0f;
+			n_xz_e0 = -1.0f * n_xz_e0;
+			n_xz_e1 = -1.0f * n_xz_e1;
+			n_xz_e2 = -1.0f * n_xz_e2;
 		}
 		float d_xz_e0 = (-1.0f * (n_xz_e0 DOT vec2(t.v0[X],t.v0[Z]))) + max(0.0f, delta_p[X]*n_xz_e0[X]) + max(0.0f, delta_p[Z]*n_xz_e0[Z]);
 		float d_xz_e1 = (-1.0f * (n_xz_e1 DOT vec2(t.v1[X],t.v1[Z]))) + max(0.0f, delta_p[X]*n_xz_e1[X]) + max(0.0f, delta_p[Z]*n_xz_e1[Z]);

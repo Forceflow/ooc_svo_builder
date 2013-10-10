@@ -282,6 +282,7 @@ int main(int argc, char *argv[]) {
 
 			// voxelize partition
 			size_t nfilled_before = nfilled;
+			size_t total_voxels = 0;
 #ifdef BINARY_VOXELIZATION
 			voxelize_partition2(reader, start, end, unitlength, voxels, nfilled);
 #else
@@ -322,6 +323,7 @@ int main(int argc, char *argv[]) {
 	builder.finalizeTree(); // finalize SVO so it gets written to disk
 	algo_timer.stop(); // TIMING
 	cout << "done" << endl;
+	cout << "Total amount of voxels: " << nfilled << endl;
 
 	// Removing .trip files which are left by partitioner
 	io_timer_out.start(); // TIMING
