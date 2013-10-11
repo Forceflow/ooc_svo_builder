@@ -242,51 +242,31 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 
 					assert(index-morton_start < (morton_end-morton_start));
 
-					if(! voxels[index-morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
+					if(! voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
 
 					// TRIANGLE PLANE THROUGH BOX TEST
 					vec3 p = vec3(x*unitlength,y*unitlength,z*unitlength);
 					float nDOTp = n DOT p;
-					if( (nDOTp + d1) * (nDOTp + d2) > 0.0f ){
-						continue; // plane does not intersect voxel box // ignore triangle
-					}
+					if( (nDOTp + d1) * (nDOTp + d2) > 0.0f ){continue;}
 
-					////// PROJECTION TESTS
+					// PROJECTION TESTS
 					// XY
 					vec2 p_xy = vec2(p[X],p[Y]);
-					if (((n_xy_e0 DOT p_xy) + d_xy_e0) < 0.0f){
-						continue;
-					}
-					if (((n_xy_e1 DOT p_xy) + d_xy_e1) < 0.0f){
-						continue;
-					}
-					if (((n_xy_e2 DOT p_xy) + d_xy_e2) < 0.0f){
-						continue;
-					}
+					if (((n_xy_e0 DOT p_xy) + d_xy_e0) < 0.0f){continue;}
+					if (((n_xy_e1 DOT p_xy) + d_xy_e1) < 0.0f){continue;}
+					if (((n_xy_e2 DOT p_xy) + d_xy_e2) < 0.0f){continue;}
 
 					// YZ
 					vec2 p_yz = vec2(p[Y],p[Z]);
-					if (((n_yz_e0 DOT p_yz) + d_yz_e0) < 0.0f){
-						continue;
-					}
-					if (((n_yz_e1 DOT p_yz) + d_yz_e1) < 0.0f){
-						continue;
-					}
-					if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){
-						continue;
-					}
+					if (((n_yz_e0 DOT p_yz) + d_yz_e0) < 0.0f){continue;}
+					if (((n_yz_e1 DOT p_yz) + d_yz_e1) < 0.0f){continue;}
+					if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){continue;}
 
 					// XZ	
 					vec2 p_zx = vec2(p[Z],p[X]);
-					if (((n_zx_e0 DOT p_zx) + d_xz_e0) < 0.0f){
-						continue;
-					}
-					if (((n_zx_e1 DOT p_zx) + d_xz_e1) < 0.0f){
-						continue;
-					}
-					if (((n_zx_e2 DOT p_zx) + d_xz_e2) < 0.0f){
-						continue;
-					}
+					if (((n_zx_e0 DOT p_zx) + d_xz_e0) < 0.0f){continue;}
+					if (((n_zx_e1 DOT p_zx) + d_xz_e1) < 0.0f){continue;}
+					if (((n_zx_e2 DOT p_zx) + d_xz_e2) < 0.0f){continue;}
 
 #ifdef BINARY_VOXELIZATION
 					voxels[index-morton_start] = true;
