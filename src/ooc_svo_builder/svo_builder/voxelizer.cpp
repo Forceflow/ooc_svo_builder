@@ -162,6 +162,24 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		reader.getTriangle(t);
 		io_timer_in.stop(); algo_timer.start();
 
+		// compute triangle bbox in world and grid
+		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0,t.v1,t.v2);
+		AABox<ivec3> t_bbox_grid;
+		t_bbox_grid.min[0] = (int) (t_bbox_world.min[0] * unit_div);
+		t_bbox_grid.min[1] = (int) (t_bbox_world.min[1] * unit_div);
+		t_bbox_grid.min[2] = (int) (t_bbox_world.min[2] * unit_div);
+		t_bbox_grid.max[0] = (int) (t_bbox_world.max[0] * unit_div);
+		t_bbox_grid.max[1] = (int) (t_bbox_world.max[1] * unit_div);
+		t_bbox_grid.max[2] = (int) (t_bbox_world.max[2] * unit_div);
+
+		// clamp
+		t_bbox_grid.min[0]  = clampval<int>(t_bbox_grid.min[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
+		t_bbox_grid.min[1]  = clampval<int>(t_bbox_grid.min[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
+		t_bbox_grid.min[2]  = clampval<int>(t_bbox_grid.min[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
+		t_bbox_grid.max[0]  = clampval<int>(t_bbox_grid.max[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
+		t_bbox_grid.max[1]  = clampval<int>(t_bbox_grid.max[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
+		t_bbox_grid.max[2]  = clampval<int>(t_bbox_grid.max[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
+
 		// COMMON PROPERTIES FOR THE TRIANGLE
 		vec3 e0 = t.v1 - t.v0;
 		vec3 e1 = t.v2 - t.v1;
@@ -214,24 +232,6 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		float d_xz_e0 = (-1.0f * (n_zx_e0 DOT vec2(t.v0[Z],t.v0[X]))) + max(0.0f, unitlength*n_zx_e0[0]) + max(0.0f, unitlength*n_zx_e0[1]);
 		float d_xz_e1 = (-1.0f * (n_zx_e1 DOT vec2(t.v1[Z],t.v1[X]))) + max(0.0f, unitlength*n_zx_e1[0]) + max(0.0f, unitlength*n_zx_e1[1]);
 		float d_xz_e2 = (-1.0f * (n_zx_e2 DOT vec2(t.v2[Z],t.v2[X]))) + max(0.0f, unitlength*n_zx_e2[0]) + max(0.0f, unitlength*n_zx_e2[1]);
-
-		// compute triangle bbox in world and grid
-		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0,t.v1,t.v2);
-		AABox<ivec3> t_bbox_grid;
-		t_bbox_grid.min[0] = (int) (t_bbox_world.min[0] * unit_div);
-		t_bbox_grid.min[1] = (int) (t_bbox_world.min[1] * unit_div);
-		t_bbox_grid.min[2] = (int) (t_bbox_world.min[2] * unit_div);
-		t_bbox_grid.max[0] = (int) (t_bbox_world.max[0] * unit_div);
-		t_bbox_grid.max[1] = (int) (t_bbox_world.max[1] * unit_div);
-		t_bbox_grid.max[2] = (int) (t_bbox_world.max[2] * unit_div);
-
-		// clamp
-		t_bbox_grid.min[0]  = clampval<int>(t_bbox_grid.min[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
-		t_bbox_grid.min[1]  = clampval<int>(t_bbox_grid.min[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
-		t_bbox_grid.min[2]  = clampval<int>(t_bbox_grid.min[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
-		t_bbox_grid.max[0]  = clampval<int>(t_bbox_grid.max[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
-		t_bbox_grid.max[1]  = clampval<int>(t_bbox_grid.max[1], p_bbox_grid.min[1], p_bbox_grid.max[1]);
-		t_bbox_grid.max[2]  = clampval<int>(t_bbox_grid.max[2], p_bbox_grid.min[2], p_bbox_grid.max[2]);
 
 		// test possible grid boxes for overlap
 		for(int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
