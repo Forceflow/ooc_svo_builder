@@ -8,7 +8,14 @@
 
 // Intersection methods
 inline AABox<vec3> computeBoundingBox(const vec3 &v0, const vec3 &v1, const vec3 &v2){
-	return AABox<vec3>(min(v0,min(v1,v2)),max(v0,max(v1,v2)));
+	AABox<vec3> answer = AABox<vec3>(vec3(0.0f,0.0f,0.0f), vec3(0.0f,0.0f,0.0f)); 
+	answer.min[0] = min(v0[0],min(v1[0],v2[0]));
+	answer.min[1] = min(v0[1],min(v1[1],v2[1]));
+	answer.min[2] = min(v0[2],min(v1[2],v2[2]));
+	answer.max[0] = max(v0[0],max(v1[0],v2[0]));
+	answer.max[1] = max(v0[1],max(v1[1],v2[1]));
+	answer.max[2] = max(v0[2],max(v1[2],v2[2]));
+	return answer;
 }
 
 inline bool isPointBetweenParallelPlanes(const vec3 &point, const Plane &a, const Plane &b){
