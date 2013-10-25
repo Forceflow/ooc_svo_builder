@@ -50,11 +50,11 @@ inline bool isPointinCylinder(const vec3 &point, const Cylinder &cyl){
 template <typename T>
 inline bool intersectBoxBox(const AABox<T> &a, const AABox<T> &b){
 	if(a.max[0] < b.min[0]) {return false;}
-	else if(a.min[0] > b.max[0]) {return false;}
-	else if(a.max[1] < b.min[1]) {return false;}
-	else if(a.min[1] > b.max[1]) {return false;}
-	else if(a.max[2] < b.min[2]) {return false;}
-	else if(a.min[2] > b.max[2]) {return false;}
+	if(a.min[0] > b.max[0]) {return false;}
+	if(a.max[1] < b.min[1]) {return false;}
+	if(a.min[1] > b.max[1]) {return false;}
+	if(a.max[2] < b.min[2]) {return false;}
+	if(a.min[2] > b.max[2]) {return false;}
 	return true; // intersection or inside
 }
 
