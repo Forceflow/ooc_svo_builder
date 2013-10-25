@@ -1,3 +1,6 @@
+// Various methods of computing morton codes
+// by Jeroen Baert - jeroen.baert@cs.kuleuven.be - www.forceflow.be
+
 #ifndef MORTON_H_
 #define MORTON_H_
 
