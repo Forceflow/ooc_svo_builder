@@ -384,7 +384,6 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 
 		// You can even delay bounding box computations to here
 
-
 		// dominant X, we only test YZ
 		if(dominant_axis == X){
 			for(int y = t_bbox_grid.min[Y]; y <= t_bbox_grid.max[Y]; y++){
@@ -395,7 +394,13 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 					if (((n_yz_e1 DOT p_yz) + d_yz_e1) < 0.0f){continue;}
 					if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){continue;}
 					
-					// determine range of voxels in X direction
+					// Determine range of voxels in X direction
+					// Determine min and max corners
+					vec2 min_corner = p_yz;
+					vec2 max_corner = p_yz + vec2(unitlength,unitlength);
+					if(n[Y] < 0) {swap(min_corner[0], max_corner[0]);}
+					if(n[Z] < 0) {swap(min_corner[1], max_corner[1]);}
+
 				}
 			}
 
