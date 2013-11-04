@@ -314,7 +314,6 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 		t_bbox_grid.max[X] = (int) (t_bbox_world.max[X] * unit_div);
 		t_bbox_grid.max[Y] = (int) (t_bbox_world.max[Y] * unit_div);
 		t_bbox_grid.max[Z] = (int) (t_bbox_world.max[Z] * unit_div);
-
 		// clamp
 		t_bbox_grid.min[X]  = clampval<int>(t_bbox_grid.min[X], p_bbox_grid.min[X], p_bbox_grid.max[X]);
 		t_bbox_grid.min[Y]  = clampval<int>(t_bbox_grid.min[Y], p_bbox_grid.min[Y], p_bbox_grid.max[Y]);
@@ -323,12 +322,21 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 		t_bbox_grid.max[Y]  = clampval<int>(t_bbox_grid.max[Y], p_bbox_grid.min[Y], p_bbox_grid.max[Y]);
 		t_bbox_grid.max[Z]  = clampval<int>(t_bbox_grid.max[Z], p_bbox_grid.min[Z], p_bbox_grid.max[Z]);
 
+		// There are 9 cases:
+		// 3 axes          x 1D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 2 directions
+		// 3 planes        x 2D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 1 direction
+		// 3 dominant axes x 3D Bounding Boxes: triangle bbox is of variable size
+
+
+
+
 		// COMMON PROPERTIES FOR THE TRIANGLE
 		vec3 e0 = t.v1 - t.v0;
 		vec3 e1 = t.v2 - t.v1;
 		vec3 e2 = t.v0 - t.v2;
 		vec3 to_normalize = (e0) CROSS (e1);
 		vec3 n = normalize(to_normalize); // triangle normal
+		float d = (-1.0)*(n[X]*t.v0[X] + n[Y]*t.v0[Y] + n[Z]*t.v0[Z]); // d in plane equation
 
 		// PLANE TEST PROPERTIES
 		vec3 c = vec3(0.0f,0.0f,0.0f); // critical point
@@ -382,24 +390,30 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 		if(n[Y] > n[dominant_axis]){dominant_axis = Y;}
 		if(n[Z] > n[dominant_axis]){dominant_axis = Z;}
 
-		// You can even delay bounding box computations to here
+		// TODO: You can even delay bounding box computations to here
 
 		// dominant X, we only test YZ
 		if(dominant_axis == X){
 			for(int y = t_bbox_grid.min[Y]; y <= t_bbox_grid.max[Y]; y++){
 				for(int z = t_bbox_grid.min[Z]; z <= t_bbox_grid.max[Z]; z++){
+
 					// YZ projection tests
 					vec2 p_yz = vec2(y*unitlength,z*unitlength);
 					if (((n_yz_e0 DOT p_yz) + d_yz_e0) < 0.0f){continue;}
 					if (((n_yz_e1 DOT p_yz) + d_yz_e1) < 0.0f){continue;}
 					if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){continue;}
 					
-					// Determine range of voxels in X direction
-					// Determine min and max corners
+					// Column test: Determine range of voxels in X direction
+					// (1) Determine min and max corners
 					vec2 min_corner = p_yz;
 					vec2 max_corner = p_yz + vec2(unitlength,unitlength);
 					if(n[Y] < 0) {swap(min_corner[0], max_corner[0]);}
 					if(n[Z] < 0) {swap(min_corner[1], max_corner[1]);}
+					// (2) Project corners on triangle plane (Equation: n_x*x + n_y*y + n_z*z + d = 0)
+					float x_min_world = (n[Y]*min_corner[0] + n[Z]*min_corner[1] + d) / (-1.0f * n[X]);
+					float x_max_world = (n[Y]*max_corner[0] + n[Z]*max_corner[1] + d) / (-1.0f * n[X]);
+					int x_min = x_min_world / unitlength;
+					int x_max = x_max_world / unitlength;
 
 				}
 			}
