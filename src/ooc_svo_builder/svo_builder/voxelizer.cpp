@@ -322,10 +322,88 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 		t_bbox_grid.max[Y]  = clampval<int>(t_bbox_grid.max[Y], p_bbox_grid.min[Y], p_bbox_grid.max[Y]);
 		t_bbox_grid.max[Z]  = clampval<int>(t_bbox_grid.max[Z], p_bbox_grid.min[Z], p_bbox_grid.max[Z]);
 
-		// There are 9 cases:
+		// There are 10 cases:
+		// 1               x 1D Bounding Boxes: triangle bbox is only 1 voxel thick in all directions
 		// 3 axes          x 1D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 2 directions
 		// 3 planes        x 2D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 1 direction
 		// 3 dominant axes x 3D Bounding Boxes: triangle bbox is of variable size
+
+		// Measure bbox thickness to find case
+		ivec3 one_thick = ivec3(0,0,0);
+		if(t_bbox_grid.min[X] == t_bbox_grid.max[X]) {one_thick[X] = 1;}
+		if(t_bbox_grid.min[Y] == t_bbox_grid.max[Y]) {one_thick[Y] = 1;}
+		if(t_bbox_grid.min[Z] == t_bbox_grid.max[Z]) {one_thick[Z] = 1;}
+
+		// CASE 1: Triangle bbox is only 1 voxel thick in all directions
+		if(one_thick.sum() == 3){
+			uint64_t index = mortonEncode_LUT(t_bbox_grid.min[Z],t_bbox_grid.min[Y],t_bbox_grid.min[X]);
+			if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
+#ifdef BINARY_VOXELIZATION
+			voxels[index-morton_start] = true;
+#else
+			voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
+			voxels[index-morton_start] = voxel_data.size()-1;
+#endif
+			nfilled++; 
+			continue;
+		}
+
+		// CASE 2-4:
+		// 3 axes x 1D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 2 directions
+		if(one_thick.sum() == 2) { 
+			if(one_thick[X] == 0){
+				for(int x = t_bbox_grid.min[X]; x <= t_bbox_grid.max[X]; x++){
+					uint64_t index = mortonEncode_LUT(t_bbox_grid.min[Z],t_bbox_grid.min[Y],x);
+					if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
+#ifdef BINARY_VOXELIZATION
+					voxels[index-morton_start] = true;
+#else
+					voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
+					voxels[index-morton_start] = voxel_data.size()-1;
+#endif
+					nfilled++;
+				}	
+			} else if(one_thick[Y] == 0){
+				for(int y = t_bbox_grid.min[Y]; y <= t_bbox_grid.max[Y]; y++){
+					uint64_t index = mortonEncode_LUT(t_bbox_grid.min[Z],y,t_bbox_grid.min[X]);
+					if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
+#ifdef BINARY_VOXELIZATION
+					voxels[index-morton_start] = true;
+#else
+					voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
+					voxels[index-morton_start] = voxel_data.size()-1;
+#endif
+					nfilled++;
+				}
+			} else if(one_thick[Z] == 0){
+				for(int z = t_bbox_grid.min[Z]; z <= t_bbox_grid.max[Z]; z++){
+					uint64_t index = mortonEncode_LUT(z,t_bbox_grid.min[Y],t_bbox_grid.min[X]);
+					if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
+#ifdef BINARY_VOXELIZATION
+					voxels[index-morton_start] = true;
+#else
+					voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
+					voxels[index-morton_start] = voxel_data.size()-1;
+#endif
+					nfilled++;
+				}
+			}
+			continue;
+		}
+
+		// COMMON PROPERTIES FOR THE TRIANGLE
+		vec3 e0 = t.v1 - t.v0;
+		vec3 e1 = t.v2 - t.v1;
+		vec3 e2 = t.v0 - t.v2;
+		vec3 to_normalize = (e0) CROSS (e1);
+		vec3 n = normalize(to_normalize); // triangle normal
+		float d = (-1.0)*(n[X]*t.v0[X] + n[Y]*t.v0[Y] + n[Z]*t.v0[Z]); // d in plane equation
+
+		// CASE 5-7:
+		// 3 planes x 2D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 1 direction
+		if(one_thick.sum() == 1) {
+
+		}
 
 
 
@@ -414,11 +492,8 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 					float x_max_world = (n[Y]*max_corner[0] + n[Z]*max_corner[1] + d) / (-1.0f * n[X]);
 					int x_min = x_min_world / unitlength;
 					int x_max = x_max_world / unitlength;
-
 				}
 			}
-
-
 		}
 
 		// test possible grid boxes for overlap
