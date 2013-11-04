@@ -283,9 +283,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
 	voxel_data.clear();
 #endif
-	for(size_t i = 0; i < (morton_end-morton_start); i++){
-		voxels[i] = EMPTY_VOXEL;
-	}
+	for(size_t i = 0; i < (morton_end-morton_start); i++){voxels[i] = EMPTY_VOXEL;}
 
 	// compute partition min and max in grid coords
 	AABox<uivec3> p_bbox_grid;
@@ -322,73 +320,37 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 		t_bbox_grid.max[Y]  = clampval<int>(t_bbox_grid.max[Y], p_bbox_grid.min[Y], p_bbox_grid.max[Y]);
 		t_bbox_grid.max[Z]  = clampval<int>(t_bbox_grid.max[Z], p_bbox_grid.min[Z], p_bbox_grid.max[Z]);
 
-		// There are 10 cases:
-		// 1               x 1D Bounding Boxes: triangle bbox is only 1 voxel thick in all directions
+		// There are 9 cases:
 		// 3 axes          x 1D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 2 directions
 		// 3 planes        x 2D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 1 direction
 		// 3 dominant axes x 3D Bounding Boxes: triangle bbox is of variable size
 
-		// Measure bbox thickness to find case
+		// Measure bbox thickness to find correct case
 		ivec3 one_thick = ivec3(0,0,0);
 		if(t_bbox_grid.min[X] == t_bbox_grid.max[X]) {one_thick[X] = 1;}
 		if(t_bbox_grid.min[Y] == t_bbox_grid.max[Y]) {one_thick[Y] = 1;}
 		if(t_bbox_grid.min[Z] == t_bbox_grid.max[Z]) {one_thick[Z] = 1;}
 
-		// CASE 1: Triangle bbox is only 1 voxel thick in all directions
-		if(one_thick.sum() == 3){
-			uint64_t index = mortonEncode_LUT(t_bbox_grid.min[Z],t_bbox_grid.min[Y],t_bbox_grid.min[X]);
-			if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
-#ifdef BINARY_VOXELIZATION
-			voxels[index-morton_start] = true;
-#else
-			voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
-			voxels[index-morton_start] = voxel_data.size()-1;
-#endif
-			nfilled++; 
-			continue;
-		}
-
-		// CASE 2-4:
+		// CASE 1-3
 		// 3 axes x 1D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 2 directions
-		if(one_thick.sum() == 2) { 
-			if(one_thick[X] == 0){
-				for(int x = t_bbox_grid.min[X]; x <= t_bbox_grid.max[X]; x++){
-					uint64_t index = mortonEncode_LUT(t_bbox_grid.min[Z],t_bbox_grid.min[Y],x);
-					if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
+		// TESTS: All voxels can be accepted without further test
+		if(one_thick.sum() >= 2){
+			for(int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
+				for(int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
+					for(int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
+						uint64_t index = mortonEncode_LUT(t_bbox_grid.min[Z],t_bbox_grid.min[Y],t_bbox_grid.min[X]);
+						if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
 #ifdef BINARY_VOXELIZATION
-					voxels[index-morton_start] = true;
+						voxels[index-morton_start] = true;
 #else
-					voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
-					voxels[index-morton_start] = voxel_data.size()-1;
+						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
+						voxels[index-morton_start] = voxel_data.size()-1;
 #endif
-					nfilled++;
-				}	
-			} else if(one_thick[Y] == 0){
-				for(int y = t_bbox_grid.min[Y]; y <= t_bbox_grid.max[Y]; y++){
-					uint64_t index = mortonEncode_LUT(t_bbox_grid.min[Z],y,t_bbox_grid.min[X]);
-					if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
-#ifdef BINARY_VOXELIZATION
-					voxels[index-morton_start] = true;
-#else
-					voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
-					voxels[index-morton_start] = voxel_data.size()-1;
-#endif
-					nfilled++;
-				}
-			} else if(one_thick[Z] == 0){
-				for(int z = t_bbox_grid.min[Z]; z <= t_bbox_grid.max[Z]; z++){
-					uint64_t index = mortonEncode_LUT(z,t_bbox_grid.min[Y],t_bbox_grid.min[X]);
-					if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
-#ifdef BINARY_VOXELIZATION
-					voxels[index-morton_start] = true;
-#else
-					voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
-					voxels[index-morton_start] = voxel_data.size()-1;
-#endif
-					nfilled++;
+						nfilled++; 
+						continue;
+					}
 				}
 			}
-			continue;
 		}
 
 		// COMMON PROPERTIES FOR THE TRIANGLE
@@ -402,7 +364,42 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 		// CASE 5-7:
 		// 3 planes x 2D Bounding Boxes: triangle bbox is only 1 voxel thick in at least 1 direction
 		if(one_thick.sum() == 1) {
+			if(one_thick[X] == 1){ // 1 voxel thick in X direction - so 2D overlap test in YZ plane
+				// YZ plane projection test setup
+				vec2 n_yz_e0 = vec2(-1.0f*e0[Z], e0[Y]);
+				vec2 n_yz_e1 = vec2(-1.0f*e1[Z], e1[Y]);
+				vec2 n_yz_e2 = vec2(-1.0f*e2[Z], e2[Y]);
+				if(n[X] < 0.0f) { 
+					n_yz_e0 = -1.0f * n_yz_e0;
+					n_yz_e1 = -1.0f * n_yz_e1;
+					n_yz_e2 = -1.0f * n_yz_e2;
+				}
+				float d_yz_e0 = (-1.0f * (n_yz_e0 DOT vec2(t.v0[Y],t.v0[Z]))) + max(0.0f, unitlength*n_yz_e0[0]) + max(0.0f, unitlength*n_yz_e0[1]);
+				float d_yz_e1 = (-1.0f * (n_yz_e1 DOT vec2(t.v1[Y],t.v1[Z]))) + max(0.0f, unitlength*n_yz_e1[0]) + max(0.0f, unitlength*n_yz_e1[1]);
+				float d_yz_e2 = (-1.0f * (n_yz_e2 DOT vec2(t.v2[Y],t.v2[Z]))) + max(0.0f, unitlength*n_yz_e2[0]) + max(0.0f, unitlength*n_yz_e2[1]);
 
+				// Test bbox projection in YZ plane
+				for(int y = t_bbox_grid.min[Y]; y <= t_bbox_grid.max[Y]; y++){
+					for(int z = t_bbox_grid.min[Z]; z <= t_bbox_grid.max[Z]; z++){
+						uint64_t index = mortonEncode_LUT(z,y,t_bbox_grid.min[X]);
+						if(!voxels[index-morton_start] == EMPTY_VOXEL){continue;} // already marked, continue
+						// YZ PROJECTION TEST
+						vec2 p_yz = vec2(y*unitlength,z*unitlength);
+						if (((n_yz_e0 DOT p_yz) + d_yz_e0) < 0.0f){continue;}
+						if (((n_yz_e1 DOT p_yz) + d_yz_e1) < 0.0f){continue;}
+						if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){continue;}
+#ifdef BINARY_VOXELIZATION
+						voxels[index-morton_start] = true;
+#else
+						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
+						voxels[index-morton_start] = voxel_data.size()-1;
+#endif
+						nfilled++; continue;
+					}
+				}
+			} else if (one_thick[Y] == 1) { // 1 voxel thick in Y direction - so 2D overlap test in ZX plane
+
+			}
 		}
 
 
