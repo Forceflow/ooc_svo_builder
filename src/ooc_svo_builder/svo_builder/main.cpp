@@ -2,9 +2,10 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "globals.h"
 #include <trip_tools.h>
 #include <TriReader.h>
-#include "globals.h"
+
 #include "voxelizer.h"
 #include "OctreeBuilder.h"
 #include "partitioner.h"
@@ -42,7 +43,13 @@ TripInfo trip_info;
 size_t input_buffersize = 500000;
 
 // timers
-Timer main_timer, algo_timer, io_timer_in, io_timer_out;
+ Timer main_timer;
+ Timer part_total_timer;
+ Timer part_io_in_timer;
+ Timer part_io_out_timer;
+ Timer part_algo_timer;
+ Timer vox_timer;
+ Timer svo_timer;;
 
 void printInfo() {
 	cout << "--------------------------------------------------------------------" << endl;
@@ -161,34 +168,38 @@ void parseProgramParameters(int argc, char* argv[]) {
 // Initialize all performance timers
 void setupTimers() {
 	main_timer = Timer();
-	algo_timer = Timer();
-	io_timer_in = Timer();
-	io_timer_out = Timer();
+	part_total_timer = Timer();
+	part_io_in_timer = Timer();
+	part_io_out_timer = Timer();
+	part_algo_timer = Timer();
+	vox_timer = Timer();
+	svo_timer = Timer();
 }
 
 // Printout total time of running Timers (for debugging purposes)
 void printTimerInfo() {
-	double diff = main_timer.getTotalTimeSeconds() - (algo_timer.getTotalTimeSeconds() + io_timer_in.getTotalTimeSeconds() + io_timer_out.getTotalTimeSeconds());
+	//double diff = main_timer.getTotalTimeSeconds() - (algo_timer.getTotalTimeSeconds() + io_timer_in.getTotalTimeSeconds() + io_timer_out.getTotalTimeSeconds());
 	cout << "Total MAIN time      : " << main_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "Total IO IN time     : " << io_timer_in.getTotalTimeSeconds() << " s." << endl;
-	cout << "Total algorithm time : " << algo_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "Total IO OUT time    : " << io_timer_out.getTotalTimeSeconds() << " s." << endl;
-	cout << "Total misc time      : " << diff << " s." << endl;
+	cout << "PARTITIONING" << endl;
+	cout << "  Total time           : " << part_total_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  Total IO IN time     : " << part_io_in_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  Total algorithm time : " << part_algo_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  Total IO OUT time    : " << part_io_out_timer.getTotalTimeSeconds() << " s." << endl;
+	//cout << "Total misc time      : " << diff << " s." << endl;
 }
 
 // Tri header handling and error checking
 void readTriHeader(string& filename, TriInfo& tri_info){
-	io_timer_in.start();
 	cout << "Parsing tri header " << filename << " ..." << endl;
 	if (parseTriHeader(filename, tri_info) != 1) {
 		exit(0); // something went wrong in parsing the header - exiting.
 	}
-	if (!tri_info.filesExist()) {
-		cout << "Not all required .tri or .tridata files exist. Please regenerate using tri_convert." << endl; 
-		exit(0); // not all required files exist - exiting.
-	}
+	// disabled for benchmarking
+	//if (!tri_info.filesExist()) {
+	//	cout << "Not all required .tri or .tridata files exist. Please regenerate using tri_convert." << endl; 
+	//	exit(0); // not all required files exist - exiting.
+	//}
 	if (verbose) {tri_info.print();}
-	io_timer_in.stop();
 	// Check if the user is using the correct executable for type of tri file
 #ifdef BINARY_VOXELIZATION
 	if (!tri_info.geometry_only) {
@@ -205,16 +216,15 @@ void readTriHeader(string& filename, TriInfo& tri_info){
 
 // Trip header handling and error checking
 void readTripHeader(string& filename, TripInfo& trip_info){
-	io_timer_in.start(); // TIMING
 	if (parseTripHeader(filename, trip_info) != 1) {
 		exit(0);
 	}
-	if (!trip_info.filesExist()) {
-		cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
-		exit(0); // not all required files exist - exiting.
-	}
+	// disabled for benchmarking
+	//if (!trip_info.filesExist()) {
+	//	cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
+	//	exit(0); // not all required files exist - exiting.
+	//}
 	if (verbose) {trip_info.print();}
-	io_timer_in.stop(); // TIMING
 }
 
 int main(int argc, char *argv[]) {
@@ -240,9 +250,9 @@ int main(int argc, char *argv[]) {
 	// Do partitioning and store results/file refs in TripInfo
 	size_t n_partitions = estimate_partitions(gridsize, memory_limit);
 	cout << "Partitioning data into " << n_partitions << " partitions ... "; cout.flush();
-	algo_timer.start(); // TIMING
+	part_total_timer.start(); // TIMING
 	TripInfo trip_info = partition(tri_info, n_partitions, gridsize);
-	algo_timer.stop(); // TIMING
+	part_total_timer.stop(); // TIMING
 	cout << "done." << endl;
 
 	// Parse TRIP header
@@ -267,7 +277,7 @@ int main(int argc, char *argv[]) {
 	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, true, generate_levels);
 
 	// Start voxelisation and SVO building per partition
-	algo_timer.start(); // TIMING
+	//algo_timer.start(); // TIMING
 	for (size_t i = 0; i < trip_info.n_partitions; i++) {
 		if (trip_info.part_tricounts[i] > 0) { // if this partition contains triangles
 			cout << "Voxelizing partition " << i << " ..." << endl;
@@ -284,9 +294,9 @@ int main(int argc, char *argv[]) {
 			size_t nfilled_before = nfilled;
 			size_t total_voxels = 0;
 #ifdef BINARY_VOXELIZATION
-			voxelize_partition2(reader, start, end, unitlength, voxels, nfilled);
+			voxelize_partition3(reader, start, end, unitlength, voxels, nfilled);
 #else
-			voxelize_partition2(reader, start, end, unitlength, voxels, voxel_data, nfilled);
+			voxelize_partition3(reader, start, end, unitlength, voxels, voxel_data, nfilled);
 #endif
 			if (verbose) {cout << "  found " << nfilled - nfilled_before << " new voxels." << endl;}
 
@@ -321,15 +331,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	builder.finalizeTree(); // finalize SVO so it gets written to disk
-	algo_timer.stop(); // TIMING
+	//algo_timer.stop(); // TIMING
 	cout << "done" << endl;
 	cout << "Total amount of voxels: " << nfilled << endl;
 
 	// Removing .trip files which are left by partitioner
-	io_timer_out.start(); // TIMING
-	removeTripFiles(trip_info);
-	io_timer_out.stop(); // TIMING
+	// removeTripFiles(trip_info);
 
 	main_timer.stop();
-	if (verbose) {printTimerInfo();}
+	printTimerInfo();
 }

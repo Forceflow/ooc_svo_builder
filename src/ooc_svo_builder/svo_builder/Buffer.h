@@ -61,9 +61,9 @@ inline void Buffer::flush(){
 	if(file == NULL){ // if the file is not open yet, we open it.
 		file = fopen(filename.c_str(), "wb");
 	}
-	algo_timer.stop(); io_timer_out.start(); // TIMING
+	part_algo_timer.stop(); part_io_out_timer.start(); // TIMING
 	writeTriangles(file,triangle_buffer[0],triangle_buffer.size());
-	io_timer_out.stop(); algo_timer.start();  // TIMING
+	part_io_out_timer.stop(); part_algo_timer.start();  // TIMING
 	triangle_buffer.clear();
 }
 
@@ -71,9 +71,9 @@ inline void Buffer::flush(){
 inline void Buffer::processTriangle(Triangle &t, const AABox<vec3> &bbox){
 	if(intersectBoxBox(bbox, bbox_world)){ // triangle in this partition
 		if(buffer_max == 0){ // no buffering, just write triangle
-			algo_timer.stop(); io_timer_out.start(); // TIMING
+			part_algo_timer.stop(); part_io_out_timer.start(); // TIMING
 			writeTriangle(file, t);
-			io_timer_out.stop(); algo_timer.start();  // TIMING
+			part_io_out_timer.stop(); part_algo_timer.start();  // TIMING
 		} else { // add to buffer
 			triangle_buffer.push_back(t);
 			if(triangle_buffer.size() >= buffer_max) { // buffer full, writeout to files

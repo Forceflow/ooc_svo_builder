@@ -4,10 +4,12 @@
 #include <tri_tools.h>
 #include <trip_tools.h>
 #include <file_tools.h>
+#include "globals.h"
 #include <TriReader.h>
 #include "Buffer.h"
 #include "morton.h"
 #include "voxelizer.h"
+
 
 // Partitioning-related stuff
 

@@ -1,5 +1,4 @@
 #include "partitioner.h"
-#include <omp.h>
 
 using namespace std;
 using namespace trimesh;
@@ -95,37 +94,40 @@ TripInfo partition_one(const TriInfo& tri_info, const size_t gridsize){
 	std::string header = trip_info.base_filename + string(".trip");
 	trip_info.gridsize = gridsize;
 	trip_info.n_partitions = 1;
-	io_timer_out.start(); // TIMING
+	part_io_out_timer.start(); // TIMING
 	writeTripHeader(header, trip_info);
-	io_timer_out.stop(); // TIMING
+	part_io_out_timer.stop(); // TIMING
 	return trip_info;
 }
 
 // Partition the mesh referenced by tri_info into n partitions for gridsize, and store information about the partitioning in trip_info
 TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize){
-
 	// Special case: just one partition
 	if(n_partitions == 1) {
 		return partition_one(tri_info,gridsize);
 	}
 
 	// Open tri_data stream
+	part_io_in_timer.start(); // TIMING
 	TriReader reader = TriReader(tri_info.base_filename + string(".tridata"), tri_info.n_triangles, input_buffersize);
-
+	part_io_in_timer.stop(); // TIMING
+	
+	part_algo_timer.start(); // TIMING
 	// Create Mortonbuffers
 	vector<Buffer*> buffers;
 	createBuffers(tri_info, n_partitions, gridsize, buffers);
 
 	while(reader.hasNext()) {
 		Triangle t; 
-		algo_timer.stop(); io_timer_in.start(); // TIMING
+		part_algo_timer.stop(); part_io_in_timer.start(); // TIMING
 		reader.getTriangle(t);
-		io_timer_in.stop(); algo_timer.start(); // TIMING
+		part_io_in_timer.stop(); part_algo_timer.start(); // TIMING
 		AABox<vec3> bbox = computeBoundingBox(t.v0,t.v1,t.v2); // compute bounding box
 		for(int j = 0; j < n_partitions; j++){ // Test against all partitions
 			buffers[j]->processTriangle(t, bbox);
 		}
 	}
+	part_algo_timer.stop(); // TIMING
 
 //	vector<Triangle> triangle_buffer;
 //	while(reader.hasNext()) {
@@ -145,6 +147,8 @@ TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const siz
 //		}
 //	}
 
+	part_io_out_timer.start(); // TIMING
+
 	// create TripInfo object to hold header info
 	TripInfo trip_info = TripInfo(tri_info);
 
@@ -160,8 +164,8 @@ TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const siz
 	std::string header = trip_info.base_filename + string(".trip");
 	trip_info.gridsize = gridsize;
 	trip_info.n_partitions = n_partitions;
-	io_timer_out.start(); // TIMING
 	writeTripHeader(header, trip_info);
-	io_timer_out.stop(); // TIMING
+
+	part_io_out_timer.stop(); // TIMING
 	return trip_info;
 }
