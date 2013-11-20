@@ -34,7 +34,7 @@ private:
 };
 
 // default constructor
-inline Buffer::Buffer() : bbox_world(AABox<vec3>(vec3(0,0,0),vec3(1,1,1))), n_triangles(0), buffer_max(1024), file(NULL), filename(""){
+inline Buffer::Buffer() : bbox_world(AABox<vec3>(vec3(),vec3(1,1,1))), n_triangles(0), buffer_max(1024), file(NULL), filename(""){
 }
 
 // full constructor

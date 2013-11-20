@@ -19,7 +19,7 @@ public:
 };
 
 
-inline DataPoint::DataPoint() : opacity(0.0f), color(vec3(0,0,0)), normal(vec3(0.0f,0.0f,0.0f)){
+inline DataPoint::DataPoint() : opacity(0.0f), color(vec3()), normal(vec3()){
 }
 
 inline DataPoint::DataPoint(float opacity, vec3 color) : opacity(opacity), color(color){
