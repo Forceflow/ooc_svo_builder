@@ -8,6 +8,9 @@
 #define NOCHILD -1
 #define NODATA 0
 
+// This is how an array of a leaf node will look
+const char LEAF[] {NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD};
+
 // An SVO node. Only contains child pointers, extend this if you want parent pointers as well
 class Node
 {
@@ -28,9 +31,7 @@ public:
 
 // Default constructor
 inline Node::Node() : data(0), children_base(0), data_cache(DataPoint()){
-	for(unsigned int i = 0; i<8; i++){
-		children_offset[i] = NOCHILD;
-	}
+	memset(children_offset, (char) NOCHILD, 8);
 }
 
 // Check if this Node has a child at position i
@@ -54,12 +55,10 @@ inline bool Node::isNull() const{
 
 // If this node doesn;t have any children, it's a leaf node
 inline bool Node::isLeaf() const{
-	for(unsigned int i = 0; i<8; i++){
-		if(children_offset[i] != NOCHILD){
-			return false;
-		}
+	if (memcmp(children_offset, LEAF, 8 * sizeof(char)) == 0){
+		return true;
 	}
-	return true;
+	return false;
 }
 
 // If the data pointer is NODATA, there is no data
