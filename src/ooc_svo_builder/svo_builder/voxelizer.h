@@ -22,7 +22,7 @@ struct VoxelData{
 };
 
 #ifdef BINARY_VOXELIZATION
-#define EMPTY_VOXEL false // false means no voxel
+#define EMPTY_VOXEL 0 // false means no voxel
 void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled);
 #else
 #define EMPTY_VOXEL 0 // false means no voxel
@@ -36,7 +36,7 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 #endif
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled);
+void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, size_t &nfilled);
 #else
 void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled);
 #endif

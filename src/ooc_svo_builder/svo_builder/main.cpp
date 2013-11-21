@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) {
 	
 	// Storage for voxel references (STATIC)
 #ifdef BINARY_VOXELIZATION
-	bool* voxels = new bool[(size_t) morton_part]; // TODO: If you want tighter packing, check the Frankensteiny that is vector<bool>
+	char* voxels = new char[(size_t) morton_part]; // TODO: If you want tighter packing, check the Frankensteiny that is vector<bool>
 #else
 	size_t* voxels = new size_t[(size_t) morton_part];
 	vector<VoxelData> voxel_data; // Storage for voxel data (DYNAMIC)
