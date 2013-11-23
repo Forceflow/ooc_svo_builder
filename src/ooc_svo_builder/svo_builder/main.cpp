@@ -294,15 +294,12 @@ int main(int argc, char *argv[]) {
 
 			// voxelize partition
 			size_t nfilled_before = nfilled;
-			size_t total_voxels = 0;
 #ifdef BINARY_VOXELIZATION
 			voxelize_partition3(reader, start, end, unitlength, voxels, morton, nfilled);
 #else
 			voxelize_partition3(reader, start, end, unitlength, voxels, voxel_data, nfilled);
 #endif
 			if (verbose) { cout << "  found " << nfilled - nfilled_before << " new voxels." << endl; }
-
-
 
 			// build SVO
 			cout << "Building SVO for partition " << i << " ..." << endl;
