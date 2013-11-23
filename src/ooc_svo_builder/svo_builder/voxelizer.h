@@ -36,7 +36,7 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 #endif
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, size_t &nfilled);
+void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &morton, size_t &nfilled);
 #else
 void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled);
 #endif

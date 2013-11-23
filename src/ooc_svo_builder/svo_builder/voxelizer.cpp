@@ -279,8 +279,9 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 }
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, size_t &nfilled) {
+void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &morton, size_t &nfilled) {
 	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(char));
+	morton.clear();
 #else
 void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
 	voxel_data.clear();
@@ -344,6 +345,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (!voxels[index - morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
+						morton.push_back(index);
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -385,6 +387,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){ continue; }
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
+						morton.push_back(index);
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -413,6 +416,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (((n_zx_e2 DOT p_zx) + d_xz_e2) < 0.0f){ continue; }
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
+						morton.push_back(index);
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -441,6 +445,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (((n_xy_e2 DOT p_xy) + d_xy_e2) < 0.0f){ continue; }
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
+						morton.push_back(index);
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -549,6 +554,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
+						morton.push_back(index);
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;

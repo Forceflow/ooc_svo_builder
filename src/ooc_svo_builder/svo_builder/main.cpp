@@ -5,6 +5,7 @@
 #include "globals.h"
 #include <trip_tools.h>
 #include <TriReader.h>
+#include <algorithm>
 
 #include "voxelizer.h"
 #include "OctreeBuilder.h"
@@ -24,7 +25,7 @@ using namespace std;
 enum ColorType {COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL};
 
 // Program version
-string version = "1.1";
+string version = "1.2";
 
 // Program parameters
 string filename = "";
@@ -266,6 +267,7 @@ int main(int argc, char *argv[]) {
 	// Storage for voxel references (STATIC)
 #ifdef BINARY_VOXELIZATION
 	char* voxels = new char[(size_t) morton_part]; // TODO: If you want tighter packing, check the Frankensteiny that is vector<bool>
+	vector<uint64_t> morton;
 #else
 	size_t* voxels = new size_t[(size_t) morton_part];
 	vector<VoxelData> voxel_data; // Storage for voxel data (DYNAMIC)
@@ -288,28 +290,41 @@ int main(int argc, char *argv[]) {
 			// open file to read triangles
 			std::string part_data_filename = trip_info.base_filename + string("_") + val_to_string(i) + string(".tripdata");
 			TriReader reader = TriReader(part_data_filename, trip_info.part_tricounts[i], min(trip_info.part_tricounts[i], input_buffersize));
-			if (verbose) {cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl;}
+			if (verbose) { cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl; }
 
 			// voxelize partition
 			size_t nfilled_before = nfilled;
 			size_t total_voxels = 0;
 #ifdef BINARY_VOXELIZATION
-			voxelize_partition3(reader, start, end, unitlength, voxels, nfilled);
+			voxelize_partition3(reader, start, end, unitlength, voxels, morton, nfilled);
 #else
 			voxelize_partition3(reader, start, end, unitlength, voxels, voxel_data, nfilled);
 #endif
-			if (verbose) {cout << "  found " << nfilled - nfilled_before << " new voxels." << endl;}
+			if (verbose) { cout << "  found " << nfilled - nfilled_before << " new voxels." << endl; }
+
+
 
 			// build SVO
 			cout << "Building SVO for partition " << i << " ..." << endl;
 			uint64_t morton_number;
 			DataPoint d;
+
+#ifdef BINARY_VOXELIZATION
+			sort(morton.begin(), morton.end()); // sort morton codes
+			for (std::vector<uint64_t>::iterator it = morton.begin(); it != morton.end(); ++it){
+				d = DataPoint();
+				d.opacity = 1.0;
+				builder.addDataPoint(*it, d);
+			}
+#endif
+
+#ifndef BINARY_VOXELIZATION	
 			for (size_t j = 0; j < morton_part; j++) {
 				if (! voxels[j] == EMPTY_VOXEL) {
 					morton_number = start + j;
 					d = DataPoint();
 					d.opacity = 1.0; // this voxel is filled
-#ifndef BINARY_VOXELIZATION
+
 					VoxelData& current_data = voxel_data.at(voxels[j]);
 					// NORMALS
 					d.normal = current_data.normal;
@@ -324,10 +339,11 @@ int main(int argc, char *argv[]) {
 						vec3 normal = normalize(d.normal);
 						d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
 					}
-#endif
+
 					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
 				}
 			}
+#endif
 		}
 	}
 	builder.finalizeTree(); // finalize SVO so it gets written to disk
