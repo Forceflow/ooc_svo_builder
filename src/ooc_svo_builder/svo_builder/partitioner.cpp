@@ -10,13 +10,7 @@ using namespace trimesh;
 // Estimate the optimal amount of partitions we need, given the requested gridsize and the overall memory limit.
 size_t estimate_partitions(const size_t gridsize, const size_t memory_limit){
 	cout << "Estimating best partition count ..." << endl;
-	cout << "Size of bool: " << sizeof(bool) << endl;
-	cout << "Size of char: " << sizeof(char) << endl;
-#ifdef BINARY_VOXELIZATION
-	uint64_t required = (gridsize*gridsize*gridsize*sizeof(bool)) /1024 /1024;
-#else
-	uint64_t required = (gridsize*gridsize*gridsize*sizeof(size_t)) /1024 /1024;
-#endif
+	uint64_t required = (gridsize*gridsize*gridsize*sizeof(char)) /1024 /1024;
 	cout << "  to do this in-core I would need " << required << " Mb of system memory" << endl;
 	if(required <= memory_limit){
 		cout << "  memory limit of " << memory_limit << " Mb allows that" << endl;

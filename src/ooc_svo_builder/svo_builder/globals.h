@@ -10,12 +10,19 @@ using namespace std;
 
 // timers
 extern Timer main_timer;
+
 extern Timer part_total_timer;
 extern Timer part_io_in_timer;
 extern Timer part_io_out_timer;
 extern Timer part_algo_timer;
-extern Timer vox_timer;
-extern Timer svo_timer;
+
+extern Timer vox_total_timer;
+extern Timer vox_io_in_timer;
+extern Timer vox_algo_timer;
+
+extern Timer svo_total_timer;
+extern Timer svo_io_out_timer;
+extern Timer svo_algo_timer;
 
 // global flag: be verbose about what we do?
 extern bool verbose;

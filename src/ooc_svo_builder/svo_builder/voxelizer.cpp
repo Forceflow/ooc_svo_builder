@@ -131,8 +131,10 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 }
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
-	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(bool));
+void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
+	vox_algo_timer.start();
+	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(char));
+	data.clear();
 #else
 void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
 	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(size_t));
@@ -144,6 +146,13 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 	mortonDecode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
 	mortonDecode(morton_end - 1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
 
+	// compute maximum grow size for data array
+	size_t data_max_items;
+	if (use_data){
+		uint64_t max_bytes_data = ((morton_end - morton_start)*sizeof(char)) * sparseness_limit;
+		data_max_items = max_bytes_data / sizeof(uint64_t);
+	}
+
 	// COMMON PROPERTIES FOR ALL TRIANGLES
 	float unit_div = 1.0f / unitlength;
 	vec3 delta_p = vec3(unitlength, unitlength, unitlength);
@@ -153,9 +162,17 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		// read triangle
 		Triangle t;
 
-		//	algo_timer.stop(); io_timer_in.start();
+		vox_algo_timer.stop(); vox_io_in_timer.start();
 		reader.getTriangle(t);
-		//	io_timer_in.stop(); algo_timer.start();
+		vox_io_in_timer.stop(); vox_algo_timer.start();
+
+		if (use_data){
+			if (data.size() > data_max_items){
+				cout << "Data side-array overflowed, reverting to normal voxelization." << endl;
+				cout << data.size() << " > " << data_max_items << endl;
+				use_data = false;
+			}
+		}
 
 		// compute triangle bbox in world and grid
 		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0, t.v1, t.v2);
@@ -237,7 +254,7 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 
 					assert(index - morton_start < (morton_end - morton_start));
 
-					if (!voxels[index - morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
+					if (voxels[index - morton_start] == FULL_VOXEL){ continue; } // already marked, continue
 
 					// TRIANGLE PLANE THROUGH BOX TEST
 					vec3 p = vec3(x*unitlength, y*unitlength, z*unitlength);
@@ -264,7 +281,8 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 					if (((n_zx_e2 DOT p_zx) + d_xz_e2) < 0.0f){ continue; }
 
 #ifdef BINARY_VOXELIZATION
-					voxels[index - morton_start] = true;
+					voxels[index - morton_start] = FULL_VOXEL;
+					if (use_data){data.push_back(index);}
 #else
 					voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color,t.v1_color,t.v2_color)));
 					voxels[index-morton_start] = voxel_data.size()-1;
@@ -279,15 +297,15 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 }
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &morton, size_t &nfilled) {
+void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled){
+	vox_algo_timer.start();
 	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(char));
-	morton.clear();
+	data.clear();
 #else
 void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
 	voxel_data.clear();
 	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(size_t));
 #endif
-
 	// compute partition min and max in grid coords
 	AABox<uivec3> p_bbox_grid;
 	mortonDecode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
@@ -297,14 +315,29 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 	float unit_div = 1.0f / unitlength;
 	vec3 delta_p = vec3(unitlength, unitlength, unitlength);
 
+	// compute maximum grow size for data array
+	size_t data_max_items;
+	if (use_data){
+		uint64_t max_bytes_data = ((morton_end - morton_start)*sizeof(char)) * sparseness_limit;
+		data_max_items = max_bytes_data / sizeof(uint64_t);
+	}
+
 	// voxelize every triangle
 	while (reader.hasNext()) {
 		// read triangle
 		Triangle t;
 
-		//algo_timer.stop(); io_timer_in.start();
+		vox_algo_timer.stop(); vox_io_in_timer.start();
 		reader.getTriangle(t);
-		//io_timer_in.stop(); algo_timer.start();
+		vox_io_in_timer.stop(); vox_algo_timer.start();
+
+		if (use_data){
+			if (data.size() > data_max_items){
+				cout << "Data side-array overflowed, reverting to normal voxelization." << endl;
+				cout << data.size() << " > " << data_max_items << endl;
+				use_data = false;
+			}
+		}
 
 		// compute triangle bbox in world and grid
 		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0, t.v1, t.v2);
@@ -345,7 +378,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (!voxels[index - morton_start] == EMPTY_VOXEL){ continue; } // already marked, continue
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
-						morton.push_back(index);
+						if (use_data){data.push_back(index);}
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -387,7 +420,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){ continue; }
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
-						morton.push_back(index);
+						if (use_data){ data.push_back(index); }
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -416,7 +449,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (((n_zx_e2 DOT p_zx) + d_xz_e2) < 0.0f){ continue; }
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
-						morton.push_back(index);
+						if (use_data){ data.push_back(index); }
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -445,7 +478,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 						if (((n_xy_e2 DOT p_xy) + d_xy_e2) < 0.0f){ continue; }
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
-						morton.push_back(index);
+						if (use_data){ data.push_back(index); }
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -554,7 +587,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = 1;
-						morton.push_back(index);
+						if (use_data){ data.push_back(index); }
 #else
 						voxel_data.push_back(VoxelData(t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
@@ -567,6 +600,7 @@ void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const u
 			}
 		}
 	}
+	vox_algo_timer.stop();
 }
 
 #ifdef BINARY_VOXELIZATION

@@ -2,28 +2,31 @@
 
 // OctreeBuilder constructor: this initializes the builder and sets up the output files, ready to go
 OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool fast_empty, bool generate_levels) :
-	gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), fast_empty(fast_empty), generate_levels(generate_levels), base_filename(base_filename) {
-		// Open output files
-		string nodes_name = base_filename + string(".octreenodes");
-		string data_name = base_filename + string(".octreedata");
-		node_out = fopen(nodes_name.c_str(), "wb");
-		data_out = fopen(data_name.c_str(), "wb");
-		// Setup building variables
-		b_maxdepth = log2((unsigned int) gridlength);
-		b_buffers.resize(b_maxdepth+1);
-		for(int i = 0; i < b_maxdepth+1; i++){
-			b_buffers[i].reserve(8);
-		}
-		b_max_morton = mortonEncode_LUT((unsigned int) gridlength-1, (unsigned int) gridlength-1, (unsigned int) gridlength-1);
+gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), fast_empty(fast_empty), generate_levels(generate_levels), base_filename(base_filename) {
+	svo_algo_timer.start();
 
-//		algo_timer.stop(); io_timer_out.start(); // TIMING
-		writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
+	// Open output files
+	string nodes_name = base_filename + string(".octreenodes");
+	string data_name = base_filename + string(".octreedata");
+	node_out = fopen(nodes_name.c_str(), "wb");
+	data_out = fopen(data_name.c_str(), "wb");
+	// Setup building variables
+	b_maxdepth = log2((unsigned int)gridlength);
+	b_buffers.resize(b_maxdepth + 1);
+	for (int i = 0; i < b_maxdepth + 1; i++){
+		b_buffers[i].reserve(8);
+	}
+	b_max_morton = mortonEncode_LUT((unsigned int)gridlength - 1, (unsigned int)gridlength - 1, (unsigned int)gridlength - 1);
+
+	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
+	writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
-		// second data point is NULL, all voxels refer to this if binary voxelization only
-		// This point has no color and opacity of 0.0 - will not show up in rendering
-		writeDataPoint(data_out, DataPoint(), b_data_pos); 
+	// second data point is NULL, all voxels refer to this if binary voxelization only
+	// This point has no color and opacity of 0.0 - will not show up in rendering
+	writeDataPoint(data_out, DataPoint(), b_data_pos);
 #endif
-//		io_timer_out.stop(); algo_timer.start(); // TIMING
+	svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
+	svo_algo_timer.stop();
 }
 
 // Finalize the tree: add rest of empty nodes, make sure root node is on top
@@ -39,16 +42,16 @@ void OctreeBuilder::finalizeTree(){
 		}
 	}
 	// write root node
-	//algo_timer.stop(); io_timer_out.start(); // TIMING
+	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 	writeNode(node_out, b_buffers[0][0], b_node_pos);
-	//io_timer_out.stop(); algo_timer.start(); // TIMING
+	svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 
 	// write header
 	OctreeInfo octree_info(1,base_filename,gridlength,b_node_pos,b_data_pos);
 
-	//algo_timer.stop(); io_timer_out.start(); // TIMING
+	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 	writeOctreeHeader(base_filename+string(".octree"),octree_info);
-	//io_timer_out.stop(); algo_timer.start(); // TIMING
+	svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 
 	// close files
 	fclose(data_out);
@@ -62,15 +65,15 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 	for(int k = 0; k<8; k++){
 		if(!buffer[k].isNull()){
 			if(first_stored_child){
-				//algo_timer.stop(); io_timer_out.start(); // TIMING
+				svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 				parent.children_base = writeNode(node_out,buffer[k],b_node_pos);
-				//io_timer_out.stop(); algo_timer.start(); // TIMING
+				svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 				parent.children_offset[k] = 0;
 				first_stored_child = false;
 			} else {
-				//algo_timer.stop(); io_timer_out.start(); // TIMING
+				svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 				parent.children_offset[k] = (char) (writeNode(node_out,buffer[k],b_node_pos) - parent.children_base);
-				//io_timer_out.stop(); algo_timer.start(); // TIMING
+				svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 			}
 		} else {
 			parent.children_offset[k] = NOCHILD;
@@ -93,9 +96,9 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 		d.normal = normalize(tonormalize);
 		d.opacity = d.opacity / notnull;
 		// set it in the parent node
-		//algo_timer.stop(); io_timer_out.start(); // TIMING
+		svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 		parent.data = writeDataPoint(data_out, d, b_data_pos);
-		//io_timer_out.stop(); algo_timer.start(); // TIMING
+		svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 		parent.data_cache = d;
 	}
 
@@ -141,9 +144,9 @@ void OctreeBuilder::addDataPoint(const uint64_t morton_number, const DataPoint& 
 #ifdef BINARY_VOXELIZATION
 		node.data = 1; // all nodes in binary voxelization refer to this
 #else
-		//algo_timer.stop(); io_timer_out.start(); // TIMING
+		svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 		node.data = writeDataPoint(data_out, point, b_data_pos); // store data
-		//io_timer_out.stop(); algo_timer.start(); // TIMING
+		svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 #endif
 		node.data_cache = point; // store data as cache
 	} 

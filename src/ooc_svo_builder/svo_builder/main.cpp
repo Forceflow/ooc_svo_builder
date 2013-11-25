@@ -10,7 +10,6 @@
 #include "voxelizer.h"
 #include "OctreeBuilder.h"
 #include "partitioner.h"
-//#include <omp.h>
 
 using namespace std;
 
@@ -25,12 +24,13 @@ using namespace std;
 enum ColorType {COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL};
 
 // Program version
-string version = "1.3";
+string version = "1.2";
 
 // Program parameters
 string filename = "";
 size_t gridsize = 1024;
-size_t memory_limit = 2048;
+size_t voxel_memory_limit = 2048;
+float sparseness_limit = 0.10;
 ColorType color = COLOR_FROM_MODEL;
 vec3 fixed_color = vec3(1.0f,1.0f,1.0f); // fixed color is white
 bool generate_levels = false;
@@ -44,13 +44,17 @@ TripInfo trip_info;
 size_t input_buffersize = 500000;
 
 // timers
- Timer main_timer;
- Timer part_total_timer;
- Timer part_io_in_timer;
- Timer part_io_out_timer;
- Timer part_algo_timer;
- Timer vox_timer;
- Timer svo_timer;;
+Timer main_timer;
+Timer part_total_timer;
+Timer part_io_in_timer;
+Timer part_io_out_timer;
+Timer part_algo_timer;
+Timer vox_total_timer;
+Timer vox_io_in_timer;
+Timer vox_algo_timer;
+Timer svo_total_timer;
+Timer svo_io_out_timer;
+Timer svo_algo_timer;
 
 void printInfo() {
 	cout << "--------------------------------------------------------------------" << endl;
@@ -123,9 +127,18 @@ void parseProgramParameters(int argc, char* argv[]) {
 			}
 			i++;
 		} else if (string(argv[i]) == "-l") {
-			memory_limit = atoi(argv[i + 1]);
-			if (memory_limit <= 1) {
-				cout << "Requested memory limit is nonsensical. Use a value 1>= 0" << endl;
+			voxel_memory_limit = atoi(argv[i + 1]);
+			if (voxel_memory_limit <= 1) {
+				cout << "Requested memory limit is nonsensical. Use a value >= 1" << endl;
+				printInvalid();
+				exit(0);
+			}
+			i++;
+		} else if (string(argv[i]) == "-d") {
+			int percent = atoi(argv[i + 1]);
+			sparseness_limit = percent / 100.0f;
+			if (sparseness_limit < 0) {
+				cout << "Requested data memory limit is nonsensical. Use a value > 0" << endl;
 				printInvalid();
 				exit(0);
 			}
@@ -159,7 +172,8 @@ void parseProgramParameters(int argc, char* argv[]) {
 	if (verbose) {
 		cout << "  filename: " << filename << endl;
 		cout << "  gridsize: " << gridsize << endl;
-		cout << "  memory limit: " << memory_limit << endl;
+		cout << "  memory limit: " << voxel_memory_limit << endl;
+		cout << "  sparseness limit: " << sparseness_limit << endl;
 		cout << "  color type: " << color << endl;
 		cout << "  generate levels: " << generate_levels << endl;
 		cout << "  verbosity: " << verbose << endl;
@@ -169,12 +183,21 @@ void parseProgramParameters(int argc, char* argv[]) {
 // Initialize all performance timers
 void setupTimers() {
 	main_timer = Timer();
+
+	// Partitioning timers
 	part_total_timer = Timer();
 	part_io_in_timer = Timer();
 	part_io_out_timer = Timer();
 	part_algo_timer = Timer();
-	vox_timer = Timer();
-	svo_timer = Timer();
+
+	// Voxelization timers
+	vox_total_timer = Timer();
+	vox_io_in_timer = Timer();
+	vox_algo_timer = Timer();
+
+	svo_total_timer = Timer();
+	svo_io_out_timer = Timer();
+	svo_algo_timer = Timer();
 }
 
 // Printout total time of running Timers (for debugging purposes)
@@ -182,10 +205,22 @@ void printTimerInfo() {
 	//double diff = main_timer.getTotalTimeSeconds() - (algo_timer.getTotalTimeSeconds() + io_timer_in.getTotalTimeSeconds() + io_timer_out.getTotalTimeSeconds());
 	cout << "Total MAIN time      : " << main_timer.getTotalTimeSeconds() << " s." << endl;
 	cout << "PARTITIONING" << endl;
-	cout << "  Total time           : " << part_total_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  Total IO IN time     : " << part_io_in_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  Total algorithm time : " << part_algo_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  Total IO OUT time    : " << part_io_out_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  Total time		: " << part_total_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  IO IN time		: " << part_io_in_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  algorithm time	: " << part_algo_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  IO OUT time		: " << part_io_out_timer.getTotalTimeSeconds() << " s." << endl;
+	double part_diff = part_total_timer.getTotalTimeSeconds() - part_io_in_timer.getTotalTimeSeconds() - part_algo_timer.getTotalTimeSeconds() - part_io_out_timer.getTotalTimeSeconds();
+	cout << "  misc time		: " << part_diff << " s." << endl;
+	cout << "VOXELIZING" << endl;
+	cout << "  Total time		: " << vox_total_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  IO IN time		: " << vox_io_in_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  algorithm time	: " << vox_algo_timer.getTotalTimeSeconds() << " s." << endl;
+	double vox_diff = vox_total_timer.getTotalTimeSeconds() - vox_io_in_timer.getTotalTimeSeconds() - vox_algo_timer.getTotalTimeSeconds();
+	cout << "  misc time		: " << vox_diff << " s." << endl;
+	cout << "SVO BUILDING" << endl;
+	cout << "  Total time		: " << svo_total_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  IO OUT time		: " << svo_io_out_timer.getTotalTimeSeconds() << " s." << endl;
+	cout << "  algorithm time	: " << svo_algo_timer.getTotalTimeSeconds() << " s." << endl;
 	//cout << "Total misc time      : " << diff << " s." << endl;
 }
 
@@ -237,116 +272,129 @@ int main(int argc, char *argv[]) {
 	_setmaxstdio(1024); // increase file descriptor limit in Windows
 #endif
 
-	//// Get the number of processors in this system
-	//int iCPU = omp_get_num_procs();
-	//omp_set_num_threads(iCPU);
-
 	// Parse program parameters
 	printInfo();
 	parseProgramParameters(argc, argv);
 
-	// Parse TRI header
+	// PARTITIONING
+	part_total_timer.start(); part_io_in_timer.start(); // TIMING
 	readTriHeader(filename, tri_info);
-
-	// Do partitioning and store results/file refs in TripInfo
-	size_t n_partitions = estimate_partitions(gridsize, memory_limit);
+	part_io_in_timer.stop();
+	size_t n_partitions = estimate_partitions(gridsize, voxel_memory_limit);
 	cout << "Partitioning data into " << n_partitions << " partitions ... "; cout.flush();
-	part_total_timer.start(); // TIMING
 	TripInfo trip_info = partition(tri_info, n_partitions, gridsize);
-	part_total_timer.stop(); // TIMING
 	cout << "done." << endl;
+	part_total_timer.stop(); // TIMING
 
+	vox_total_timer.start(); vox_io_in_timer.start(); // TIMING
 	// Parse TRIP header
 	string tripheader = trip_info.base_filename + string(".trip");
 	readTripHeader(tripheader, trip_info);
+	vox_io_in_timer.stop(); // TIMING
 
 	// General voxelization calculations (stuff we need throughout voxelization process)
 	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float) trip_info.gridsize;
 	uint64_t morton_part = (trip_info.gridsize * trip_info.gridsize * trip_info.gridsize) / trip_info.n_partitions;
 	
-	// Storage for voxel references (STATIC)
+	char* voxels = new char[(size_t)morton_part]; // Storage for voxel on/off
 #ifdef BINARY_VOXELIZATION
-	char* voxels = new char[(size_t) morton_part]; // TODO: If you want tighter packing, check the Frankensteiny that is vector<bool>
-	vector<uint64_t> morton;
+	vector<uint64_t> data;
 #else
-	size_t* voxels = new size_t[(size_t) morton_part];
-	vector<VoxelData> voxel_data; // Storage for voxel data (DYNAMIC)
+	vector<VoxelData> data; // Storage for voxel data (DYNAMIC)
 #endif 
-
 	size_t nfilled = 0;
+	vox_total_timer.stop(); // TIMING
 
+	svo_total_timer.start();
 	// create Octreebuilder which will output our SVO
 	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, true, generate_levels);
+	svo_total_timer.stop();
 
 	// Start voxelisation and SVO building per partition
-	//algo_timer.start(); // TIMING
 	for (size_t i = 0; i < trip_info.n_partitions; i++) {
-		if (trip_info.part_tricounts[i] > 0) { // if this partition contains triangles
-			cout << "Voxelizing partition " << i << " ..." << endl;
-			// morton codes for this partition
-			uint64_t start = i * morton_part;
-			uint64_t end = (i + 1) * morton_part;
-
-			// open file to read triangles
-			std::string part_data_filename = trip_info.base_filename + string("_") + val_to_string(i) + string(".tripdata");
-			TriReader reader = TriReader(part_data_filename, trip_info.part_tricounts[i], min(trip_info.part_tricounts[i], input_buffersize));
-			if (verbose) { cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl; }
-
-			// voxelize partition
-			size_t nfilled_before = nfilled;
+		if (trip_info.part_tricounts[i] == 0) {continue;} // skip partition if it contains no triangles
+		
+		// VOXELIZATION
+		vox_total_timer.start(); // TIMING
+		cout << "Voxelizing partition " << i << " ..." << endl;
+		// morton codes for this partition
+		uint64_t start = i * morton_part;
+		uint64_t end = (i + 1) * morton_part;
+		// open file to read triangles
+		vox_io_in_timer.start(); // TIMING
+		std::string part_data_filename = trip_info.base_filename + string("_") + val_to_string(i) + string(".tripdata");
+		TriReader reader = TriReader(part_data_filename, trip_info.part_tricounts[i], min(trip_info.part_tricounts[i], input_buffersize));
+		if (verbose) { cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl; }
+		vox_io_in_timer.stop(); // TIMING
+		// voxelize partition
+		size_t nfilled_before = nfilled;
+		bool use_data = true;
 #ifdef BINARY_VOXELIZATION
-			voxelize_partition3(reader, start, end, unitlength, voxels, morton, nfilled);
+		voxelize_partition2(reader, start, end, unitlength, voxels, data, sparseness_limit, use_data, nfilled);
 #else
-			voxelize_partition3(reader, start, end, unitlength, voxels, voxel_data, nfilled);
+		voxelize_partition3(reader, start, end, unitlength, voxels, voxel_data, nfilled);
 #endif
-			if (verbose) { cout << "  found " << nfilled - nfilled_before << " new voxels." << endl; }
+		if (verbose) { cout << "  found " << nfilled - nfilled_before << " new voxels." << endl; }
+		vox_total_timer.stop(); // TIMING
 
-			// build SVO
-			cout << "Building SVO for partition " << i << " ..." << endl;
-			uint64_t morton_number;
-			DataPoint d;
+		// build SVO
+		svo_total_timer.start(); svo_algo_timer.start(); // TIMING
+		cout << "Building SVO for partition " << i << " ..." << endl;
+		uint64_t morton_number;
+		DataPoint d;
 
 #ifdef BINARY_VOXELIZATION
-			sort(morton.begin(), morton.end()); // sort morton codes
-			for (std::vector<uint64_t>::iterator it = morton.begin(); it != morton.end(); ++it){
+		if (use_data){ // use fast way of building SVO
+			sort(data.begin(), data.end()); // sort morton codes
+			for (std::vector<uint64_t>::iterator it = data.begin(); it != data.end(); ++it){
 				d = DataPoint();
 				d.opacity = 1.0;
 				builder.addDataPoint(*it, d);
 			}
-#endif
-
-#ifndef BINARY_VOXELIZATION	
+		}
+		else { // slower way - data memory was exceeded
 			for (size_t j = 0; j < morton_part; j++) {
-				if (! voxels[j] == EMPTY_VOXEL) {
+				if (!voxels[j] == EMPTY_VOXEL) {
 					morton_number = start + j;
 					d = DataPoint();
 					d.opacity = 1.0; // this voxel is filled
-
-					VoxelData& current_data = voxel_data.at(voxels[j]);
-					// NORMALS
-					d.normal = current_data.normal;
-					// COLORS
-					if (color == COLOR_FROM_MODEL){
-						d.color = current_data.color;
-					} else if (color == COLOR_FIXED){
-						d.color = fixed_color;
-					} else if (color == COLOR_LINEAR){ // linear color scale
-						d.color = mortonToRGB(morton_number, gridsize);
-					} else if (color == COLOR_NORMAL){ // color models using their normals
-						vec3 normal = normalize(d.normal);
-						d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
-					}
-
-					builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
+					builder.addDataPoint(morton_number, d);
 				}
 			}
-#endif
 		}
+#else
+		for (size_t j = 0; j < morton_part; j++) {
+			if (! voxels[j] == EMPTY_VOXEL) {
+				morton_number = start + j;
+				d = DataPoint();
+				d.opacity = 1.0; // this voxel is filled
+
+				VoxelData& current_data = voxel_data.at(voxels[j]);
+				// NORMALS
+				d.normal = current_data.normal;
+				// COLORS
+				if (color == COLOR_FROM_MODEL){
+					d.color = current_data.color;
+				} else if (color == COLOR_FIXED){
+					d.color = fixed_color;
+				} else if (color == COLOR_LINEAR){ // linear color scale
+					d.color = mortonToRGB(morton_number, gridsize);
+				} else if (color == COLOR_NORMAL){ // color models using their normals
+					vec3 normal = normalize(d.normal);
+					d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
+				}
+
+				builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
+			}
+		}
+#endif
+		svo_algo_timer.stop(); svo_total_timer.stop();  // TIMING
 	}
+	svo_total_timer.start(); svo_algo_timer.start(); // TIMING
 	builder.finalizeTree(); // finalize SVO so it gets written to disk
-	//algo_timer.stop(); // TIMING
 	cout << "done" << endl;
 	cout << "Total amount of voxels: " << nfilled << endl;
+	svo_total_timer.stop(); svo_algo_timer.stop(); // TIMING
 
 	// Removing .trip files which are left by partitioner
 	// removeTripFiles(trip_info);
