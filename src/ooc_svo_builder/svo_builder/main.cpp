@@ -21,7 +21,7 @@ using namespace std;
 #endif
 #endif
 
-enum ColorType {COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL};
+enum ColorType { COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL };
 
 // Program version
 string version = "1.3";
@@ -32,7 +32,7 @@ size_t gridsize = 1024;
 size_t voxel_memory_limit = 2048;
 float sparseness_limit = 0.10;
 ColorType color = COLOR_FROM_MODEL;
-vec3 fixed_color = vec3(1.0f,1.0f,1.0f); // fixed color is white
+vec3 fixed_color = vec3(1.0f, 1.0f, 1.0f); // fixed color is white
 bool generate_levels = false;
 bool verbose = false;
 
@@ -95,7 +95,7 @@ void printHelp() {
 
 void printInvalid() {
 	std::cout << "Not enough or invalid arguments, please try again." << endl;
-	std::cout << "At the bare minimum, I need a path to a .TRI file" << endl<< "" << endl;
+	std::cout << "At the bare minimum, I need a path to a .TRI file" << endl << "" << endl;
 	printHelp();
 }
 
@@ -118,7 +118,8 @@ void parseProgramParameters(int argc, char* argv[]) {
 				exit(0);
 			}
 			i++;
-		} else if (string(argv[i]) == "-s") {
+		}
+		else if (string(argv[i]) == "-s") {
 			gridsize = atoi(argv[i + 1]);
 			if (!isPowerOf2(gridsize)) {
 				cout << "Requested gridsize is not a power of 2" << endl;
@@ -126,7 +127,8 @@ void parseProgramParameters(int argc, char* argv[]) {
 				exit(0);
 			}
 			i++;
-		} else if (string(argv[i]) == "-l") {
+		}
+		else if (string(argv[i]) == "-l") {
 			voxel_memory_limit = atoi(argv[i + 1]);
 			if (voxel_memory_limit <= 1) {
 				cout << "Requested memory limit is nonsensical. Use a value >= 1" << endl;
@@ -134,7 +136,8 @@ void parseProgramParameters(int argc, char* argv[]) {
 				exit(0);
 			}
 			i++;
-		} else if (string(argv[i]) == "-d") {
+		}
+		else if (string(argv[i]) == "-d") {
 			int percent = atoi(argv[i + 1]);
 			sparseness_limit = percent / 100.0f;
 			if (sparseness_limit < 0) {
@@ -143,29 +146,37 @@ void parseProgramParameters(int argc, char* argv[]) {
 				exit(0);
 			}
 			i++;
-		} else if (string(argv[i]) == "-v") {
+		}
+		else if (string(argv[i]) == "-v") {
 			verbose = true;
-		} else if (string(argv[i]) == "-levels") {
+		}
+		else if (string(argv[i]) == "-levels") {
 			generate_levels = true;
-		} else if (string(argv[i]) == "-c") {
-			string color_input = string(argv[i+1]);
+		}
+		else if (string(argv[i]) == "-c") {
+			string color_input = string(argv[i + 1]);
 #ifdef BINARY_VOXELIZATION
 			cout << "You asked to generate colors, but we're only doing binary voxelisation." << endl;
 #else
-			if(color_input == "linear") {
+			if (color_input == "linear") {
 				color = COLOR_LINEAR;
-			} else if(color_input == "normal") { 
+			}
+			else if (color_input == "normal") {
 				color = COLOR_NORMAL;
-			} else if(color_input == "fixed") { 
+			}
+			else if (color_input == "fixed") {
 				color = COLOR_FIXED;
-			} else {
+			}
+			else {
 				cout << "Unrecognized color switch: " << color_input << ", so reverting to no colors." << endl;
 			}
 #endif
 			i++;
-		} else if (string(argv[i]) == "-h") {
+		}
+		else if (string(argv[i]) == "-h") {
 			printHelp(); exit(0);
-		} else {
+		}
+		else {
 			printInvalid(); exit(0);
 		}
 	}
@@ -221,7 +232,8 @@ void printTimerInfo() {
 	cout << "  Total time		: " << svo_total_timer.getTotalTimeSeconds() << " s." << endl;
 	cout << "  IO OUT time		: " << svo_io_out_timer.getTotalTimeSeconds() << " s." << endl;
 	cout << "  algorithm time	: " << svo_algo_timer.getTotalTimeSeconds() << " s." << endl;
-	//cout << "Total misc time      : " << diff << " s." << endl;
+	double svo_misc = svo_total_timer.getTotalTimeSeconds() - svo_io_out_timer.getTotalTimeSeconds() - svo_algo_timer.getTotalTimeSeconds();
+	cout << "  misc time		: " << svo_misc << " s." << endl;
 }
 
 // Tri header handling and error checking
@@ -235,7 +247,7 @@ void readTriHeader(string& filename, TriInfo& tri_info){
 	//	cout << "Not all required .tri or .tridata files exist. Please regenerate using tri_convert." << endl; 
 	//	exit(0); // not all required files exist - exiting.
 	//}
-	if (verbose) {tri_info.print();}
+	if (verbose) { tri_info.print(); }
 	// Check if the user is using the correct executable for type of tri file
 #ifdef BINARY_VOXELIZATION
 	if (!tri_info.geometry_only) {
@@ -260,7 +272,7 @@ void readTripHeader(string& filename, TripInfo& trip_info){
 	//	cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
 	//	exit(0); // not all required files exist - exiting.
 	//}
-	if (verbose) {trip_info.print();}
+	if (verbose) { trip_info.print(); }
 }
 
 int main(int argc, char *argv[]) {
@@ -293,9 +305,9 @@ int main(int argc, char *argv[]) {
 	vox_io_in_timer.stop(); // TIMING
 
 	// General voxelization calculations (stuff we need throughout voxelization process)
-	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float) trip_info.gridsize;
+	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float)trip_info.gridsize;
 	uint64_t morton_part = (trip_info.gridsize * trip_info.gridsize * trip_info.gridsize) / trip_info.n_partitions;
-	
+
 	char* voxels = new char[(size_t)morton_part]; // Storage for voxel on/off
 #ifdef BINARY_VOXELIZATION
 	vector<uint64_t> data;
@@ -312,8 +324,8 @@ int main(int argc, char *argv[]) {
 
 	// Start voxelisation and SVO building per partition
 	for (size_t i = 0; i < trip_info.n_partitions; i++) {
-		if (trip_info.part_tricounts[i] == 0) {continue;} // skip partition if it contains no triangles
-		
+		if (trip_info.part_tricounts[i] == 0) { continue; } // skip partition if it contains no triangles
+
 		// VOXELIZATION
 		vox_total_timer.start(); // TIMING
 		cout << "Voxelizing partition " << i << " ..." << endl;
@@ -329,11 +341,7 @@ int main(int argc, char *argv[]) {
 		// voxelize partition
 		size_t nfilled_before = nfilled;
 		bool use_data = true;
-#ifdef BINARY_VOXELIZATION
 		voxelize_partition2(reader, start, end, unitlength, voxels, data, sparseness_limit, use_data, nfilled);
-#else
-		voxelize_partition3(reader, start, end, unitlength, voxels, voxel_data, nfilled);
-#endif
 		if (verbose) { cout << "  found " << nfilled - nfilled_before << " new voxels." << endl; }
 		vox_total_timer.stop(); // TIMING
 
@@ -363,29 +371,25 @@ int main(int argc, char *argv[]) {
 			}
 		}
 #else
-		for (size_t j = 0; j < morton_part; j++) {
-			if (! voxels[j] == EMPTY_VOXEL) {
-				morton_number = start + j;
-				d = DataPoint();
-				d.opacity = 1.0; // this voxel is filled
-
-				VoxelData& current_data = voxel_data.at(voxels[j]);
-				// NORMALS
-				d.normal = current_data.normal;
-				// COLORS
-				if (color == COLOR_FROM_MODEL){
-					d.color = current_data.color;
-				} else if (color == COLOR_FIXED){
-					d.color = fixed_color;
-				} else if (color == COLOR_LINEAR){ // linear color scale
-					d.color = mortonToRGB(morton_number, gridsize);
-				} else if (color == COLOR_NORMAL){ // color models using their normals
-					vec3 normal = normalize(d.normal);
-					d.color = vec3((normal[0]+1.0f)/2.0f, (normal[1]+1.0f)/2.0f, (normal[2]+1.0f)/2.0f);
-				}
-
-				builder.addDataPoint(morton_number, d); // add data point to SVO building algorithm
+		sort(data.begin(), data.end()); // sort morton codes
+		for (std::vector<VoxelData>::iterator it = data.begin(); it != data.end(); ++it){
+			d = DataPoint();
+			d.opacity = 1.0;
+			d.normal = it->normal;
+			if (color == COLOR_FROM_MODEL){
+				d.color = it->color;
 			}
+			else if (color == COLOR_FIXED){
+				d.color = fixed_color;
+			}
+			else if (color == COLOR_LINEAR){ // linear color scale
+				d.color = mortonToRGB(it->morton, gridsize);
+			}
+			else if (color == COLOR_NORMAL){ // color models using their normals
+				vec3 normal = normalize(d.normal);
+				d.color = vec3((normal[0] + 1.0f) / 2.0f, (normal[1] + 1.0f) / 2.0f, (normal[2] + 1.0f) / 2.0f);
+			}
+			builder.addDataPoint(it->morton, d);
 		}
 #endif
 		svo_algo_timer.stop(); svo_total_timer.stop();  // TIMING

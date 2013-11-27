@@ -18,8 +18,16 @@ struct VoxelData{
 	uint64_t morton;
 	vec3 normal;
 	vec3 color;
-	VoxelData(): normal(vec3(0.0f,0.0f,0.0f)), color(vec3(0.0f,0.0f,0.0f)){}
-	VoxelData(vec3 normal, vec3 color): normal(normal), color(color){}
+	VoxelData(): morton(0), normal(vec3(0.0f,0.0f,0.0f)), color(vec3(0.0f,0.0f,0.0f)){}
+	VoxelData(uint64_t morton, vec3 normal, vec3 color): morton(morton), normal(normal), color(color){}
+
+	bool operator >(VoxelData &a){
+		return morton > a.morton;
+	}
+
+	bool operator <(VoxelData &a){
+		return morton < a.morton;
+	}
 };
 
 #define EMPTY_VOXEL 0
@@ -34,13 +42,13 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 #ifdef BINARY_VOXELIZATION
 void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled);
 #else
-void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled);
+void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<VoxelData> &data, float sparseness_limit, bool &use_data, size_t &nfilled);
 #endif
 
-#ifdef BINARY_VOXELIZATION
-void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled);
-#else
-void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled);
-#endif
+//#ifdef BINARY_VOXELIZATION
+//void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled);
+//#else
+//void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled);
+//#endif
 
 #endif // VOXELIZER_H_
