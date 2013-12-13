@@ -89,6 +89,7 @@ void printHelp() {
 	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
 	std::cout << "-levels               Generate intermediary voxel levels by averaging voxel data" << endl;
 	std::cout << "-c <option>           Coloring of voxels (Options: from_model (default), fixed, linear, normal)" << endl;
+	std::cout << "-d <percentage>		Percentage of memory limit to be used additionaly for sparseness optimization" << endl;
 	std::cout << "-v                    Be very verbose." << endl;
 	std::cout << "-h                    Print help and exit." << endl;
 }
@@ -184,7 +185,7 @@ void parseProgramParameters(int argc, char* argv[]) {
 		cout << "  filename: " << filename << endl;
 		cout << "  gridsize: " << gridsize << endl;
 		cout << "  memory limit: " << voxel_memory_limit << endl;
-		cout << "  sparseness limit: " << sparseness_limit << endl;
+		cout << "  sparseness optimization limit: " << sparseness_limit << " resulting in " << (sparseness_limit*voxel_memory_limit) << " memory limit." << endl;
 		cout << "  color type: " << color << endl;
 		cout << "  generate levels: " << generate_levels << endl;
 		cout << "  verbosity: " << verbose << endl;
@@ -243,10 +244,10 @@ void readTriHeader(string& filename, TriInfo& tri_info){
 		exit(0); // something went wrong in parsing the header - exiting.
 	}
 	// disabled for benchmarking
-	//if (!tri_info.filesExist()) {
-	//	cout << "Not all required .tri or .tridata files exist. Please regenerate using tri_convert." << endl; 
-	//	exit(0); // not all required files exist - exiting.
-	//}
+	if (!tri_info.filesExist()) {
+		cout << "Not all required .tri or .tridata files exist. Please regenerate using tri_convert." << endl; 
+		exit(0); // not all required files exist - exiting.
+	}
 	if (verbose) { tri_info.print(); }
 	// Check if the user is using the correct executable for type of tri file
 #ifdef BINARY_VOXELIZATION
@@ -267,11 +268,10 @@ void readTripHeader(string& filename, TripInfo& trip_info){
 	if (parseTripHeader(filename, trip_info) != 1) {
 		exit(0);
 	}
-	// disabled for benchmarking
-	//if (!trip_info.filesExist()) {
-	//	cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
-	//	exit(0); // not all required files exist - exiting.
-	//}
+	if (!trip_info.filesExist()) {
+		cout << "Not all required .trip or .tripdata files exist. Please regenerate using svo_builder." << endl; 
+		exit(0); // not all required files exist - exiting.
+	}
 	if (verbose) { trip_info.print(); }
 }
 
@@ -401,7 +401,7 @@ int main(int argc, char *argv[]) {
 	svo_total_timer.stop(); svo_algo_timer.stop(); // TIMING
 
 	// Removing .trip files which are left by partitioner
-	// removeTripFiles(trip_info);
+	removeTripFiles(trip_info);
 
 	main_timer.stop();
 	printTimerInfo();

@@ -171,8 +171,10 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 #ifdef BINARY_VOXELIZATION
 		if (use_data){
 			if (data.size() > data_max_items){
-				cout << "Data side-array overflowed, reverting to normal voxelization." << endl;
-				cout << data.size() << " > " << data_max_items << endl;
+				if (verbose){
+					cout << "Sparseness optimization side-array overflowed, reverting to slower voxelization." << endl;
+					cout << data.size() << " > " << data_max_items << endl;
+				}
 				use_data = false;
 			}
 		}
@@ -222,7 +224,6 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		float d_xy_e0 = (-1.0f * (n_xy_e0 DOT vec2(t.v0[X], t.v0[Y]))) + max(0.0f, unitlength*n_xy_e0[0]) + max(0.0f, unitlength*n_xy_e0[1]);
 		float d_xy_e1 = (-1.0f * (n_xy_e1 DOT vec2(t.v1[X], t.v1[Y]))) + max(0.0f, unitlength*n_xy_e1[0]) + max(0.0f, unitlength*n_xy_e1[1]);
 		float d_xy_e2 = (-1.0f * (n_xy_e2 DOT vec2(t.v2[X], t.v2[Y]))) + max(0.0f, unitlength*n_xy_e2[0]) + max(0.0f, unitlength*n_xy_e2[1]);
-
 		// YZ plane
 		vec2 n_yz_e0 = vec2(-1.0f*e0[Z], e0[Y]);
 		vec2 n_yz_e1 = vec2(-1.0f*e1[Z], e1[Y]);
@@ -235,7 +236,6 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 		float d_yz_e0 = (-1.0f * (n_yz_e0 DOT vec2(t.v0[Y], t.v0[Z]))) + max(0.0f, unitlength*n_yz_e0[0]) + max(0.0f, unitlength*n_yz_e0[1]);
 		float d_yz_e1 = (-1.0f * (n_yz_e1 DOT vec2(t.v1[Y], t.v1[Z]))) + max(0.0f, unitlength*n_yz_e1[0]) + max(0.0f, unitlength*n_yz_e1[1]);
 		float d_yz_e2 = (-1.0f * (n_yz_e2 DOT vec2(t.v2[Y], t.v2[Z]))) + max(0.0f, unitlength*n_yz_e2[0]) + max(0.0f, unitlength*n_yz_e2[1]);
-
 		// ZX plane
 		vec2 n_zx_e0 = vec2(-1.0f*e0[X], e0[Z]);
 		vec2 n_zx_e1 = vec2(-1.0f*e1[X], e1[Z]);
@@ -255,8 +255,6 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 				for (int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
 
 					uint64_t index = mortonEncode_LUT(z, y, x);
-
-					assert(index - morton_start < (morton_end - morton_start));
 
 					if (voxels[index - morton_start] == FULL_VOXEL){ continue; } // already marked, continue
 
@@ -286,18 +284,18 @@ void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const u
 
 #ifdef BINARY_VOXELIZATION
 					voxels[index - morton_start] = FULL_VOXEL;
-					if (use_data){data.push_back(index);}
+					if (use_data){ data.push_back(index); }
 #else
 					voxels[index - morton_start] = FULL_VOXEL;
 					data.push_back(VoxelData(index, t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color))); // we ignore data limits for colored voxelization
 #endif
-						nfilled++;
-						continue;
-					}
+					nfilled++;
+					continue;
 				}
 			}
 		}
 	}
+}
 
 //#ifdef BINARY_VOXELIZATION
 //void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled){
