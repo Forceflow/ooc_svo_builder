@@ -68,5 +68,8 @@
     <ClInclude Include="svo_builder_util.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="VoxelData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
