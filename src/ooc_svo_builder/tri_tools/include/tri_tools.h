@@ -37,23 +37,6 @@ struct TriInfo{
 	}
 };
 
-// FSTREAM IO for Triangles
-inline void readTriangle(ifstream &file, Triangle &t){
-	file.read(reinterpret_cast<char*> (& t.v0[0]), TRIANGLE_SIZE*sizeof(float));
-}
-
-inline void readTriangles(ifstream &file, Triangle &t, size_t howmany){
-	file.read(reinterpret_cast<char*> (& t.v0[0]), howmany*TRIANGLE_SIZE*sizeof(float));
-}
-
-inline void writeTriangle(ofstream &file, Triangle &t){
-	file.write(reinterpret_cast<char*> (& t.v0[0]), TRIANGLE_SIZE*sizeof(float));
-}
-
-inline void writeTriangles(ofstream &file, Triangle &t, size_t howmany){
-	file.write(reinterpret_cast<char*> (& t.v0[0]), howmany*TRIANGLE_SIZE*sizeof(float));
-}
-
 // STDIO IO for Triangles
 inline void readTriangle(FILE* f, Triangle &t){
 	fread(&t, TRIANGLE_SIZE*sizeof(float), 1, f);
@@ -71,7 +54,24 @@ inline void writeTriangles(FILE* f, Triangle &t, size_t howmany){
 	fwrite(&t, TRIANGLE_SIZE*sizeof(float), howmany, f);
 }
 
-// Parsing a .tri header filem store info in TriInfo struct
+// FSTREAM IO for Triangles (deprecated - this slow)
+inline void readTriangle(ifstream &file, Triangle &t){
+	file.read(reinterpret_cast<char*> (&t.v0[0]), TRIANGLE_SIZE*sizeof(float));
+}
+
+inline void readTriangles(ifstream &file, Triangle &t, size_t howmany){
+	file.read(reinterpret_cast<char*> (&t.v0[0]), howmany*TRIANGLE_SIZE*sizeof(float));
+}
+
+inline void writeTriangle(ofstream &file, Triangle &t){
+	file.write(reinterpret_cast<char*> (&t.v0[0]), TRIANGLE_SIZE*sizeof(float));
+}
+
+inline void writeTriangles(ofstream &file, Triangle &t, size_t howmany){
+	file.write(reinterpret_cast<char*> (&t.v0[0]), howmany*TRIANGLE_SIZE*sizeof(float));
+}
+
+// Parsing a .tri header file and store info in TriInfo struct
 inline int parseTriHeader(std::string filename, TriInfo &t){
 	ifstream file;
 	file.open(filename.c_str(), ios::in);

@@ -7,9 +7,9 @@ using namespace std;
 using namespace trimesh;
 
 #ifdef BINARY_VOXELIZATION
-#define TRIANGLE_SIZE 9
+#define TRIANGLE_SIZE 9 // just the vertices
 #else
-#define TRIANGLE_SIZE 21
+#define TRIANGLE_SIZE 21 // vertices + normal + vertex colors
 #endif
 
 // Various helper methods / structs
