@@ -37,9 +37,10 @@ public:
 	void finalizeTree();
 
 private:
+	// helper methods for octree building
+	void addEmptyDataPoint(const int buffer);
 	bool isBufferEmpty(const vector<Node> &buffer);
 	Node groupNodes(const vector<Node> &buffer);
-	void addEmptyDataPoint(const int buffer);
 	int highestNonEmptyBuffer();
 	int computeBestFillBuffer(const size_t budget);
 	void fastAddEmpty(const size_t budget);

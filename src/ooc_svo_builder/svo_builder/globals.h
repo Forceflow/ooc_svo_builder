@@ -1,14 +1,12 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-// global header containing timers (this is a bit ugly, but it's a quick and surefire way to measure performance)
-#include <fstream>
-#include <iostream>
 #include "svo_builder_util.h"
 
 using namespace std;
 
-// timers
+// Timers (for debugging purposes)
+// (This is a bit ugly, but it's a quick and surefire way to measure performance)
 extern Timer main_timer;
 
 extern Timer part_total_timer;
