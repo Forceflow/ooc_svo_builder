@@ -148,7 +148,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
-    <ClInclude Include="DataPoint.h" />
     <ClInclude Include="geometry_primitives.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="intersection.h" />
@@ -157,6 +156,7 @@
     <ClInclude Include="OctreeBuilder.h" />
     <ClInclude Include="octree_io.h" />
     <ClInclude Include="partitioner.h" />
+    <ClInclude Include="VoxelData.h" />
     <ClInclude Include="voxelizer.h" />
     <ClInclude Include="svo_builder_util.h" />
   </ItemGroup>

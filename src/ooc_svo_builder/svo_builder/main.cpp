@@ -41,7 +41,7 @@ TriInfo tri_info;
 TripInfo trip_info;
 
 // buffer_size
-size_t input_buffersize = 500000;
+size_t input_buffersize = 8192;
 
 // timers
 Timer main_timer;
@@ -63,7 +63,7 @@ void printInfo() {
 #else
 	cout << "Out-Of-Core SVO Builder " << version << " - Geometry+normals version" << endl;
 #endif
-#ifdef _WIN32 || _WIN64
+#if defined(_WIN32) || defined(_WIN64)
 	cout << "Windows " << endl;
 #endif
 #ifdef __linux__
@@ -102,6 +102,7 @@ void printInvalid() {
 
 // Parse command-line params and so some basic error checking on them
 void parseProgramParameters(int argc, char* argv[]) {
+	string color_s = "Color from model (fallback to fixed color if model has no color)";
 	cout << "Reading program parameters ..." << endl;
 	// Input argument validation
 	if (argc < 3) {
@@ -159,17 +160,23 @@ void parseProgramParameters(int argc, char* argv[]) {
 #ifdef BINARY_VOXELIZATION
 			cout << "You asked to generate colors, but we're only doing binary voxelisation." << endl;
 #else
-			if (color_input == "linear") {
+			if (color_input == "model") {
+				color = COLOR_FROM_MODEL;
+			}
+			else if (color_input == "linear") {
 				color = COLOR_LINEAR;
+				color_s = "Linear";
 			}
 			else if (color_input == "normal") {
 				color = COLOR_NORMAL;
+				color_s = "Normal";
 			}
 			else if (color_input == "fixed") {
 				color = COLOR_FIXED;
+				color_s = "Fixed";
 			}
 			else {
-				cout << "Unrecognized color switch: " << color_input << ", so reverting to no colors." << endl;
+				cout << "Unrecognized color switch: " << color_input << ", so reverting to colors from model." << endl;
 			}
 #endif
 			i++;
@@ -186,7 +193,7 @@ void parseProgramParameters(int argc, char* argv[]) {
 		cout << "  gridsize: " << gridsize << endl;
 		cout << "  memory limit: " << voxel_memory_limit << endl;
 		cout << "  sparseness optimization limit: " << sparseness_limit << " resulting in " << (sparseness_limit*voxel_memory_limit) << " memory limit." << endl;
-		cout << "  color type: " << color << endl;
+		cout << "  color type: " << color_s << endl;
 		cout << "  generate levels: " << generate_levels << endl;
 		cout << "  verbosity: " << verbose << endl;
 	}
@@ -280,7 +287,7 @@ int main(int argc, char *argv[]) {
 	setupTimers();
 	main_timer.start();
 
-#ifdef _WIN32 || _WIN64
+#if defined(_WIN32) || defined(_WIN64)
 	_setmaxstdio(1024); // increase file descriptor limit in Windows
 #endif
 
@@ -319,7 +326,7 @@ int main(int argc, char *argv[]) {
 
 	svo_total_timer.start();
 	// create Octreebuilder which will output our SVO
-	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, true, generate_levels);
+	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, generate_levels);
 	svo_total_timer.stop();
 
 	// Start voxelisation and SVO building per partition
@@ -341,55 +348,43 @@ int main(int argc, char *argv[]) {
 		// voxelize partition
 		size_t nfilled_before = nfilled;
 		bool use_data = true;
-		voxelize_partition2(reader, start, end, unitlength, voxels, data, sparseness_limit, use_data, nfilled);
+		voxelize_schwarz_method(reader, start, end, unitlength, voxels, data, sparseness_limit, use_data, nfilled);
 		if (verbose) { cout << "  found " << nfilled - nfilled_before << " new voxels." << endl; }
 		vox_total_timer.stop(); // TIMING
 
 		// build SVO
-		svo_total_timer.start(); svo_algo_timer.start(); // TIMING
 		cout << "Building SVO for partition " << i << " ..." << endl;
-		uint64_t morton_number;
-		DataPoint d;
-
+		svo_total_timer.start(); svo_algo_timer.start(); // TIMING
 #ifdef BINARY_VOXELIZATION
 		if (use_data){ // use fast way of building SVO
 			sort(data.begin(), data.end()); // sort morton codes
 			for (std::vector<uint64_t>::iterator it = data.begin(); it != data.end(); ++it){
-				d = DataPoint();
-				d.opacity = 1.0;
-				builder.addDataPoint(*it, d);
+				builder.addVoxel(*it);
 			}
 		}
 		else { // slower way - data memory was exceeded
+			uint64_t morton_number;
 			for (size_t j = 0; j < morton_part; j++) {
 				if (!voxels[j] == EMPTY_VOXEL) {
 					morton_number = start + j;
-					d = DataPoint();
-					d.opacity = 1.0; // this voxel is filled
-					builder.addDataPoint(morton_number, d);
+					builder.addVoxel(morton_number);
 				}
 			}
 		}
 #else
-		sort(data.begin(), data.end()); // sort morton codes
+		sort(data.begin(), data.end()); // sort
 		for (std::vector<VoxelData>::iterator it = data.begin(); it != data.end(); ++it){
-			d = DataPoint();
-			d.opacity = 1.0;
-			d.normal = it->normal;
-			if (color == COLOR_FROM_MODEL){
-				d.color = it->color;
-			}
-			else if (color == COLOR_FIXED){
-				d.color = fixed_color;
+			if (color == COLOR_FIXED){
+				it->color = fixed_color;
 			}
 			else if (color == COLOR_LINEAR){ // linear color scale
-				d.color = mortonToRGB(it->morton, gridsize);
+				it->color = mortonToRGB(it->morton, gridsize);
 			}
 			else if (color == COLOR_NORMAL){ // color models using their normals
-				vec3 normal = normalize(d.normal);
-				d.color = vec3((normal[0] + 1.0f) / 2.0f, (normal[1] + 1.0f) / 2.0f, (normal[2] + 1.0f) / 2.0f);
+				vec3 normal = normalize(it->normal);
+				it->color = vec3((normal[0] + 1.0f) / 2.0f, (normal[1] + 1.0f) / 2.0f, (normal[2] + 1.0f) / 2.0f);
 			}
-			builder.addDataPoint(it->morton, d);
+			builder.addVoxel(*it);
 		}
 #endif
 		svo_algo_timer.stop(); svo_total_timer.stop();  // TIMING
