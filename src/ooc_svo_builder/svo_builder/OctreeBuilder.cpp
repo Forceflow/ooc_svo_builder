@@ -10,12 +10,15 @@ gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), gener
 	string data_name = base_filename + string(".octreedata");
 	node_out = fopen(nodes_name.c_str(), "wb");
 	data_out = fopen(data_name.c_str(), "wb");
+
 	// Setup building variables
 	b_maxdepth = log2((unsigned int)gridlength);
 	b_buffers.resize(b_maxdepth + 1);
 	for (int i = 0; i < b_maxdepth + 1; i++){
 		b_buffers[i].reserve(8);
 	}
+
+	// Fill data arrays
 	b_max_morton = mortonEncode_LUT((unsigned int)gridlength - 1, (unsigned int)gridlength - 1, (unsigned int)gridlength - 1);
 	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 	writeVoxelData(data_out, VoxelData(), b_data_pos); // first data point is NULL
@@ -99,28 +102,13 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 // Add an empty datapoint at a certain buffer level, and refine upwards from there
 void OctreeBuilder::addEmptyVoxel(const int buffer){
 	b_buffers[buffer].push_back(Node());
-	// REFINE BUFFERS: check from touched buffer, upwards
-	for (int d = buffer; d >= 0; d--){
-		if (b_buffers[d].size() == 8){ // if we have 8 nodes
-			assert(d - 1 >= 0);
-			if (isBufferEmpty(b_buffers[d])){
-				b_buffers[d - 1].push_back(Node()); // push back NULL node to represent 8 empty nodes
-			}
-			else {
-				b_buffers[d - 1].push_back(groupNodes(b_buffers[d])); // push back parent node
-			}
-			b_buffers.at(d).clear(); // clear the 8 nodes on this level
-		}
-		else {
-			break; // break the for loop: no upper levels will need changing
-		}
-	}
+	refineBuffers(buffer);
 	b_current_morton = (uint64_t)(b_current_morton + pow(8.0, b_maxdepth - buffer)); // because we're adding at a certain level
 }
 
-void OctreeBuilder::refineBuffers(){
-	// REFINE BUFFERS: check all levels (bottom up) and group 8 nodes on a higher level
-	for (int d = b_maxdepth; d >= 0; d--){
+// REFINE BUFFERS: check all levels from start_depth up and group 8 nodes on a higher level
+void OctreeBuilder::refineBuffers(const int start_depth){
+	for (int d = start_depth; d >= 0; d--){
 		if (b_buffers[d].size() == 8){ // if we have 8 nodes
 			assert(d - 1 >= 0);
 			if (isBufferEmpty(b_buffers[d])){
@@ -150,14 +138,14 @@ void OctreeBuilder::addVoxel(const uint64_t morton_number){
 	// Add to buffer
 	b_buffers.at(b_maxdepth).push_back(node);
 	// Refine buffers
-	refineBuffers();
+	refineBuffers(b_maxdepth);
 
 	b_current_morton++;
 }
 
 // Add a datapoint to the octree: this is the main method used to push datapoints
 void OctreeBuilder::addVoxel(const VoxelData& data){
-	// PADDING FOR MISSED MORTON NUMBERS
+	// Padding for missed morton numbers
 	if (data.morton != b_current_morton){
 		fastAddEmpty(data.morton - b_current_morton);
 	}
@@ -172,8 +160,7 @@ void OctreeBuilder::addVoxel(const VoxelData& data){
 	// Add to buffers
 	b_buffers.at(b_maxdepth).push_back(node);
 	// Refine buffers
-	refineBuffers();
+	refineBuffers(b_maxdepth);
 
-	// INCREASE CURRENT MORTON NUMBER
 	b_current_morton++;
 }

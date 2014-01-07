@@ -7,9 +7,7 @@
 #include <tri_util.h>
 #include "globals.h"
 #include "svo_builder_util.h"
-#include "morton.h"
 #include "octree_io.h"
-#include "VoxelData.h"
 
 using namespace std;
 using namespace trimesh;
@@ -42,7 +40,7 @@ private:
 	void fastAddEmpty(const size_t budget);
 	void addEmptyVoxel(const int buffer);
 	bool isBufferEmpty(const vector<Node> &buffer);
-	void refineBuffers();
+	void refineBuffers(const int start_depth);
 	Node groupNodes(const vector<Node> &buffer);
 	int highestNonEmptyBuffer();
 	int computeBestFillBuffer(const size_t budget);
@@ -92,4 +90,4 @@ inline void OctreeBuilder::fastAddEmpty(const size_t budget){
 	}
 }
 
-#endif  // OCTREE_BUILDER_H_
+#endif // OCTREE_BUILDER_H_

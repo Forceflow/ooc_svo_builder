@@ -1,4 +1,5 @@
 // Various methods of computing morton codes
+// Check http://www.forceflow.be/2013/10/07/morton-encodingdecoding-through-bit-interleaving-implementations/ for more info
 // by Jeroen Baert - jeroen.baert@cs.kuleuven.be - www.forceflow.be
 
 #ifndef MORTON_H_
@@ -13,8 +14,6 @@ uint64_t mortonEncode_LUT(unsigned int x, unsigned int y, unsigned int z);
 uint64_t mortonEncode_magicbits(unsigned int x, unsigned int y, unsigned int z);
 uint64_t mortonEncode_for(unsigned int x, unsigned int y, unsigned int z);
 void mortonDecode(uint64_t morton, unsigned int& x, unsigned int& y, unsigned int& z);
-
-// encode a given (x,y,z) coordinate to a 64-bit morton code
 
 // VERSION WITH FOR LOOP
 // ---------------------
@@ -46,7 +45,6 @@ inline uint64_t mortonEncode_magicbits(unsigned int x, unsigned int y, unsigned 
 
 // VERSION WITH LOOKUP TABLE
 // -------------------------
-
 static const uint64_t morton256_x[256] =
 {
 	0x00000000, 
