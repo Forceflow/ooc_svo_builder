@@ -148,7 +148,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
-    <ClInclude Include="DataPoint.h" />
     <ClInclude Include="geometry_primitives.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="intersection.h" />

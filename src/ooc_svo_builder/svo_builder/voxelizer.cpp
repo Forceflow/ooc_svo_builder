@@ -3,19 +3,20 @@
 using namespace std;
 using namespace trimesh;
 
-// Implementation of http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.6294 (Huang et al.)
-// Adapted for mortoncode -based subgrids
-// by Jeroen Baert - jeroen.baert@cs.kuleuven.be
-
 #define X 0
 #define Y 1
 #define Z 2
 
+
+
+// Implementation of http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.6294 (Huang et al.)
+// Adapted for mortoncode -based subgrids
+
 #ifdef BINARY_VOXELIZATION
-void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
+void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
 	for (size_t i = 0; i < (morton_end - morton_start); i++){ voxels[i] = EMPTY_VOXEL; }
 #else
-void voxelize_partition(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
+void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
 	for (size_t i = 0; i < (morton_end - morton_start); i++){ voxels[i] = EMPTY_VOXEL; }
 	voxel_data.clear();
 #endif
@@ -131,9 +132,9 @@ void voxelize_partition(TriReader &reader, const uint64_t morton_start, const ui
 }
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
+void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
 #else
-void voxelize_partition2(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<VoxelData> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
+void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<VoxelData> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
 #endif
 	vox_algo_timer.start();
 	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(char));

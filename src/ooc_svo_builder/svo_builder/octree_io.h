@@ -5,7 +5,6 @@
 #include <fstream>
 #include <file_tools.h>
 #include "Node.h"
-#include "VoxelData.h"
 
 using namespace std;
 
@@ -63,8 +62,6 @@ inline void readDataPoint(FILE* f, VoxelData &v){
 // Write an octree node to file
 inline size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos){
 	fwrite(& n.data, sizeof(size_t), 3, node_out);
-	//fwrite(& n.children_base, sizeof(size_t), 1, node_out);
-	//fwrite(& n.children_offset[0], sizeof(char), 8, node_out);
 	b_node_pos++;
 	return b_node_pos-1;
 }
@@ -72,8 +69,6 @@ inline size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos){
 // Read a Node from a file
 inline void readNode(FILE* f, Node &n){
 	fread(& n.data, sizeof(size_t), 3, f);
-	//fread(& n.children_base, sizeof(size_t), 1, f);
-	//fread(& n.children_offset[0], sizeof(char), 8, f);
 }
 
 // Write an octree header to a file

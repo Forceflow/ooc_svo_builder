@@ -47,9 +47,6 @@
     <ClInclude Include="Buffer.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="DataPoint.h">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="geometry_primitives.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
