@@ -9,7 +9,7 @@ using namespace trimesh;
 
 
 
-// Implementation of http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.6294 (Huang et al.)
+// Implementation of algorithm from http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.6294 (Huang et al.)
 // Adapted for mortoncode -based subgrids
 
 #ifdef BINARY_VOXELIZATION
@@ -130,6 +130,9 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 		}
 	}
 }
+
+// Implementation of algorithm from http://research.michael-schwarz.com/publ/2010/vox/ (Schwarz & Seidel)
+// Adapted for mortoncode -based subgrids
 
 #ifdef BINARY_VOXELIZATION
 void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {

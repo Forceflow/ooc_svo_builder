@@ -13,18 +13,10 @@
 
 using namespace std;
 
-#if _WIN32 || _WIN64
-#if _WIN64
-#define ENVIRONMENT64
-#else
-#define ENVIRONMENT32
-#endif
-#endif
-
 enum ColorType { COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL };
 
 // Program version
-string version = "1.3";
+string version = "1.2";
 
 // Program parameters
 string filename = "";
@@ -69,11 +61,8 @@ void printInfo() {
 #ifdef __linux__
 	cout << "Linux " << endl;
 #endif
-#ifdef ENVIRONMENT64
+#ifdef _WIN64
 	cout << "64-bit version" << endl;
-#endif
-#ifdef ENVIRONMENT32
-	cout << "32-bit version" << endl;
 #endif
 	cout << "Jeroen Baert - jeroen.baert@cs.kuleuven.be - www.forceflow.be" << endl;
 	cout << "--------------------------------------------------------------------" << endl << endl;
@@ -317,9 +306,9 @@ int main(int argc, char *argv[]) {
 
 	char* voxels = new char[(size_t)morton_part]; // Storage for voxel on/off
 #ifdef BINARY_VOXELIZATION
-	vector<uint64_t> data;
+	vector<uint64_t> data; // Dynamic storage for morton codes
 #else
-	vector<VoxelData> data; // Storage for voxel data (DYNAMIC)
+	vector<VoxelData> data; // Dynamic storage for voxel data
 #endif 
 	size_t nfilled = 0;
 	vox_total_timer.stop(); // TIMING

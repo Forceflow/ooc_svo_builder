@@ -8,20 +8,13 @@
 using namespace std;
 using namespace trimesh;
 
-#if _WIN32 || _WIN64
-#if _WIN64
-#define ENVIRONMENT64
-#else
-#define ENVIRONMENT32
-#endif
-#endif
-
 // Program version
-string version = "1.1";
+string version = "1.2";
 
 // Program parameters
 string filename = "";
 bool recompute_normals = false;
+vec3 fixed_color = vec3(1.0f, 1.0f, 1.0f);
 
 void printInfo(){
 	cout << "-------------------------------------------------------------" << endl;
@@ -30,17 +23,14 @@ void printInfo(){
 #else
 	cout << "Tri Converter " << version << " - GEOMETRY+NORMALS"<< endl;
 #endif
-#ifdef _WIN32 || _WIN64
+#if defined(_WIN32) || defined(_WIN64)
 	cout << "Windows ";
 #endif
 #ifdef __linux__
 	cout << "Linux ";
 #endif
-#ifdef ENVIRONMENT64
+#ifdef _WIN64
 	cout << "64-bit version" << endl;
-#endif
-#ifdef ENVIRONMENT32
-	cout << "32-bit version" << endl;
 #endif
 	cout << "Jeroen Baert - jeroen.baert@cs.kuleuven.be - www.forceflow.be" << endl;
 	cout << "-------------------------------------------------------------" << endl << endl;
@@ -114,7 +104,7 @@ int main(int argc, char *argv[]){
 	FILE* tri_out = fopen(tri_out_name.c_str(), "wb");
 
 	cout << "Writing mesh triangles ... "; timer.reset();
-	Triangle t;
+	Triangle t(vec3(),vec3(),vec3(),vec3(),fixed_color,fixed_color,fixed_color);
 	// Write all triangles to data file
 	for(size_t i = 0; i < themesh->faces.size(); i++){
 		t.v0 = themesh->vertices[themesh->faces[i][0]];
@@ -122,7 +112,6 @@ int main(int argc, char *argv[]){
 		t.v2 = themesh->vertices[themesh->faces[i][2]];
 #ifndef BINARY_VOXELIZATION
 		// COLLECT VERTEX COLORS
-		// TODO: Make this user-switchable (in case you want to ignore colors from mesh)
 		if(!themesh->colors.empty()){ // if this mesh has colors, we're going to use them
 			t.v0_color = themesh->colors[themesh->faces[i][0]];
 			t.v1_color = themesh->colors[themesh->faces[i][1]];

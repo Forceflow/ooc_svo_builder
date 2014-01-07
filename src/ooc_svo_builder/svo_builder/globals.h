@@ -25,7 +25,6 @@ extern Timer vox_total_timer;
 extern Timer vox_io_in_timer;
 extern Timer vox_algo_timer;
 
-
 // Timers for SVO building step
 extern Timer svo_total_timer;
 extern Timer svo_io_out_timer;
