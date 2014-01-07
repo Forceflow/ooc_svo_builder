@@ -5,11 +5,9 @@
 #include <fstream>
 #include <file_tools.h>
 #include "Node.h"
-#include "DataPoint.h"
+#include "VoxelData.h"
 
 using namespace std;
-
-#define DATAPOINT_SIZE 7
 
 // File containing all the octree IO methods
 
@@ -41,8 +39,8 @@ struct OctreeInfo {
 	}
 };
 
-size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos);
-void readDataPoint(FILE* f, DataPoint &d);
+size_t writeVoxelData(FILE* f, const VoxelData &v, size_t &b_data_pos);
+void readVoxelData(FILE* f, VoxelData &v);
 size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos);
 inline void readNode(FILE* f, Node &n);
 
@@ -50,19 +48,16 @@ void writeOctreeHeader(const std::string &filename, const OctreeInfo &i);
 int parseOctreeHeader(const std::string &filename, OctreeInfo &i);
 
 // Write a data point to file
-inline size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos){
-	fwrite(& d.opacity, sizeof(float), DATAPOINT_SIZE, data_out);
-	//fwrite(& d.color[0], sizeof(float), 3, data_out);
-	//fwrite(& d.normal[0], sizeof(float), 3, data_out);
+inline size_t writeVoxelData(FILE* f, const VoxelData &v, size_t &b_data_pos){
+	fwrite(&v.morton, VOXELDATA_SIZE, 1, f);
 	b_data_pos++;
 	return b_data_pos-1;
 }
 
 // Read a data point from a file
-inline void readDataPoint(FILE* f, DataPoint &d){
-	fread(& d.opacity, sizeof(float), DATAPOINT_SIZE, f);
-	//fread(& d.color[0], sizeof(float), 3, f);
-	//fread(& d.normal[0], sizeof(float), 3, f);
+inline void readDataPoint(FILE* f, VoxelData &v){
+	v.morton = 0;
+	fread(&v.morton, VOXELDATA_SIZE, 1, f);
 }
 
 // Write an octree node to file

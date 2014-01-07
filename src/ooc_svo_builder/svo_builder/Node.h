@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "DataPoint.h"
+#include "VoxelData.h"
 
 #define NOCHILD -1
 #define NODATA 0
@@ -19,7 +19,7 @@ public:
 	size_t children_base;
 	char children_offset[8];
 
-	DataPoint data_cache; // only if you want to refine octree (clustering)
+	VoxelData data_cache; // only if you want to refine octree (clustering)
 
 	Node();
 	bool hasChild(unsigned int i) const;
@@ -30,7 +30,7 @@ public:
 };
 
 // Default constructor
-inline Node::Node() : data(0), children_base(0), data_cache(DataPoint()){
+inline Node::Node() : data(0), children_base(0), data_cache(VoxelData()){
 	memset(children_offset, (char) NOCHILD, 8);
 }
 

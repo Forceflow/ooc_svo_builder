@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
 
 	svo_total_timer.start();
 	// create Octreebuilder which will output our SVO
-	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, true, generate_levels);
+	OctreeBuilder builder = OctreeBuilder(trip_info.base_filename, trip_info.gridsize, generate_levels);
 	svo_total_timer.stop();
 
 	// Start voxelisation and SVO building per partition
@@ -346,50 +346,38 @@ int main(int argc, char *argv[]) {
 		vox_total_timer.stop(); // TIMING
 
 		// build SVO
-		svo_total_timer.start(); svo_algo_timer.start(); // TIMING
 		cout << "Building SVO for partition " << i << " ..." << endl;
-		uint64_t morton_number;
-		DataPoint d;
-
+		svo_total_timer.start(); svo_algo_timer.start(); // TIMING
 #ifdef BINARY_VOXELIZATION
 		if (use_data){ // use fast way of building SVO
 			sort(data.begin(), data.end()); // sort morton codes
 			for (std::vector<uint64_t>::iterator it = data.begin(); it != data.end(); ++it){
-				d = DataPoint();
-				d.opacity = 1.0;
-				builder.addDataPoint(*it, d);
+				builder.addVoxel(*it);
 			}
 		}
 		else { // slower way - data memory was exceeded
+			uint64_t morton_number;
 			for (size_t j = 0; j < morton_part; j++) {
 				if (!voxels[j] == EMPTY_VOXEL) {
 					morton_number = start + j;
-					d = DataPoint();
-					d.opacity = 1.0; // this voxel is filled
-					builder.addDataPoint(morton_number, d);
+					builder.addVoxel(morton_number);
 				}
 			}
 		}
 #else
-		sort(data.begin(), data.end()); // sort morton codes
+		sort(data.begin(), data.end()); // sort
 		for (std::vector<VoxelData>::iterator it = data.begin(); it != data.end(); ++it){
-			d = DataPoint();
-			d.opacity = 1.0;
-			d.normal = it->normal;
-			if (color == COLOR_FROM_MODEL){
-				d.color = it->color;
-			}
-			else if (color == COLOR_FIXED){
-				d.color = fixed_color;
+			if (color == COLOR_FIXED){
+				it->color = fixed_color;
 			}
 			else if (color == COLOR_LINEAR){ // linear color scale
-				d.color = mortonToRGB(it->morton, gridsize);
+				it->color = mortonToRGB(it->morton, gridsize);
 			}
 			else if (color == COLOR_NORMAL){ // color models using their normals
-				vec3 normal = normalize(d.normal);
-				d.color = vec3((normal[0] + 1.0f) / 2.0f, (normal[1] + 1.0f) / 2.0f, (normal[2] + 1.0f) / 2.0f);
+				vec3 normal = normalize(it->normal);
+				it->color = vec3((normal[0] + 1.0f) / 2.0f, (normal[1] + 1.0f) / 2.0f, (normal[2] + 1.0f) / 2.0f);
 			}
-			builder.addDataPoint(it->morton, d);
+			builder.addVoxel(*it);
 		}
 #endif
 		svo_algo_timer.stop(); svo_total_timer.stop();  // TIMING

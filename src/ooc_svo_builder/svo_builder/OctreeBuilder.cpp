@@ -1,8 +1,8 @@
 #include "OctreeBuilder.h"
 
 // OctreeBuilder constructor: this initializes the builder and sets up the output files, ready to go
-OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool fast_empty, bool generate_levels) :
-gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), fast_empty(fast_empty), generate_levels(generate_levels), base_filename(base_filename) {
+OctreeBuilder::OctreeBuilder(std::string base_filename, size_t gridlength, bool generate_levels) :
+gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), generate_levels(generate_levels), base_filename(base_filename) {
 	svo_algo_timer.start();
 
 	// Open output files
@@ -17,40 +17,31 @@ gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), fast_
 		b_buffers[i].reserve(8);
 	}
 	b_max_morton = mortonEncode_LUT((unsigned int)gridlength - 1, (unsigned int)gridlength - 1, (unsigned int)gridlength - 1);
-
 	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
-	writeDataPoint(data_out, DataPoint(), b_data_pos); // first data point is NULL
+	writeVoxelData(data_out, VoxelData(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
-	// second data point is NULL, all voxels refer to this if binary voxelization only
-	// This point has no color and opacity of 0.0 - will not show up in rendering
-	writeDataPoint(data_out, DataPoint(), b_data_pos);
+	writeVoxelData(data_out, VoxelData(), b_data_pos); // second data point is NULL, all voxels refer to this if binary voxelization only
 #endif
-	svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
-	svo_algo_timer.stop();
+	svo_io_out_timer.stop(); svo_algo_timer.stop();
 }
 
 // Finalize the tree: add rest of empty nodes, make sure root node is on top
 void OctreeBuilder::finalizeTree(){
 	// fill octree
-	if(b_current_morton < b_max_morton){
-		if(fast_empty){
-			fastAddEmpty((b_max_morton - b_current_morton)+1);
-		} else {
-			for(uint64_t i = b_current_morton; i <= b_max_morton; i++){
-				addDataPoint(i, DataPoint());
-			}
-		}
+	if (b_current_morton < b_max_morton){
+		fastAddEmpty((b_max_morton - b_current_morton) + 1);
 	}
+
 	// write root node
 	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 	writeNode(node_out, b_buffers[0][0], b_node_pos);
 	svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 
 	// write header
-	OctreeInfo octree_info(1,base_filename,gridlength,b_node_pos,b_data_pos);
+	OctreeInfo octree_info(1, base_filename, gridlength, b_node_pos, b_data_pos);
 
 	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
-	writeOctreeHeader(base_filename+string(".octree"),octree_info);
+	writeOctreeHeader(base_filename + string(".octree"), octree_info);
 	svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 
 	// close files
@@ -62,42 +53,42 @@ void OctreeBuilder::finalizeTree(){
 Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 	Node parent = Node();
 	bool first_stored_child = true;
-	for(int k = 0; k<8; k++){
-		if(!buffer[k].isNull()){
-			if(first_stored_child){
+	for (int k = 0; k < 8; k++){
+		if (!buffer[k].isNull()){
+			if (first_stored_child){
 				svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
-				parent.children_base = writeNode(node_out,buffer[k],b_node_pos);
+				parent.children_base = writeNode(node_out, buffer[k], b_node_pos);
 				svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 				parent.children_offset[k] = 0;
 				first_stored_child = false;
-			} else {
+			}
+			else {
 				svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
-				parent.children_offset[k] = (char) (writeNode(node_out,buffer[k],b_node_pos) - parent.children_base);
+				parent.children_offset[k] = (char)(writeNode(node_out, buffer[k], b_node_pos) - parent.children_base);
 				svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 			}
-		} else {
+		}
+		else {
 			parent.children_offset[k] = NOCHILD;
 		}
 	}
 
 	// SIMPLE LEVEL CONSTRUCTION
-	if(generate_levels){
-		DataPoint d = DataPoint();
+	if (generate_levels){
+		VoxelData d = VoxelData();
 		float notnull = 0.0f;
-		for(int i = 0; i < 8; i++){ // this node has no data: need to refine
-			if(!buffer[i].isNull())
+		for (int i = 0; i < 8; i++){ // this node has no data: need to refine
+			if (!buffer[i].isNull())
 				notnull++;
-			d.opacity += buffer[i].data_cache.opacity;
 			d.color += buffer[i].data_cache.color;
 			d.normal += buffer[i].data_cache.normal;
 		}
 		d.color = d.color / notnull;
-		vec3 tonormalize = (vec3) (d.normal / notnull);
+		vec3 tonormalize = (vec3)(d.normal / notnull);
 		d.normal = normalize(tonormalize);
-		d.opacity = d.opacity / notnull;
 		// set it in the parent node
 		svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
-		parent.data = writeDataPoint(data_out, d, b_data_pos);
+		parent.data = writeVoxelData(data_out, d, b_data_pos);
 		svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
 		parent.data_cache = d;
 	}
@@ -106,66 +97,82 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 }
 
 // Add an empty datapoint at a certain buffer level, and refine upwards from there
-void OctreeBuilder::addEmptyDataPoint(const int buffer){
+void OctreeBuilder::addEmptyVoxel(const int buffer){
 	b_buffers[buffer].push_back(Node());
 	// REFINE BUFFERS: check from touched buffer, upwards
-	for(int d = buffer; d >= 0; d--){
-		if(b_buffers[d].size() == 8){ // if we have 8 nodes
-			assert(d-1 >= 0);
-			if(isBufferEmpty(b_buffers[d])){
-				b_buffers[d-1].push_back(Node()); // push back NULL node to represent 8 empty nodes
-			} else { 
-				b_buffers[d-1].push_back(groupNodes(b_buffers[d])); // push back parent node
+	for (int d = buffer; d >= 0; d--){
+		if (b_buffers[d].size() == 8){ // if we have 8 nodes
+			assert(d - 1 >= 0);
+			if (isBufferEmpty(b_buffers[d])){
+				b_buffers[d - 1].push_back(Node()); // push back NULL node to represent 8 empty nodes
+			}
+			else {
+				b_buffers[d - 1].push_back(groupNodes(b_buffers[d])); // push back parent node
 			}
 			b_buffers.at(d).clear(); // clear the 8 nodes on this level
-		} else {
+		}
+		else {
 			break; // break the for loop: no upper levels will need changing
 		}
 	}
-	b_current_morton = (uint64_t) (b_current_morton + pow(8.0,b_maxdepth-buffer)); // because we're adding at a certain level
+	b_current_morton = (uint64_t)(b_current_morton + pow(8.0, b_maxdepth - buffer)); // because we're adding at a certain level
+}
+
+void OctreeBuilder::refineBuffers(){
+	// REFINE BUFFERS: check all levels (bottom up) and group 8 nodes on a higher level
+	for (int d = b_maxdepth; d >= 0; d--){
+		if (b_buffers[d].size() == 8){ // if we have 8 nodes
+			assert(d - 1 >= 0);
+			if (isBufferEmpty(b_buffers[d])){
+				b_buffers[d - 1].push_back(Node()); // push back NULL node to represent 8 empty nodes
+			}
+			else {
+				b_buffers[d - 1].push_back(groupNodes(b_buffers[d])); // push back parent node
+			}
+			b_buffers.at(d).clear(); // clear the 8 nodes on this level
+		}
+		else {
+			break; // break the for loop: no upper levels will need changing
+		}
+	}
 }
 
 // Add a datapoint to the octree: this is the main method used to push datapoints
-void OctreeBuilder::addDataPoint(const uint64_t morton_number, const DataPoint& point){
-	// PADDING FOR MISSED MORTON NUMBERS
-	if(morton_number != b_current_morton){
-		if(fast_empty){
-			fastAddEmpty(morton_number - b_current_morton);
-		} else {
-			for(uint64_t i = b_current_morton; i < morton_number; i++){
-				addDataPoint(i, DataPoint());
-			}
-		}
+void OctreeBuilder::addVoxel(const uint64_t morton_number){
+	// Padding for missed morton numbers
+	if (morton_number != b_current_morton){
+		fastAddEmpty(morton_number - b_current_morton);
 	}
 
-	// ADD NODE TO BUFFER
+	// Create node
 	Node node = Node(); // create empty node
-	if(!point.isEmpty()) {
-#ifdef BINARY_VOXELIZATION
-		node.data = 1; // all nodes in binary voxelization refer to this
-#else
-		svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
-		node.data = writeDataPoint(data_out, point, b_data_pos); // store data
-		svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
-#endif
-		node.data_cache = point; // store data as cache
-	} 
+	node.data = 1; // all nodes in binary voxelization refer to this
+	// Add to buffer
 	b_buffers.at(b_maxdepth).push_back(node);
+	// Refine buffers
+	refineBuffers();
 
-	// REFINE BUFFERS: check all levels (bottom up) and group 8 nodes on a higher level
-	for(int d = b_maxdepth; d >= 0; d--){
-		if(b_buffers[d].size() == 8){ // if we have 8 nodes
-			assert(d-1 >= 0);
-			if(isBufferEmpty(b_buffers[d])){
-				b_buffers[d-1].push_back(Node()); // push back NULL node to represent 8 empty nodes
-			} else { 
-				b_buffers[d-1].push_back(groupNodes(b_buffers[d])); // push back parent node
-			}
-			b_buffers.at(d).clear(); // clear the 8 nodes on this level
-		} else {
-			break; // break the for loop: no upper levels will need changing
-		}
+	b_current_morton++;
+}
+
+// Add a datapoint to the octree: this is the main method used to push datapoints
+void OctreeBuilder::addVoxel(const VoxelData& data){
+	// PADDING FOR MISSED MORTON NUMBERS
+	if (data.morton != b_current_morton){
+		fastAddEmpty(data.morton - b_current_morton);
 	}
+
+	// Create node
+	Node node = Node(); // create empty node
+	// Write data point
+	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
+	node.data = writeVoxelData(data_out, data, b_data_pos); // store data
+	svo_io_out_timer.stop(); svo_algo_timer.start(); // TIMING
+	node.data_cache = data; // store data as cache
+	// Add to buffers
+	b_buffers.at(b_maxdepth).push_back(node);
+	// Refine buffers
+	refineBuffers();
 
 	// INCREASE CURRENT MORTON NUMBER
 	b_current_morton++;

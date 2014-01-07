@@ -69,7 +69,7 @@
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="VoxelData.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

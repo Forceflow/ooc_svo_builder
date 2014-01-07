@@ -1,35 +1,16 @@
 #ifndef VOXELIZER_H_
 #define VOXELIZER_H_
 
+#include <tri_tools.h>
+#include <TriReader.h>
 #include "globals.h"
 #include "intersection.h"
 #include "morton.h"
-#include <tri_tools.h>
-#include <TriReader.h>
+#include "VoxelData.h"
 
 // Voxelization-related stuff
 typedef Vec<3, unsigned int> uivec3;
-
 using namespace std;
-
-// This struct defines VoxelData for our voxelizer - this is defined different depending on compile project
-// This is the main memory hogger: the less data you store here, the better.
-struct VoxelData{
-	uint64_t morton;
-	vec3 normal;
-	vec3 color;
-
-	VoxelData(): morton(0), normal(vec3(0.0f,0.0f,0.0f)), color(vec3(0.0f,0.0f,0.0f)){}
-	VoxelData(uint64_t morton, vec3 normal, vec3 color): morton(morton), normal(normal), color(color){}
-
-	bool operator >(VoxelData &a){
-		return morton > a.morton;
-	}
-
-	bool operator <(VoxelData &a){
-		return morton < a.morton;
-	}
-};
 
 #define EMPTY_VOXEL 0
 #define FULL_VOXEL 1
