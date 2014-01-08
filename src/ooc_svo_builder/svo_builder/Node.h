@@ -9,7 +9,7 @@
 #define NODATA 0
 
 // This is how an array of a leaf node will look
-const char LEAF[] {NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD};
+const char LEAF[8] = {NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD, NOCHILD};
 
 // An SVO node. Only contains child pointers, extend this if you want parent pointers as well
 class Node
