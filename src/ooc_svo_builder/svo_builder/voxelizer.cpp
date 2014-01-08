@@ -152,7 +152,7 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 #ifdef BINARY_VOXELIZATION
 	size_t data_max_items;
 	if (use_data){
-		uint64_t max_bytes_data = ((morton_end - morton_start)*sizeof(char)) * sparseness_limit;
+		uint64_t max_bytes_data = (uint64_t) (((morton_end - morton_start)*sizeof(char)) * sparseness_limit);
 
 		data_max_items = max_bytes_data / sizeof(uint64_t);
 		data_max_items = max_bytes_data / sizeof(VoxelData);

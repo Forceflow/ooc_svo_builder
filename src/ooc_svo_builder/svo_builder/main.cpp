@@ -22,7 +22,7 @@ string version = "1.2";
 string filename = "";
 size_t gridsize = 1024;
 size_t voxel_memory_limit = 2048;
-float sparseness_limit = 0.10;
+float sparseness_limit = 0.10f;
 ColorType color = COLOR_FROM_MODEL;
 vec3 fixed_color = vec3(1.0f, 1.0f, 1.0f); // fixed color is white
 bool generate_levels = false;
@@ -112,7 +112,7 @@ void parseProgramParameters(int argc, char* argv[]) {
 		}
 		else if (string(argv[i]) == "-s") {
 			gridsize = atoi(argv[i + 1]);
-			if (!isPowerOf2(gridsize)) {
+			if (!isPowerOf2((unsigned int) gridsize)) {
 				cout << "Requested gridsize is not a power of 2" << endl;
 				printInvalid();
 				exit(0);
