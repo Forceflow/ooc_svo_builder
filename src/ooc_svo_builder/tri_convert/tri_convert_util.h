@@ -49,7 +49,7 @@ inline AABox<vec3> createMeshBBCube(const TriMesh *themesh){
 	return AABox<vec3>(mesh_min,mesh_max);
 }
 
-inline vec3 computeFaceNormal(TriMesh *themesh, int facenumber){
+inline vec3 computeFaceNormal(TriMesh *themesh, size_t facenumber){
 	TriMesh::Face face = themesh->faces[facenumber];
 	vec3 &v0 = themesh->vertices[face[0]];
 	vec3 &v1 = themesh->vertices[face[1]];
@@ -58,7 +58,7 @@ inline vec3 computeFaceNormal(TriMesh *themesh, int facenumber){
 	return normalize(to_normalize);
 }
 
-inline vec3 getShadingFaceNormal(TriMesh *themesh, int facenumber){
+inline vec3 getShadingFaceNormal(TriMesh *themesh, size_t facenumber){
 	TriMesh::Face face = themesh->faces[facenumber];
 	vec3 &n0 = themesh->normals[face[0]];
 	vec3 &n1 = themesh->normals[face[1]];
