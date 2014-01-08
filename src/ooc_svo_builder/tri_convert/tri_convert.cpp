@@ -104,7 +104,7 @@ int main(int argc, char *argv[]){
 	FILE* tri_out = fopen(tri_out_name.c_str(), "wb");
 
 	cout << "Writing mesh triangles ... "; timer.reset();
-	Triangle t(vec3(),vec3(),vec3(),vec3(),fixed_color,fixed_color,fixed_color);
+	Triangle t = Triangle();
 	// Write all triangles to data file
 	for(size_t i = 0; i < themesh->faces.size(); i++){
 		t.v0 = themesh->vertices[themesh->faces[i][0]];

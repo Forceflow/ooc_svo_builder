@@ -149,8 +149,8 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 	mortonDecode(morton_end - 1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
 
 	// compute maximum grow size for data array
-	size_t data_max_items;
 #ifdef BINARY_VOXELIZATION
+	size_t data_max_items;
 	if (use_data){
 		uint64_t max_bytes_data = ((morton_end - morton_start)*sizeof(char)) * sparseness_limit;
 
