@@ -39,11 +39,11 @@ struct TriInfo{
 
 // STDIO IO for Triangles
 inline void readTriangle(FILE* f, Triangle &t){
-	fread(&t, TRIANGLE_SIZE*sizeof(float), 1, f);
+	size_t read = fread(&t, TRIANGLE_SIZE*sizeof(float), 1, f);
 }
 
 inline void readTriangles(FILE* f, Triangle &t, size_t howmany){
-	fread(&t, TRIANGLE_SIZE*sizeof(float), howmany, f);
+	size_t read = fread(&t, TRIANGLE_SIZE*sizeof(float), howmany, f);
 }
 
 inline void writeTriangle(FILE* f, Triangle &t){
