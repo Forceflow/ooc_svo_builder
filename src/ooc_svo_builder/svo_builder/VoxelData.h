@@ -20,11 +20,11 @@ struct VoxelData{
 	VoxelData() : morton(0), normal(vec3()), color(vec3()){}
 	VoxelData(uint64_t morton, vec3 normal, vec3 color) : morton(morton), normal(normal), color(color){}
 
-	bool operator > (const VoxelData &a){
+	bool operator > (const VoxelData &a) const{
 		return morton > a.morton;
 	}
 
-	bool operator < (const VoxelData &a){
+	bool operator < (const VoxelData &a) const{
 		return morton < a.morton;
 	}
 };
