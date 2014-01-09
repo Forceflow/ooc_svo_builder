@@ -23,7 +23,8 @@ gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), gener
 	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 	writeVoxelData(data_out, VoxelData(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
-	writeVoxelData(data_out, VoxelData(), b_data_pos); // second data point is NULL, all voxels refer to this if binary voxelization only
+	VoxelData v = VoxelData(0, vec3(), vec3(1.0, 1.0, 1.0)); // We store a simple white voxel in case of Binary voxelization
+	writeVoxelData(data_out, VoxelData(), b_data_pos); // all leafs will refer to this.
 #endif
 	svo_io_out_timer.stop(); svo_algo_timer.stop();
 }

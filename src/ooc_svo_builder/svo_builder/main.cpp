@@ -53,7 +53,7 @@ void printInfo() {
 #ifdef BINARY_VOXELIZATION
 	cout << "Out-Of-Core SVO Builder " << version << " - Geometry only version" << endl;
 #else
-	cout << "Out-Of-Core SVO Builder " << version << " - Geometry+normals version" << endl;
+	cout << "Out-Of-Core SVO Builder " << version << endl;
 #endif
 #if defined(_WIN32) || defined(_WIN64)
 	cout << "Windows " << endl;
@@ -77,7 +77,7 @@ void printHelp() {
 	std::cout << "-s <gridsize>         Voxel gridsize, should be a power of 2. Default 512." << endl;
 	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
 	std::cout << "-levels               Generate intermediary voxel levels by averaging voxel data" << endl;
-	std::cout << "-c <option>           Coloring of voxels (Options: from_model (default), fixed, linear, normal)" << endl;
+	std::cout << "-c <option>           Coloring of voxels (Options: model (default), fixed, linear, normal)" << endl;
 	std::cout << "-d <percentage>		Percentage of memory limit to be used additionaly for sparseness optimization" << endl;
 	std::cout << "-v                    Be very verbose." << endl;
 	std::cout << "-h                    Print help and exit." << endl;
@@ -253,7 +253,7 @@ void readTriHeader(string& filename, TriInfo& tri_info){
 	}
 #else
 	if (tri_info.geometry_only) {
-		cout << "You're using a .tri file which contains only geometry with the geometry+normals SVO Builder! Regenerate that .tri file using tri_convert." << endl;
+		cout << "You're using a .tri file which contains only geometry with the regular SVO Builder! Regenerate that .tri file using tri_convert." << endl;
 		exit(0);
 	}
 #endif
@@ -345,13 +345,13 @@ int main(int argc, char *argv[]) {
 		cout << "Building SVO for partition " << i << " ..." << endl;
 		svo_total_timer.start(); svo_algo_timer.start(); // TIMING
 #ifdef BINARY_VOXELIZATION
-		if (use_data){ // use fast way of building SVO
+		if (use_data){ // use array of morton codes to build the SVO
 			sort(data.begin(), data.end()); // sort morton codes
 			for (std::vector<uint64_t>::iterator it = data.begin(); it != data.end(); ++it){
 				builder.addVoxel(*it);
 			}
 		}
-		else { // slower way - data memory was exceeded
+		else { // morton array overflowed : using slower way to build SVO
 			uint64_t morton_number;
 			for (size_t j = 0; j < morton_part; j++) {
 				if (!voxels[j] == EMPTY_VOXEL) {
