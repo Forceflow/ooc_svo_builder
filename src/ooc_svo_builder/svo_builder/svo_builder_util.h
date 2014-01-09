@@ -14,7 +14,7 @@ using namespace std;
 
 // helper method to convert morton number to RGB color, for debug coloring purposes
 inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
-	int x,y,z;
+	unsigned int x,y,z;
 	mortonDecode(morton_number,z,y,x);
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
@@ -28,9 +28,9 @@ inline Vec<D,T> average3Vec(const Vec<D,T> v0, const Vec<D,T> v1, const Vec<D,T>
 	return answer;
 }
 
-inline int findPowerOf8(size_t n){
+inline unsigned int findPowerOf8(size_t n){
 	if(n == 0){return 0;}
-	int highest_index = 0;
+	unsigned int highest_index = 0;
 	while(n >>= 1){
 		highest_index++;
 	}

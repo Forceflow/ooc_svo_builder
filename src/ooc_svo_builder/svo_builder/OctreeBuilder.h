@@ -7,7 +7,6 @@
 #include <tri_util.h>
 #include "globals.h"
 #include "svo_builder_util.h"
-#include "morton.h"
 #include "octree_io.h"
 
 using namespace std;
@@ -25,24 +24,26 @@ public:
 	size_t b_node_pos; // current output node position (array index)
 
 	// configuration
-	bool fast_empty; // switch to enable fast_empty optimization
 	bool generate_levels; // switch to enable basic generation of higher octree levels
 
 	FILE* node_out;
 	FILE* data_out;
 	string base_filename;
 
-	OctreeBuilder(std::string base_filename, size_t gridlength, bool fast_empty, bool generate_levels);
-	void addDataPoint(const uint64_t morton_number, const DataPoint& point);
+	OctreeBuilder(std::string base_filename, size_t gridlength, bool generate_levels);
 	void finalizeTree();
+	void addVoxel(const uint64_t morton_number);
+	void addVoxel(const VoxelData& point);
 
 private:
+	// helper methods for octree building
+	void fastAddEmpty(const size_t budget);
+	void addEmptyVoxel(const int buffer);
 	bool isBufferEmpty(const vector<Node> &buffer);
+	void refineBuffers(const int start_depth);
 	Node groupNodes(const vector<Node> &buffer);
-	void addEmptyDataPoint(const int buffer);
 	int highestNonEmptyBuffer();
 	int computeBestFillBuffer(const size_t budget);
-	void fastAddEmpty(const size_t budget);
 };
 
 // Check if a buffer contains non-empty nodes
@@ -82,11 +83,11 @@ inline int OctreeBuilder::computeBestFillBuffer(const size_t budget){
 inline void OctreeBuilder::fastAddEmpty(const size_t budget){
 	size_t r_budget = budget;
 	while (r_budget > 0){
-		int buffer = computeBestFillBuffer(r_budget);
-		addEmptyDataPoint(buffer);
+		unsigned int buffer = computeBestFillBuffer(r_budget);
+		addEmptyVoxel(buffer);
 		size_t budget_hit = (size_t) pow(8.0,b_maxdepth-buffer);
 		r_budget = r_budget - budget_hit;
 	}
 }
 
-#endif  // OCTREE_BUILDER_H_
+#endif // OCTREE_BUILDER_H_

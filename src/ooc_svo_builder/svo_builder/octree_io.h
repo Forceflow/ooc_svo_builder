@@ -5,7 +5,6 @@
 #include <fstream>
 #include <file_tools.h>
 #include "Node.h"
-#include "DataPoint.h"
 
 using namespace std;
 
@@ -39,8 +38,8 @@ struct OctreeInfo {
 	}
 };
 
-size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos);
-void readDataPoint(FILE* f, DataPoint &d);
+size_t writeVoxelData(FILE* f, const VoxelData &v, size_t &b_data_pos);
+void readVoxelData(FILE* f, VoxelData &v);
 size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos);
 inline void readNode(FILE* f, Node &n);
 
@@ -48,35 +47,28 @@ void writeOctreeHeader(const std::string &filename, const OctreeInfo &i);
 int parseOctreeHeader(const std::string &filename, OctreeInfo &i);
 
 // Write a data point to file
-inline size_t writeDataPoint(FILE* data_out, const DataPoint &d, size_t &b_data_pos){
-	fwrite(& d.opacity, sizeof(float), 1, data_out);
-	fwrite(& d.color[0], sizeof(float), 3, data_out);
-	fwrite(& d.normal[0], sizeof(float), 3, data_out);
+inline size_t writeVoxelData(FILE* f, const VoxelData &v, size_t &b_data_pos){
+	fwrite(&v.morton, VOXELDATA_SIZE, 1, f);
 	b_data_pos++;
 	return b_data_pos-1;
 }
 
 // Read a data point from a file
-inline void readDataPoint(FILE* f, DataPoint &d){
-	fread(& d.opacity, sizeof(float), 1, f);
-	fread(& d.color[0], sizeof(float), 3, f);
-	fread(& d.normal[0], sizeof(float), 3, f);
+inline void readDataPoint(FILE* f, VoxelData &v){
+	v.morton = 0;
+	fread(&v.morton, VOXELDATA_SIZE, 1, f);
 }
 
 // Write an octree node to file
 inline size_t writeNode(FILE* node_out, const Node &n, size_t &b_node_pos){
-	fwrite(& n.children_base, sizeof(size_t), 1, node_out);
-	fwrite(& n.children_offset[0], sizeof(char), 8, node_out);
-	fwrite(& n.data, sizeof(size_t), 1, node_out);
+	fwrite(& n.data, sizeof(size_t), 3, node_out);
 	b_node_pos++;
 	return b_node_pos-1;
 }
 
 // Read a Node from a file
 inline void readNode(FILE* f, Node &n){
-	fread(& n.children_base, sizeof(size_t), 1, f);
-	fread(& n.children_offset[0], sizeof(char), 8, f);
-	fread(& n.data, sizeof(size_t), 1, f);
+	fread(& n.data, sizeof(size_t), 3, f);
 }
 
 // Write an octree header to a file

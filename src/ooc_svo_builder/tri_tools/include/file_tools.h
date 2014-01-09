@@ -8,7 +8,7 @@ using namespace std;
 
 // Various file operations, implemented in standard C
 
-// Copy files from src to dst
+// Copy files from src to dst using stdio
 inline void copy_file(const std::string& src, const std::string& dst){
 	char buf[8192];
     size_t size;
@@ -21,7 +21,7 @@ inline void copy_file(const std::string& src, const std::string& dst){
     fclose(dest);
 }
 
-// Check if a file exists
+// Check if a file exists using stdio
 inline bool file_exists(const std::string& name) {
 	if (FILE *file = fopen(name.c_str(), "r")) {
 		fclose(file);
