@@ -32,43 +32,39 @@ INCLUDE_DIRECTORIES (
   ./src/ooc_svo_builder/tri_tools/include
   )
 
-INCLUDE_DIRECTORIES (
-  ${TRIMESH2_ROOT}/include
-)
 
-LINK_DIRECTORIES (
-  ${TRIMESH2_ROOT}/lib.Darwin64
-)
-
-ADD_EXECUTABLE ( svo_builder
+SET(SVO_BUILDER_SRCS
   ./src/ooc_svo_builder/svo_builder/main.cpp
   ./src/ooc_svo_builder/svo_builder/OctreeBuilder.cpp
   ./src/ooc_svo_builder/svo_builder/partitioner.cpp
   ./src/ooc_svo_builder/svo_builder/voxelizer.cpp
-  )
-
-
-ADD_EXECUTABLE ( tri_convert
-  ./src/ooc_svo_builder/tri_convert/tri_convert.cpp
-  )
-
-ADD_EXECUTABLE ( tri_convert_binary
-  ./src/ooc_svo_builder/tri_convert/tri_convert.cpp
-  )
-SET_TARGET_PROPERTIES(tri_convert_binary PROPERTIES
+)
+ADD_EXECUTABLE ( svo_builder ${SVO_BUILDER_SRCS} )
+ADD_EXECUTABLE ( svo_builder_binary ${SVO_BUILDER_SRCS} )
+SET_TARGET_PROPERTIES(svo_builder_binary PROPERTIES
 	COMPILE_FLAGS "-DBINARY_VOXELIZATION ${SHARED_FLAGS}"
 )
 
 
+SET(TRI_CONVERT_SRCS
+  ./src/ooc_svo_builder/tri_convert/tri_convert.cpp
+)
+ADD_EXECUTABLE ( tri_convert ${TRI_CONVERT_SRCS} )
+ADD_EXECUTABLE ( tri_convert_binary ${TRI_CONVERT_SRCS} )
+SET_TARGET_PROPERTIES(tri_convert_binary PROPERTIES
+	COMPILE_FLAGS "-DBINARY_VOXELIZATION ${SHARED_FLAGS}"
+)
+
 TARGET_LINK_LIBRARIES ( svo_builder
   gomp
 )
-
+TARGET_LINK_LIBRARIES ( svo_builder_binary
+  gomp
+)
 TARGET_LINK_LIBRARIES ( tri_convert
   ${Trimesh2_LIBRARY}
   gomp
 )
-
 TARGET_LINK_LIBRARIES ( tri_convert_binary
   ${Trimesh2_LIBRARY}
   gomp
