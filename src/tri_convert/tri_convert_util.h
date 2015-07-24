@@ -3,7 +3,7 @@
 
 #include <TriMesh.h>
 #include <time.h>
-#include <tri_util.h>
+#include <"../tri_tools/include/tri_util.h">
 
 using namespace trimesh;
 
