@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 #include <vector>
-#include <tri_util.h>
-#include <tri_tools.h>
+#include "../libs/tri_tools/include/tri_util.h"
+#include "../libs/tri_tools/include/tri_tools.h"
 #include "globals.h"
 #include "intersection.h"
 

@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <../tri_tools/include/tri_tools.h>
 #include "tri_convert_util.h"
 
 using namespace std;

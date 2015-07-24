@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <fstream>
-#include <file_tools.h>
+#include "../libs/tri_tools/include/file_tools.h"
 #include "Node.h"
 
 using namespace std;

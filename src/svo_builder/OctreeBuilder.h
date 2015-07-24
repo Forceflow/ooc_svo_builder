@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <assert.h>
-#include <tri_util.h>
+#include "../libs/tri_tools/include/tri_util.h"
 #include "globals.h"
 #include "svo_builder_util.h"
 #include "octree_io.h"

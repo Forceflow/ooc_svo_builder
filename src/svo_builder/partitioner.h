@@ -1,9 +1,9 @@
 #ifndef PARTITIONER_H_
 #define PARTITIONER_H_
 
-#include <tri_tools.h>
-#include <trip_tools.h>
-#include <file_tools.h>
+#include "../libs/tri_tools/include/tri_tools.h"
+#include "../libs/tri_tools/include/trip_tools.h"
+#include "../libs/tri_tools/include/file_tools.h""
 #include "globals.h"
 #include <TriReader.h>
 #include "Buffer.h"
