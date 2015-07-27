@@ -79,6 +79,9 @@
     <LibraryPath>$(SolutionDir)\x64\Release Binary;C:\libs\trimesh2_new\lib.Win64;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_binary</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Binary|x64'">
+    <IncludePath>C:\libs\trimesh2_new\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>

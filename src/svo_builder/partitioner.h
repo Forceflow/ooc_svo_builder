@@ -3,9 +3,9 @@
 
 #include "../libs/tri_tools/include/tri_tools.h"
 #include "../libs/tri_tools/include/trip_tools.h"
-#include "../libs/tri_tools/include/file_tools.h""
+#include "../libs/tri_tools/include/file_tools.h"
+#include "../libs/tri_tools/include/TriReader.h"
 #include "globals.h"
-#include <TriReader.h>
 #include "Buffer.h"
 #include "morton.h"
 #include "voxelizer.h"
