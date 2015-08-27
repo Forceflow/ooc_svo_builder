@@ -5,9 +5,9 @@
 #include "../libs/tri_tools/include/trip_tools.h"
 #include "../libs/tri_tools/include/file_tools.h"
 #include "../libs/tri_tools/include/TriReader.h"
+#include "../libs/libmorton/include/morton3D_64.h"
 #include "globals.h"
 #include "Buffer.h"
-#include "morton.h"
 #include "voxelizer.h"
 
 // Partitioning-related stuff

@@ -50,8 +50,8 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 	for (size_t i = 0; i < n_partitions; i++){
 		// compute world bounding box
-		mortonDecode(morton_part*i, bbox_grid.min[2], bbox_grid.min[1], bbox_grid.min[0]);
-		mortonDecode((morton_part*(i + 1)) - 1, bbox_grid.max[2], bbox_grid.max[1], bbox_grid.max[0]); // -1, because z-curve skips to first block of next partition
+		morton3D_64_Decode_LUT_shifted(morton_part*i, bbox_grid.min[2], bbox_grid.min[1], bbox_grid.min[0]);
+		morton3D_64_Decode_LUT_shifted((morton_part*(i + 1)) - 1, bbox_grid.max[2], bbox_grid.max[1], bbox_grid.max[0]); // -1, because z-curve skips to first block of next partition
 		bbox_world.min[0] = bbox_grid.min[0] * unitlength;
 		bbox_world.min[1] = bbox_grid.min[1] * unitlength;
 		bbox_world.min[2] = bbox_grid.min[2] * unitlength;

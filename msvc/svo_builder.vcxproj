@@ -151,7 +151,6 @@
     <ClInclude Include="..\src\svo_builder\geometry_primitives.h" />
     <ClInclude Include="..\src\svo_builder\globals.h" />
     <ClInclude Include="..\src\svo_builder\intersection.h" />
-    <ClInclude Include="..\src\svo_builder\morton.h" />
     <ClInclude Include="..\src\svo_builder\Node.h" />
     <ClInclude Include="..\src\svo_builder\OctreeBuilder.h" />
     <ClInclude Include="..\src\svo_builder\octree_io.h" />

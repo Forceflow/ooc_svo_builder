@@ -53,9 +53,6 @@
     <ClInclude Include="..\src\svo_builder\intersection.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\morton.h">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\svo_builder\Node.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>

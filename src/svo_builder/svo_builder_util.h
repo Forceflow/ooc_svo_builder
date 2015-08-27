@@ -5,7 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <TriMesh.h>
-#include "morton.h"
+#include "../libs/libmorton/include/morton3D_64.h"
 
 using namespace trimesh;
 using namespace std;
@@ -15,7 +15,7 @@ using namespace std;
 // helper method to convert morton number to RGB color, for debug coloring purposes
 inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
 	unsigned int x,y,z;
-	mortonDecode(morton_number,z,y,x);
+	morton3D_64_Decode_LUT_shifted(morton_number,z,y,x);
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
 
