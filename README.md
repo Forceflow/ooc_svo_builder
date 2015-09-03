@@ -1,4 +1,4 @@
-# Out-Of-Core SVO Builder v1.2
+# Out-Of-Core SVO Builder v1.3
 
 This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, Out Of Core Construction of Sparse Voxel Octrees. The paper and additional material can be found on the [project page](http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/).
 
@@ -11,12 +11,18 @@ There are two tools distributed in this release, both are required to convert a 
 The current **ooc_svo_builder** release consists of:
 
 * Precompiled binaries for Win64 and Linux64
-* Source code on Github.
 * Visual Studio 2013 project files, Linux build scripts (sh) and Cmake files for OSX
 
 For Linux and OSX, the standard gcc/clang toolchain will do. For Windows64, VS2012 is required - there's a free VS Studio 2012 Express edition [available](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products).
 
-The only dependency for compiling from source is the [Trimesh2 library](http://gfx.cs.princeton.edu/proj/trimesh2/) by Szymon Rusinkiewicz, which is used for input/output of triangle meshes and the vector math. It will be statically linked in the binaries.
+Library dependencies are
+
+ * [**libmorton**](https://github.com/Forceflow/libmorton)
+ * [**libtri**](https://github.com/Forceflow/libtri)
+
+Both of these are included in the src/libs directory.
+
+The only external dependency for compiling from source is the [Trimesh2 library](http://gfx.cs.princeton.edu/proj/trimesh2/) by Szymon Rusinkiewicz, which is used for input/output of triangle meshes and the vector math. It will be statically linked in the binaries.
 
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
@@ -27,7 +33,9 @@ This release supports two modes of SVO building:
 Throughout all executables, the tools for binary voxelization are postfixed with _binary. During compilation, you can define the preprocessor directive #BINARY_VOXELIZATION to generate the binary-only SVO construction version.
 
 ### tri_convert: Converting a model to .tri format
-The out-of-core octree builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model, you've got to convert it to the .tri format using the *tri_convert* tool. The bounding box of the model will be padded to be cubical. See Tri file format (further) for more information. Tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only .tri file generation, use *tri_convert_binary*, for .tri file generation with a normal vector payload, use tri_convert.
+The out-of-core octree builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model, you've got to convert it to the .tri format using the *tri_convert* tool. For more info about the .tri file format, check [**libtri**](https://github.com/Forceflow/libtri).
+
+The bounding box of the model will be padded to be cubical. See Tri file format (further) for more information. Tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only .tri file generation, use *tri_convert_binary*, for .tri file generation with a normal vector payload, use tri_convert.
 
 **Syntax:** tri_convert(_binary) -f (path to model file)
 
@@ -110,43 +118,6 @@ The current payload contains a morton code, normal and color information. This c
 * **morton:** (64 bit unsigned int) Morton code of this voxel payload
 * **color:** (3 * 32 bit float = 96 bits) RGB color, three float values between 0 and 1.
 * **normal vector:** (3 * 32 bit float = 96 bits) x, y and z components of normal vector of this voxel payload.
-
-## Tri File Format
-The .tri file format is a very simple internal format to make abstraction of all the pitfalls and peculiarities of the plethora of model input formats in the wild. It basicly lists all triangles as one long list, with optional triangle properties (normals, colors ...) right behind the triangle definition. It was created with regards to streamability: all triangle information is stored sequentially, so you don't need to load the whole file in memory to process triangles. It's not as space-efficient as other formats, but is very easy to understand and parse.
-
-The .tri file format consists of a text-based header (extension .tri) containing the relevant model info and a binary data file (extension .tridata) containing the actual model data. 
-
-###Tri Header
-A typical .tri header file is text-based and looks like this. All keyword - values lines are separated by a newline:
-```
-#tri 1
-ntriangles 8254150
-geo_only 1
-bbox  -2540.83 -2586 -15957 2699.43 2654.25 -10716.8
-END
-```
-All elements are required.
-* **#tri (version_number)**: (int) Tri version number.
-* **ntriangles (n)**: (size_t) Total number of triangles.
-* **geo_only (0 or 1)**: (bool) Indicate whether or not the data is geometry-only (for binary voxelization).
-* **bbox (min_x min_y min_z max_x max_y max_z)**: (floats) Minimum and maximum vector of bounding box of the mesh. Bounding box must be cubical, or your model will be stretched during voxelization.
-* **END**: Indicating the end of the header file.
-
-### Tri data file
-A .tridata file is a very simple binary file which just contains a list of the x, y and z coordinates of the triangle vertices (v0, v1 and v2), followed by the optional payload per triangle (normal, texture information, ...).
-
-In case of geometry-only (or, confusingly called binary, as in binary voxelization) .tridata files, the layout per triangle looks like this:
-
-* vertex 0 (3 x 32 bit float)
-* vertex 1 (3 x 32 bit float)
-* vertex 2 (3 x 32 bit float)
-
-In case of a payload .tridata file, the layout per triangle is followed by
-
-* normal (3 x 32 bit float)
-* vertex 0 color (3 x 32 bit float)
-* vertex 1 color (3 x 32 bit float)
-* vertex 2 color (3 x 32 bit float)
 
 ## Acknowledgements
 I would like to thank Ares Lagae and Philip Dutre for their continuing great input and co-authorship. We would also like to thank the anonymous reviewers for their remarks and comments. Jeroen Baert is funded by the Agency for Innovation by Science and Technology in Flanders (IWT). Ares Lagae is a postdoctoral fellow of the Research Foundation - Flanders (FWO).
