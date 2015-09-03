@@ -1,8 +1,8 @@
 #ifndef VOXELIZER_H_
 #define VOXELIZER_H_
 
-#include "../libs/tri_tools/include/tri_tools.h"
-#include "../libs/tri_tools/include/TriReader.h"
+#include "../libs/libtri/include/tri_tools.h"
+#include "../libs/libtri/include/TriReader.h"
 #include "globals.h"
 #include "intersection.h"
 #include "../libs/libmorton/include/morton3D_64.h"

@@ -7,8 +7,6 @@ using namespace trimesh;
 #define Y 1
 #define Z 2
 
-
-
 // Implementation of algorithm from http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.12.6294 (Huang et al.)
 // Adapted for mortoncode -based subgrids
 

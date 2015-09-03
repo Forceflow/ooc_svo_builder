@@ -3,8 +3,8 @@
 #include <string>
 #include <sstream>
 #include "globals.h"
-#include "../libs/tri_tools/include/trip_tools.h"
-#include "../libs/tri_tools/include/TriReader.h"
+#include "../libs/libtri/include/trip_tools.h"
+#include "../libs/libtri/include/TriReader.h"
 #include <algorithm>
 
 #include "voxelizer.h"

@@ -3,7 +3,7 @@
 
 #include <TriMesh.h>
 #include <cassert>
-#include "../libs/tri_tools/include/tri_util.h"
+#include "../libs/libtri/include/tri_util.h"
 #include "geometry_primitives.h"
 
 // Intersection methods

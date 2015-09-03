@@ -66,21 +66,21 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\src\tri_tools\include;C:\libs\trimesh2_new\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\src\tri_tools\include;C:\libs\trimesh2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Binary|x64'">
-    <IncludePath>..\src\tri_tools\include;C:\libs\trimesh2_new\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\src\tri_tools\include;C:\libs\trimesh2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(SolutionDir)\x64\Release;C:\libs\trimesh2_new\lib.Win64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\x64\Release;C:\libs\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Binary|x64'">
-    <LibraryPath>$(SolutionDir)\x64\Release Binary;C:\libs\trimesh2_new\lib.Win64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\x64\Release Binary;C:\libs\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_binary</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Binary|x64'">
-    <IncludePath>C:\libs\trimesh2_new\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\libs\trimesh2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
