@@ -27,15 +27,15 @@ The only external dependency for compiling from source is the [Trimesh2 library]
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
 This release supports two modes of SVO building:
-* **Binary-only** SVO building (only geometry, the default mode presented in the paper). The result will be an SVO with all leaf nodes referencing the same, white default voxel.
-* **Payload** SVO building with a (normal vector + vertex colors) paylodper voxel. The result will be an SVO with all leaf nodes referencing their own sampled voxel payload.
+* **Binary-only: ** SVO building (only geometry, the default mode presented in the paper). The result will be an SVO with all leaf nodes referencing the same, white default voxel. The data part of the SVO will only be a couple of bytes.
+* **Payload: ** SVO building with a (normal vector + vertex colors) payload per voxel. The result will be an SVO with all leaf nodes referencing their own sampled voxel payload. The data part of the SVO will contain all of these.
 
 Throughout all executables, the tools for binary voxelization are postfixed with _binary. During compilation, you can define the preprocessor directive #BINARY_VOXELIZATION to generate the binary-only SVO construction version.
 
 ### tri_convert: Converting a model to .tri format
 The out-of-core octree builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model, you've got to convert it to the .tri format using the *tri_convert* tool. For more info about the .tri file format, check [**libtri**](https://github.com/Forceflow/libtri).
 
-The bounding box of the model will be padded to be cubical. See Tri file format (further) for more information. Tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only .tri file generation, use *tri_convert_binary*, for .tri file generation with a normal vector payload, use tri_convert.
+The bounding box of the model will be padded to be cubical. Tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only .tri file generation, use *tri_convert_binary*, for .tri file generation with a normal vector payload, use tri_convert.
 
 **Syntax:** tri_convert(_binary) -f (path to model file)
 
