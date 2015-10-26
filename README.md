@@ -17,12 +17,9 @@ For Linux and OSX, the standard gcc/clang toolchain will do. For Windows64, VS20
 
 Library dependencies are
 
- * [**libmorton**](https://github.com/Forceflow/libmorton)
- * [**libtri**](https://github.com/Forceflow/libtri)
-
-Both of these are included in the src/libs directory.
-
-The only external dependency for compiling from source is the [Trimesh2 library](http://gfx.cs.princeton.edu/proj/trimesh2/) by Szymon Rusinkiewicz, which is used for input/output of triangle meshes and the vector math. It will be statically linked in the binaries.
+ * [**libmorton**](https://github.com/Forceflow/libmorton) (header-only, included in src/libs)
+ * [**libtri**](https://github.com/Forceflow/libtri) (header-only, included in src/libs)
+ * [**Trimesh2**](http://gfx.cs.princeton.edu/proj/trimesh2/) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to download an compile this for yourself.
 
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
