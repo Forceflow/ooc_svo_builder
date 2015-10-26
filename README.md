@@ -11,9 +11,9 @@ There are two tools distributed in this release, both are required to convert a 
 The current **ooc_svo_builder** release consists of:
 
 * Precompiled binaries for Win64 and Linux64
-* Visual Studio 2013 project files, Linux build scripts (sh) and Cmake files for OSX
+* Visual Studio 2015 project files, Linux build scripts (sh) and Cmake files for OSX
 
-For Linux and OSX, the standard gcc/clang toolchain will do. For Windows64, VS2012 is required - there's a free VS Studio 2012 Express edition [available](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-products).
+For Linux and OSX, the standard gcc/clang toolchain will do. For Windows64, VS2015 is required - the free community edition is enough, which is [available here](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx).
 
 Library dependencies are
 
