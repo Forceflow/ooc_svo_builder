@@ -210,26 +210,26 @@ void setupTimers() {
 
 // Printout total time of running Timers (for debugging purposes)
 void printTimerInfo() {
-	//double diff = main_timer.getTotalTimeSeconds() - (algo_timer.getTotalTimeSeconds() + io_timer_in.getTotalTimeSeconds() + io_timer_out.getTotalTimeSeconds());
-	cout << "Total MAIN time      : " << main_timer.getTotalTimeSeconds() << " s." << endl;
+	//double diff = main_timer.elapsed_time_milliseconds - (algo_timer.elapsed_time_milliseconds + io_timer_in.elapsed_time_milliseconds + io_timer_out.elapsed_time_milliseconds);
+	cout << "Total MAIN time      : " << main_timer.elapsed_time_milliseconds << " ms." << endl;
 	cout << "PARTITIONING" << endl;
-	cout << "  Total time		: " << part_total_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  IO IN time		: " << part_io_in_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  algorithm time	: " << part_algo_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  IO OUT time		: " << part_io_out_timer.getTotalTimeSeconds() << " s." << endl;
-	double part_diff = part_total_timer.getTotalTimeSeconds() - part_io_in_timer.getTotalTimeSeconds() - part_algo_timer.getTotalTimeSeconds() - part_io_out_timer.getTotalTimeSeconds();
+	cout << "  Total time		: " << part_total_timer.elapsed_time_milliseconds << " ms." << endl;
+	cout << "  IO IN time		: " << part_io_in_timer.elapsed_time_milliseconds << " ms." << endl;
+	cout << "  algorithm time	: " << part_algo_timer.elapsed_time_milliseconds << " ms." << endl;
+	cout << "  IO OUT time		: " << part_io_out_timer.elapsed_time_milliseconds << " ms." << endl;
+	double part_diff = part_total_timer.elapsed_time_milliseconds - part_io_in_timer.elapsed_time_milliseconds - part_algo_timer.elapsed_time_milliseconds - part_io_out_timer.elapsed_time_milliseconds;
 	cout << "  misc time		: " << part_diff << " s." << endl;
 	cout << "VOXELIZING" << endl;
-	cout << "  Total time		: " << vox_total_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  IO IN time		: " << vox_io_in_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  algorithm time	: " << vox_algo_timer.getTotalTimeSeconds() << " s." << endl;
-	double vox_diff = vox_total_timer.getTotalTimeSeconds() - vox_io_in_timer.getTotalTimeSeconds() - vox_algo_timer.getTotalTimeSeconds();
+	cout << "  Total time		: " << vox_total_timer.elapsed_time_milliseconds << " ms." << endl;
+	cout << "  IO IN time		: " << vox_io_in_timer.elapsed_time_milliseconds << " ms." << endl;
+	cout << "  algorithm time	: " << vox_algo_timer.elapsed_time_milliseconds << " ms." << endl;
+	double vox_diff = vox_total_timer.elapsed_time_milliseconds - vox_io_in_timer.elapsed_time_milliseconds - vox_algo_timer.elapsed_time_milliseconds;
 	cout << "  misc time		: " << vox_diff << " s." << endl;
 	cout << "SVO BUILDING" << endl;
-	cout << "  Total time		: " << svo_total_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  IO OUT time		: " << svo_io_out_timer.getTotalTimeSeconds() << " s." << endl;
-	cout << "  algorithm time	: " << svo_algo_timer.getTotalTimeSeconds() << " s." << endl;
-	double svo_misc = svo_total_timer.getTotalTimeSeconds() - svo_io_out_timer.getTotalTimeSeconds() - svo_algo_timer.getTotalTimeSeconds();
+	cout << "  Total time		: " << svo_total_timer.elapsed_time_milliseconds << " ms." << endl;
+	cout << "  IO OUT time		: " << svo_io_out_timer.elapsed_time_milliseconds << " ms." << endl;
+	cout << "  algorithm time	: " << svo_algo_timer.elapsed_time_milliseconds << " ms." << endl;
+	double svo_misc = svo_total_timer.elapsed_time_milliseconds - svo_io_out_timer.elapsed_time_milliseconds - svo_algo_timer.elapsed_time_milliseconds;
 	cout << "  misc time		: " << svo_misc << " s." << endl;
 }
 

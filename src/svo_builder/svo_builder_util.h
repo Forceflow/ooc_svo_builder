@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <TriMesh.h>
+#include "timer.h"
 #include "../libs/libmorton/include/morton3D_64.h"
 
 using namespace trimesh;
@@ -49,33 +50,6 @@ inline unsigned int log2(unsigned int val) {
 inline int isPowerOf2(unsigned int x){
   return ((x != 0) && !(x & (x - 1)));
 }
-
-// Simple timer to measure time, using CLOCKS_PER_SEC
-// Should work on all platforms, sacrificing some precision.
-struct Timer {
-	clock_t Start;
-	clock_t Elapsed;
-	Timer(){
-		Elapsed = 0;
-		Start = clock();
-	}
-	void reset(){
-		Start = clock();
-	}
-	void resetTotal(){
-		Elapsed = 0;
-	}
-	void start(){
-		Start = clock();
-	}
-	void stop(){
-		clock_t End = clock();
-		Elapsed = Elapsed + (End - Start);
-	}
-	double getTotalTimeSeconds() const{
-		return ((double) Elapsed)/ ((double) CLOCKS_PER_SEC);
-	}
-};
 
 template <typename T> T clampval(const T& value, const T& low, const T& high) {
   return value < low ? low : (value > high ? high : value); 
