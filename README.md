@@ -1,11 +1,11 @@
 # Out-Of-Core SVO Builder v1.3
 
-This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, Out Of Core Construction of Sparse Voxel Octrees. The paper and additional material can be found on the [project page](http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/).
+This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, Out Of Core Construction of Sparse Voxel Octrees. The project was subsequently updated after the article was also published in Computer Graphics Forum 2014. The paper and additional material can be found on the [project page](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/).
 
 There are two tools distributed in this release, both are required to convert a model into a Sparse Voxel Octree representation:
 
 * **tri_convert:** A tool to convert a model file to a simple, streamable .tri format, described in this manual.
-* **svo_builder:** Out-Of-Core SVO Builder: Partitioning, voxelizing and SVO Building rolled into one, needs a .tri file as input
+* **svo_builder:** Out-Of-Core SVO Builder: Partitioning, voxelizing and SVO Building rolled into one executable, needs a .tri file as input
 
 ## Code / Dependencies
 The current **ooc_svo_builder** release consists of:
