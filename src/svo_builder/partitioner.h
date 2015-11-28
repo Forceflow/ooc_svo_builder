@@ -5,7 +5,7 @@
 #include "../libs/libtri/include/trip_tools.h"
 #include "../libs/libtri/include/file_tools.h"
 #include "../libs/libtri/include/TriReader.h"
-#include "../libs/libmorton/include/morton3D_64.h"
+#include "../libs/libmorton/include/morton.h"
 #include "globals.h"
 #include "Buffer.h"
 #include "voxelizer.h"

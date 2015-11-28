@@ -5,7 +5,7 @@
 #include "../libs/libtri/include/TriReader.h"
 #include "globals.h"
 #include "intersection.h"
-#include "../libs/libmorton/include/morton3D_64.h"
+#include "../libs/libmorton/include/morton.h"
 #include "VoxelData.h"
 
 // Voxelization-related stuff

@@ -20,8 +20,8 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 #endif
 	// compute partition min and max in grid coords
 	AABox<uivec3> p_bbox_grid;
-	morton3D_64_Decode_LUT_shifted(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
-	morton3D_64_Decode_LUT_shifted(morton_end - 1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
+	morton3D_64_decode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
+	morton3D_64_decode(morton_end - 1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
 	// misc calc
 	float unit_div = 1.0f / unitlength;
 	float radius = unitlength / 2.0f;
@@ -66,7 +66,7 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 		for (unsigned int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
 			for (unsigned int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for (unsigned int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
-					uint64_t index = morton3D_64_Encode_LUT_shifted(z, y, x);
+					uint64_t index = morton3D_64_encode(z, y, x);
 
 					assert(index - morton_start < (morton_end - morton_start));
 
@@ -143,8 +143,8 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 
 	// compute partition min and max in grid coords
 	AABox<uivec3> p_bbox_grid;
-	morton3D_64_Decode_LUT_shifted(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
-	morton3D_64_Decode_LUT_shifted(morton_end - 1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
+	morton3D_64_decode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
+	morton3D_64_decode(morton_end - 1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
 
 	// compute maximum grow size for data array
 #ifdef BINARY_VOXELIZATION
@@ -256,7 +256,7 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			for (int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for (int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
 
-					uint64_t index = morton3D_64_Encode_LUT(z, y, x);
+					uint64_t index = morton3D_64_encode(z, y, x);
 
 					if (voxels[index - morton_start] == FULL_VOXEL){ continue; } // already marked, continue
 

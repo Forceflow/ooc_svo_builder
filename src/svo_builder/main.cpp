@@ -16,7 +16,7 @@ using namespace std;
 enum ColorType { COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL };
 
 // Program version
-string version = "1.2";
+string version = "1.3";
 
 // Program parameters
 string filename = "";
@@ -78,7 +78,7 @@ void printHelp() {
 	std::cout << "-l <memory_limit>     Memory limit for process, in Mb. Default 1024." << endl;
 	std::cout << "-levels               Generate intermediary voxel levels by averaging voxel data" << endl;
 	std::cout << "-c <option>           Coloring of voxels (Options: model (default), fixed, linear, normal)" << endl;
-	std::cout << "-d <percentage>		Percentage of memory limit to be used additionaly for sparseness optimization" << endl;
+	std::cout << "-d <percentage>       Percentage of memory limit to be used additionaly for sparseness optimization" << endl;
 	std::cout << "-v                    Be very verbose." << endl;
 	std::cout << "-h                    Print help and exit." << endl;
 }

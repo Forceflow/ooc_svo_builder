@@ -19,7 +19,7 @@ gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), gener
 	}
 
 	// Fill data arrays
-	b_max_morton = morton3D_64_Encode_LUT_shifted((uint_fast32_t)gridlength - 1, (uint_fast32_t)gridlength - 1, (uint_fast32_t)gridlength - 1);
+	b_max_morton = morton3D_64_encode((uint_fast32_t)gridlength - 1, (uint_fast32_t)gridlength - 1, (uint_fast32_t)gridlength - 1);
 	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 	writeVoxelData(data_out, VoxelData(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
