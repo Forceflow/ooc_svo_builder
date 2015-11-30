@@ -76,24 +76,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Binary|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libs\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_binary</TargetName>
     <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libs\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libs\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Binary|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libs\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

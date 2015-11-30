@@ -73,12 +73,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Binary|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(SolutionDir)\x64\Release;C:\libs\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
     <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Binary|x64'">
-    <LibraryPath>$(SolutionDir)\x64\Release Binary;C:\libs\trimesh2\trimesh2\lib.Win64;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_binary</TargetName>
     <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
