@@ -6,7 +6,7 @@
     <TRIMESH_DIR>C:\libs\trimesh2\</TRIMESH_DIR>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>$(TRIMESH_DIR)\include\;$(SolutionDir)\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(TRIMESH_DIR)\include\;$(SolutionDir)\..\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
     <_PropertySheetDisplayName>ooc_svo_builder_custom_includes</_PropertySheetDisplayName>
     <LibraryPath>$(TRIMESH_DIR)\lib.Win64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
