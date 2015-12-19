@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <BINARY_OUTPUT_DIR>E:\jeroenb\Binaries\</BINARY_OUTPUT_DIR>
-    <TRIMESH_DIR>C:\libs\trimesh2\trimesh2</TRIMESH_DIR>
+    <TRIMESH_DIR>C:\libs\trimesh2\</TRIMESH_DIR>
   </PropertyGroup>
   <PropertyGroup>
     <IncludePath>$(TRIMESH_DIR)\include\;$(SolutionDir)\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
