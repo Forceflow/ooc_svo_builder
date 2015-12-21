@@ -8,7 +8,7 @@
   <PropertyGroup>
     <IncludePath>$(TRIMESH_DIR)\include\;$(SolutionDir)\..\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
     <_PropertySheetDisplayName>ooc_svo_builder_custom_includes</_PropertySheetDisplayName>
-    <LibraryPath>$(TRIMESH_DIR)\lib.Win64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(TRIMESH_DIR)\lib.Win$(PlatformArchitecture).vs$(PlatformToolsetVersion);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>

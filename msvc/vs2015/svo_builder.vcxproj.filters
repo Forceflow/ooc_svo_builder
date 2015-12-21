@@ -18,52 +18,52 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\svo_builder\OctreeBuilder.cpp">
+    <ClCompile Include="..\..\src\svo_builder\OctreeBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\svo_builder\partitioner.cpp">
+    <ClCompile Include="..\..\src\svo_builder\partitioner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\svo_builder\voxelizer.cpp">
+    <ClCompile Include="..\..\src\svo_builder\voxelizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\svo_builder\main.cpp">
+    <ClCompile Include="..\..\src\svo_builder\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\svo_builder\globals.h">
+    <ClInclude Include="..\..\src\svo_builder\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\OctreeBuilder.h">
+    <ClInclude Include="..\..\src\svo_builder\geometry_primitives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\partitioner.h">
+    <ClInclude Include="..\..\src\svo_builder\globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\voxelizer.h">
+    <ClInclude Include="..\..\src\svo_builder\intersection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\Buffer.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="..\..\src\svo_builder\Node.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\geometry_primitives.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="..\..\src\svo_builder\OctreeBuilder.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\intersection.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="..\..\src\svo_builder\octree_io.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\Node.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="..\..\src\svo_builder\partitioner.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\octree_io.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="..\..\src\svo_builder\VoxelData.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\svo_builder_util.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="..\..\src\svo_builder\voxelizer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\svo_builder\VoxelData.h">
-      <Filter>Header Files\util</Filter>
+    <ClInclude Include="..\..\src\svo_builder\svo_builder_util.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
