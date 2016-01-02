@@ -13,7 +13,7 @@ The current **ooc_svo_builder** release consists of:
 * Precompiled binaries for Win64
 * Visual Studio project files
   * VS 2015 Community Edition (which is free) recommended
-  * You can configurate the location of the libraries in the /msvc/vs2015/ooc_svo_builder_custom_includes.props.
+  * You can configurate the location of the libraries in the */msvc/vs2015/ooc_svo_builder_custom_includes.props*.
 * Linux build scripts (sh)
 * Cmake files for OSX
 
