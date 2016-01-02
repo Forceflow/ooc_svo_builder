@@ -8,7 +8,7 @@ using namespace std;
 using namespace trimesh;
 
 // Program version
-string version = "1.3";
+string version = "1.5";
 
 // Program parameters
 string filename = "";

@@ -16,7 +16,7 @@ using namespace std;
 enum ColorType { COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL };
 
 // Program version
-string version = "1.3";
+string version = "1.5";
 
 // Program parameters
 string filename = "";
