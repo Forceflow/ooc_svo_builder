@@ -1,17 +1,21 @@
-# Out-Of-Core SVO Builder v1.3
+# Out-Of-Core SVO Builder v1.5
 
 This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, Out Of Core Construction of Sparse Voxel Octrees. The project was subsequently updated after the article was also published in Computer Graphics Forum 2014. The paper and additional material can be found on the [project page](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/).
 
 There are two tools distributed in this release, both are required to convert a model into a Sparse Voxel Octree representation:
 
-* **tri_convert:** A tool to convert a model file to a simple, streamable .tri format, described in this manual.
+* **tri_convert:** A tool to convert any model file to a simple, streamable .tri format, described in this manual.
 * **svo_builder:** Out-Of-Core SVO Builder: Partitioning, voxelizing and SVO Building rolled into one executable, needs a .tri file as input
 
-## Code / Dependencies
+## Building / Dependencies
 The current **ooc_svo_builder** release consists of:
 
-* Precompiled binaries for Win64 and Linux64
-* Visual Studio 2015 project files, Linux build scripts (sh) and Cmake files for OSX
+* Precompiled binaries for Win64
+* Visual Studio project files
+  * VS 2015 Community Edition (which is free) recommended
+  * You can configurate the location of the libraries in the /msvc/vs2015/ooc_svo_builder_custom_includes.props.
+* Linux build scripts (sh)
+* Cmake files for OSX
 
 For Linux and OSX, the standard gcc/clang toolchain will do. For Windows64, VS2015 is required - the free community edition is enough, which is [available here](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx).
 
@@ -19,18 +23,18 @@ Library dependencies are
 
  * [**libmorton**](https://github.com/Forceflow/libmorton) (header-only, included in src/libs)
  * [**libtri**](https://github.com/Forceflow/libtri) (header-only, included in src/libs)
- * [**Trimesh2**](http://gfx.cs.princeton.edu/proj/trimesh2/) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to download an compile this for yourself.
+ * [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not inclued.This library was originally developed by [Szymon Rusinkiewics](http://gfx.cs.princeton.edu/proj/trimesh2/), but I'm maintaining my own, updated version in [this repo](https://github.com/Forceflow/trimesh2).
 
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
 This release supports two modes of SVO building:
-* **Binary-only: ** SVO building (only geometry, the default mode presented in the paper). The result will be an SVO with all leaf nodes referencing the same, white default voxel. The data part of the SVO will only be a couple of bytes.
-* **Payload: ** SVO building with a (normal vector + vertex colors) payload per voxel. The result will be an SVO with all leaf nodes referencing their own sampled voxel payload. The data part of the SVO will contain all of these.
+  * **Binary-only:** SVO building (only geometry, the default mode presented in the paper). The result will be an SVO with all leaf nodes referencing the same, white default voxel. The data part of the SVO will only be a couple of bytes.
+  * **Payload:** SVO building with a (normal vector + vertex colors) payload per voxel. The result will be an SVO with all leaf nodes referencing their own sampled voxel payload.
 
 Throughout all executables, the tools for binary voxelization are postfixed with _binary. During compilation, you can define the preprocessor directive #BINARY_VOXELIZATION to generate the binary-only SVO construction version.
 
 ### tri_convert: Converting a model to .tri format
-The out-of-core octree builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model, you've got to convert it to the .tri format using the *tri_convert* tool. For more info about the .tri file format, check [**libtri**](https://github.com/Forceflow/libtri).
+The builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model you have, you've got to convert it to the .tri format using the *tri_convert* tool. For more info about the .tri file format, check [**libtri**](https://github.com/Forceflow/libtri).
 
 The bounding box of the model will be padded to be cubical. Tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only .tri file generation, use *tri_convert_binary*, for .tri file generation with a normal vector payload, use tri_convert.
 
@@ -42,8 +46,8 @@ tri_convert(_binary) -f /home/jeroen/bunny.ply
 ```
 This will generate a bunny.tri + bunny.tridata file pair in the same directory
 
-### svo_builder: Out-Of-Core octree building
-The out-of-core octree builder takes a .tri file as input and performs the three steps (partitioning, voxelization and SVO building) described in the [paper](http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/). You can read that for full details, but in short: depending on the memory limit you specify, the model is partitioned into several subgrids in a pre-pass, then each of these subgrids is voxelized and the corresponding part of the SVO is built. The output is stored in the .octree file format, described in this section.
+### svo_builder: Out-Of-Core SVO building
+The SVO builder takes a .tri file as input and performs the three steps (partitioning, voxelization and SVO building) described in the [paper](http://graphics.cs.kuleuven.be/publications/BLD13OCCSVO/). Depending on the memory limit you specify, the model is partitioned into several subgrids in a pre-pass, then each of these subgrids is voxelized and the corresponding part of the SVO is built. The output is stored in the .octree file format, described further below.
 
 Since v1.2, side-buffer of configurable maximum size is also used to speed up SVO generation. This is especially interesting for sparse models (voxelizations of thin models).
 
@@ -64,19 +68,18 @@ To build an octree for a geometry-only file, use svo_builder_binary. For buildin
 * **-v** Be very verbose, for debugging purposes. Switch this on if you're running into problems.
 
 **Examples**
-
 ````
 svo_builder_binary -f bunny.tri
 ````
 Will generate a geometry-only SVO file bunny.octree for a 1024^3 grid, using 2048 Mb of system memory.
 ````
-svo_builder -f bunny.tri -s 2048 -l 1024 -c normal -v
+svo_builder -f bunny.tri -s 2048 -l 1024 -d 0.2 -c normal -v
 ````
-Will generate a SVO file bunny.octree for a 2048^3 grid, using 1024 Mb of system memory, and be verbose about it. The voxels will have a payload and their colors will be derived from their normal.
+Will generate a SVO file bunny.octree for a 2048^3 grid, using 1024 Mb of system memory, with 20% of additional memory for speedup, and be verbose about it. The voxels will have a payload and their colors will be derived from their normal.
 
 ## Octree File Format
 
-The .octree file format is a very simple straightforward format which only contains the basic SVO information. It is not optimized for GPU streaming or compact storage, but is easy to parse and convert to whatever you need in your SVO adventures.
+The .octree file format is a very simple straightforward format. It is not optimized for GPU streaming or compact storage, but is easy to parse and convert to whatever you need in your SVO adventures.
 
 It consists of a text-based header (extension .octree) containing the relevant SVO info and two binary data files, with extensions .octreenodes and .octreedata, containing the octree nodes and actual node data payload respectively. This seperation of the SVO from the actual data is done to seperate hot (tree itself) from cold (payload) data, since the payload of course grows quickly when you store more properties in a voxel.
 
@@ -118,6 +121,7 @@ The current payload contains a morton code, normal and color information. This c
 
 ## Acknowledgements
 I would like to thank Ares Lagae and Philip Dutre for their continuing great input and co-authorship. We would also like to thank the anonymous reviewers for their remarks and comments. Jeroen Baert is funded by the Agency for Innovation by Science and Technology in Flanders (IWT). Ares Lagae is a postdoctoral fellow of the Research Foundation - Flanders (FWO).
+I would also like to thank all people who've contributed fixes to this repository over the years.
 
 ## Contact
 Feel free to contact me with questions/suggestions at jeroen.baert (at) cs.kuleuven.be
