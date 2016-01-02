@@ -14,10 +14,8 @@ The current **ooc_svo_builder** release consists of:
 * Visual Studio project files
   * VS 2015 Community Edition (which is free) recommended
   * You can configurate the location of the libraries in the */msvc/vs2015/ooc_svo_builder_custom_includes.props*.
-* Linux build scripts (sh)
+* Linux build scripts (sh) for gcc/clang
 * Cmake files for OSX
-
-For Linux and OSX, the standard gcc/clang toolchain will do. For Windows64, VS2015 is required - the free community edition is enough, which is [available here](https://www.visualstudio.com/en-us/products/visual-studio-community-vs.aspx).
 
 Library dependencies are
 
@@ -100,7 +98,7 @@ All elements are required.
 * **END**: Indicating the end of the header file.
 
 ### Octree node file
-An .octreenodes file is a very simple binary file which describes the big flat array of octree nodes. In the nodes, there are only child pointers, but it is trivial to extend the code to also store parent/neighbour pointers. The child pointers are constructed from a base address combined with a child offset, since all nonempty children of a certain node are guaranteed by the algorithm to be stored next to eachother. As described in the .octreeheader, the .octreenodes file contains n_nodes nodes.
+An .octreenodes file is a binary file which describes the big flat array of octree nodes. In the nodes, there are only child pointers, which are constructed from a 64-bit base address combined with a child offset, since all nonempty children of a certain node are guaranteed by the algorithm to be stored next to eachother. The .octreenodes file contains an amount of n_nodes nodes.
 
 * **children base address**: (size_t, 64 bits) The base address of the children of this node.
 * **child offsets**: (8 * 8 bit char = 64 bits) Children offsets for each of the 8 children. Each is a number between -1 and 7.
@@ -113,7 +111,7 @@ An .octreenodes file is a very simple binary file which describes the big flat a
 
 An .octreedata file is a binary file representing the big flat array of data payloads. Nodes in the octree refer to their data payload by using a 64-bit pointer, which corresponds to the index in this data array. The first data payload in this array is always the one representing an empty payload. Nodes refer to this if they have no payload (internal nodes in the tree, ...). 
 
-The current payload contains a morton code, normal and color information. This can be easily extended with more appearance data. I refer to the 'Appearance' section in our paper. As described in the .octreeheader, the .octreedata file contains n_data nodes.
+The current payload contains a morton code, normal vector and color information. This can be easily extended with more appearance data. I refer to the 'Appearance' section in our paper. As described in the .octreeheader, the .octreedata file contains n_data nodes.
 
 * **morton:** (64 bit unsigned int) Morton code of this voxel payload
 * **color:** (3 * 32 bit float = 96 bits) RGB color, three float values between 0 and 1.
