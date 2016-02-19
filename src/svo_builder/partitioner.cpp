@@ -40,7 +40,7 @@ void removeTripFiles(const TripInfo &trip_info){
 
 // Create n Buffers for a total gridsize, store them in the given vector, use tri_info for filename information
 void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize, vector<Buffer*> &buffers){
-	buffers.reserve(n_partitions);
+	buffers.resize(n_partitions);
 	float unitlength = (tri_info.mesh_bbox.max[0] - tri_info.mesh_bbox.min[0]) / (float)gridsize;
 	uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
 
