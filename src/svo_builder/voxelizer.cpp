@@ -256,7 +256,7 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			for (int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for (int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
 
-					uint64_t index = morton3D_64_encode(z, y, x);
+					uint64_t index = morton3D_64_encode(x, y, z);
 
 					if (voxels[index - morton_start] == FULL_VOXEL){ continue; } // already marked, continue
 
