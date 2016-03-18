@@ -21,7 +21,7 @@ Library dependencies are
 
  * [**libmorton**](https://github.com/Forceflow/libmorton) (header-only, included in src/libs)
  * [**libtri**](https://github.com/Forceflow/libtri) (header-only, included in src/libs)
- * [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not inclued.This library was originally developed by [Szymon Rusinkiewics](http://gfx.cs.princeton.edu/proj/trimesh2/), but I'm maintaining my own, updated version in [this repo](https://github.com/Forceflow/trimesh2).
+ * [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not included. This library was originally developed by [Szymon Rusinkiewicz](http://gfx.cs.princeton.edu/proj/trimesh2/), but I'm maintaining my own, updated version in [this repo](https://github.com/Forceflow/trimesh2).
 
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
