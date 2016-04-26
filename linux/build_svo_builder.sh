@@ -15,9 +15,9 @@ LINK_BINARY="g++ -g -o svo_builder_binary"
 
 ## CLEAN
 echo "Removing old versions ..."
-rm svo_builder
-rm svo_builder_binary
-rm *.o
+rm -f svo_builder
+rm -f svo_builder_binary
+rm -f *.o
 
 ## BUILD BINARY VOXELIZATION VERSION
 echo "Compiling binary voxelization build..."
