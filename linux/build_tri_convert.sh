@@ -15,9 +15,9 @@ LINK_OPTS="-L${TRIMESH_DIR}/lib.Linux64 -ltrimesh -fopenmp -static"
 
 ## CLEAN
 echo "Cleaning old versions ..."
-rm *.o
-rm tri_convert
-rm a.out
+rm -f *.o
+rm -f tri_convert
+rm -f a.out
 
 ## BUILD BINARY VOXELIZATION VERSION
 echo "Building binary voxelization version ..."
