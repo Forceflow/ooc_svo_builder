@@ -1,12 +1,14 @@
-#include "morton2D_64.h"
-#include "morton3D_64.h"
+#pragma once
+
+#include "morton2D.h"
+#include "morton3D.h"
 #include <iostream>
 
 template <typename element>
 void printTable(const element* table, size_t howmany, unsigned int splitat){
 	for (size_t i = 0; i < howmany; i++){
 		if (i % splitat == 0){ cout << endl; }
-		cout << table[i] << ", ";
+		printf("%i ,", table[i]);
 	}
 	cout << endl;
 }
@@ -17,8 +19,8 @@ void generate2D_EncodeLUT(size_t how_many_bits, uint_fast16_t*& x_table, uint_fa
 	y_table = (uint_fast16_t*)malloc(total * sizeof(uint_fast16_t));
 
 	for (uint_fast32_t i = 0; i < total; i++){
-		x_table[i] = (uint_fast16_t) morton2D_64_Encode_magicbits(i, 0);
-		y_table[i] = (uint_fast16_t) morton2D_64_Encode_magicbits(0, i);
+		x_table[i] = (uint_fast16_t) m2D_e_magicbits<uint_fast32_t, uint_fast16_t>(i, 0);
+		y_table[i] = (uint_fast16_t)m2D_e_magicbits<uint_fast32_t, uint_fast16_t>(0, i);
 	}
 
 	if (print_tables){
@@ -34,12 +36,12 @@ void generate2D_DecodeLUT(size_t how_many_bits, uint_fast8_t*& x_table, uint_fas
 	x_table = (uint_fast8_t*)malloc(total * sizeof(uint_fast8_t));
 	y_table = (uint_fast8_t*)malloc(total * sizeof(uint_fast8_t));
 
-	for (uint_fast32_t i = 0; i < total; i++){
-		x_table[i] = (uint_fast8_t) morton2D_64_splitby2(i);
-		y_table[i] = (uint_fast8_t) morton2D_64_splitby2(i >> 1);
+	//generate tables
+	for (size_t i = 0; i < total; i++) {
+		m2D_d_for(i, x_table[i], y_table[i]);
 	}
 
-	if (print_tables){
+	if (print_tables) {
 		cout << "X Table " << endl;
 		printTable<uint_fast8_t>(x_table, total, 16);
 		cout << "Y Table " << endl;
@@ -55,9 +57,9 @@ void generate3D_EncodeLUT(size_t how_many_bits, uint_fast32_t*& x_table, uint_fa
 	z_table = (uint_fast32_t*)malloc(total * sizeof(uint_fast32_t));
 
 	for (uint_fast32_t i = 0; i < total; i++){
-		x_table[i] = (uint_fast32_t) morton3D_64_Encode_magicbits(i, 0, 0);
-		y_table[i] = (uint_fast32_t) morton3D_64_Encode_magicbits(0, i, 0);
-		z_table[i] = (uint_fast32_t) morton3D_64_Encode_magicbits(0, 0, i);
+		x_table[i] = (uint_fast32_t) m3D_e_magicbits<uint_fast32_t, uint_fast16_t>(i, 0, 0);
+		y_table[i] = (uint_fast32_t) m3D_e_magicbits<uint_fast32_t, uint_fast16_t>(0, i, 0);
+		z_table[i] = (uint_fast32_t) m3D_e_magicbits<uint_fast32_t, uint_fast16_t>(0, 0, i);
 	}
 
 	if (print_tables){
@@ -80,9 +82,9 @@ void generate3D_DecodeLUT(size_t how_many_bits, uint_fast8_t*& x_table, uint_fas
 
 	//generate tables
 	for (size_t i = 0; i < total; i++){
-		x_table[i] = morton3D_64_getThirdBits(i);
-		y_table[i] = morton3D_64_getThirdBits(i >> 1);
-		z_table[i] = morton3D_64_getThirdBits(i >> 2);
+		x_table[i] = morton3D_GetThirdBits<uint_fast64_t, uint_fast32_t>(i);
+		y_table[i] = morton3D_GetThirdBits<uint_fast64_t, uint_fast32_t>(i >> 1);
+		z_table[i] = morton3D_GetThirdBits<uint_fast64_t, uint_fast32_t>(i >> 2);
 	}
 
 	if (print_tables){

@@ -1,7 +1,10 @@
-#ifndef MORTON3D_LUTS_H_
-#define MORTON3D_LUTS_H_
+#pragma once
 
 #include <stdint.h>
+
+// Magicbits masks
+static uint_fast32_t magicbit3D_masks32[5] = { 0, 0xff0000ff, 0x0f00f00f, 0xc30c30c3, 0x49249249 };
+static uint_fast64_t magicbit3D_masks64[5] = { 0xffff00000000ffff, 0x00ff0000ff0000ff, 0x100f00f00f00f00f, 0x10c30c30c30c30c3, 0x1249249249249249 };
 
 // Version with lookup table
 static const uint_fast32_t Morton3D_encode_x_256[256] =
@@ -217,5 +220,3 @@ static const uint_fast8_t Morton3D_decode_z_512[512] = {
 	6, 6, 6, 6, 7, 7, 7, 7, 6, 6, 6, 6, 7, 7, 7, 7,
 	6, 6, 6, 6, 7, 7, 7, 7, 6, 6, 6, 6, 7, 7, 7, 7
 };
-
-#endif // MORTON3D_LUTS_H_
