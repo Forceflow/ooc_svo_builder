@@ -85,7 +85,7 @@ inline void OctreeBuilder::fastAddEmpty(const size_t budget){
 	while (r_budget > 0){
 		unsigned int buffer = computeBestFillBuffer(r_budget);
 		addEmptyVoxel(buffer);
-		size_t budget_hit = (size_t) pow(8.0,b_maxdepth-buffer);
+		size_t budget_hit = static_cast<size_t>(pow(8.0,b_maxdepth-buffer));
 		r_budget = r_budget - budget_hit;
 	}
 }

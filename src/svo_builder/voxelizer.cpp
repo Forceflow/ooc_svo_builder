@@ -38,12 +38,12 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 		// compute triangle bbox in world and grid
 		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0, t.v1, t.v2);
 		AABox<uivec3> t_bbox_grid;
-		t_bbox_grid.min[0] = (unsigned int)(t_bbox_world.min[0] * unit_div);
-		t_bbox_grid.min[1] = (unsigned int)(t_bbox_world.min[1] * unit_div);
-		t_bbox_grid.min[2] = (unsigned int)(t_bbox_world.min[2] * unit_div);
-		t_bbox_grid.max[0] = (unsigned int)(t_bbox_world.max[0] * unit_div);
-		t_bbox_grid.max[1] = (unsigned int)(t_bbox_world.max[1] * unit_div);
-		t_bbox_grid.max[2] = (unsigned int)(t_bbox_world.max[2] * unit_div);
+		t_bbox_grid.min[0] = static_cast<unsigned int>(t_bbox_world.min[0] * unit_div);
+		t_bbox_grid.min[1] = static_cast<unsigned int>(t_bbox_world.min[1] * unit_div);
+		t_bbox_grid.min[2] = static_cast<unsigned int>(t_bbox_world.min[2] * unit_div);
+		t_bbox_grid.max[0] = static_cast<unsigned int>(t_bbox_world.max[0] * unit_div);
+		t_bbox_grid.max[1] = static_cast<unsigned int>(t_bbox_world.max[1] * unit_div);
+		t_bbox_grid.max[2] = static_cast<unsigned int>(t_bbox_world.max[2] * unit_div);
 
 		// clamp
 		t_bbox_grid.min[0] = clampval<unsigned int>(t_bbox_grid.min[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);
@@ -185,12 +185,12 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 		// compute triangle bbox in world and grid
 		AABox<vec3> t_bbox_world = computeBoundingBox(t.v0, t.v1, t.v2);
 		AABox<ivec3> t_bbox_grid;
-		t_bbox_grid.min[0] = (int)(t_bbox_world.min[0] * unit_div);
-		t_bbox_grid.min[1] = (int)(t_bbox_world.min[1] * unit_div);
-		t_bbox_grid.min[2] = (int)(t_bbox_world.min[2] * unit_div);
-		t_bbox_grid.max[0] = (int)(t_bbox_world.max[0] * unit_div);
-		t_bbox_grid.max[1] = (int)(t_bbox_world.max[1] * unit_div);
-		t_bbox_grid.max[2] = (int)(t_bbox_world.max[2] * unit_div);
+		t_bbox_grid.min[0] = static_cast<int>(t_bbox_world.min[0] * unit_div);
+		t_bbox_grid.min[1] = static_cast<int>(t_bbox_world.min[1] * unit_div);
+		t_bbox_grid.min[2] = static_cast<int>(t_bbox_world.min[2] * unit_div);
+		t_bbox_grid.max[0] = static_cast<int>(t_bbox_world.max[0] * unit_div);
+		t_bbox_grid.max[1] = static_cast<int>(t_bbox_world.max[1] * unit_div);
+		t_bbox_grid.max[2] = static_cast<int>(t_bbox_world.max[2] * unit_div);
 
 		// clamp
 		t_bbox_grid.min[0] = clampval<int>(t_bbox_grid.min[0], p_bbox_grid.min[0], p_bbox_grid.max[0]);

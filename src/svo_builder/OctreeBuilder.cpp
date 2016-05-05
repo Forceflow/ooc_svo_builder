@@ -12,14 +12,15 @@ gridlength(gridlength), b_node_pos(0), b_data_pos(0), b_current_morton(0), gener
 	data_out = fopen(data_name.c_str(), "wb");
 
 	// Setup building variables
-	b_maxdepth = log2((unsigned int)gridlength);
+	b_maxdepth = log2(static_cast<unsigned int>(gridlength));
 	b_buffers.resize(b_maxdepth + 1);
 	for (int i = 0; i < b_maxdepth + 1; i++){
 		b_buffers[i].reserve(8);
 	}
 
 	// Fill data arrays
-	b_max_morton = morton3D_64_encode((uint_fast32_t)gridlength - 1, (uint_fast32_t)gridlength - 1, (uint_fast32_t)gridlength - 1);
+	uint_fast32_t maxm = static_cast<uint_fast32_t>(gridlength - 1);
+	b_max_morton = morton3D_64_encode(maxm,maxm,maxm);
 	svo_algo_timer.stop(); svo_io_out_timer.start(); // TIMING
 	writeVoxelData(data_out, VoxelData(), b_data_pos); // first data point is NULL
 #ifdef BINARY_VOXELIZATION
@@ -104,7 +105,7 @@ Node OctreeBuilder::groupNodes(const vector<Node> &buffer){
 void OctreeBuilder::addEmptyVoxel(const int buffer){
 	b_buffers[buffer].push_back(Node());
 	refineBuffers(buffer);
-	b_current_morton = (uint64_t)(b_current_morton + pow(8.0, b_maxdepth - buffer)); // because we're adding at a certain level
+	b_current_morton = static_cast<uint64_t>(b_current_morton + pow(8.0, b_maxdepth - buffer)); // because we're adding at a certain level
 }
 
 // REFINE BUFFERS: check all levels from start_depth up and group 8 nodes on a higher level
