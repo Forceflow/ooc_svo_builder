@@ -2,8 +2,7 @@
 // Using QueryPerformanceCounter for Win32/Win64
 // And C++11 chrono for other platforms
 
-#ifndef TIMER_H_
-#define TIMER_H_
+#pragma once
 
 #if _MSC_VER
 #include <Windows.h>
@@ -25,7 +24,7 @@ struct Timer { // High performance Win64 timer using QPC events
 	inline Timer() {
 		LARGE_INTEGER li;
 		QueryPerformanceFrequency(&li);
-		pc_frequency = double(li.QuadPart) / 1000.0;
+		pc_frequency = static_cast<double>(li.QuadPart) / 1000.0;
 	}
 
 	inline void reset() {
@@ -38,10 +37,10 @@ struct Timer { // High performance Win64 timer using QPC events
 
 	inline void stop() {
 		QueryPerformanceCounter(&end_time);
-		elapsed_time_milliseconds += double((end_time.QuadPart - start_time.QuadPart) / pc_frequency);
+		elapsed_time_milliseconds += static_cast<double>((end_time.QuadPart - start_time.QuadPart) / pc_frequency);
 	}
 };
-#elif
+#else
 struct Timer { // High performance timer using standard c++11 chrono
 	double elapsed_time_milliseconds = 0;
 	high_resolution_clock::time_point t1;
@@ -59,6 +58,4 @@ struct Timer { // High performance timer using standard c++11 chrono
 		elapsed_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 	}
 };
-#endif
-
 #endif
