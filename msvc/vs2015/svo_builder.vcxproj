@@ -150,6 +150,7 @@
     <ClInclude Include="..\..\src\svo_builder\OctreeBuilder.h" />
     <ClInclude Include="..\..\src\svo_builder\octree_io.h" />
     <ClInclude Include="..\..\src\svo_builder\partitioner.h" />
+    <ClInclude Include="..\..\src\svo_builder\timer.h" />
     <ClInclude Include="..\..\src\svo_builder\VoxelData.h" />
     <ClInclude Include="..\..\src\svo_builder\voxelizer.h" />
     <ClInclude Include="..\..\src\svo_builder\svo_builder_util.h" />

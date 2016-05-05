@@ -157,3 +157,5 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/msvc/vs2015/ooc_svo_builder.VC.VC.opendb
+/msvc/vs2015/ooc_svo_builder.VC.db

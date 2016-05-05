@@ -65,5 +65,8 @@
     <ClInclude Include="..\..\src\svo_builder\svo_builder_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\svo_builder\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
