@@ -1,5 +1,4 @@
-#ifndef GLOBALS_H_
-#define GLOBALS_H_
+#pragma once
 
 #include "svo_builder_util.h"
 
@@ -29,5 +28,3 @@ extern Timer vox_algo_timer;
 extern Timer svo_total_timer;
 extern Timer svo_io_out_timer;
 extern Timer svo_algo_timer;
-
-#endif // GLOBALS_H_

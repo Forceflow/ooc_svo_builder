@@ -1,7 +1,6 @@
-#ifndef OCTREE_IO_H_
-#define OCTREE_IO_H_
+#pragma once
 
-#include <stdio.h>
+#include <iostream>
 #include <fstream>
 #include "../libs/libtri/include/file_tools.h"
 #include "Node.h"
@@ -109,5 +108,3 @@ inline int parseOctreeHeader(const std::string &filename, OctreeInfo &i){
 	headerfile.close();
 	return 1;
 }
-
-#endif

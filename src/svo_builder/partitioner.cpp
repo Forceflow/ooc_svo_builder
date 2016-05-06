@@ -1,7 +1,7 @@
 #include "partitioner.h"
 
 using namespace std;
-using namespace trimesh;
+using namespace glm;
 
 // Fiddle with buffer sizes here: these are defined as number of triangles
 #define input_buffersize 8192

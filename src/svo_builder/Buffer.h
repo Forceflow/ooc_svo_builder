@@ -1,15 +1,15 @@
-#ifndef BUFFER_H_
-#define BUFFER_H_
+#pragma once
 
 #include <stdio.h>
 #include <vector>
+#include <glm/glm.hpp>
 #include "../libs/libtri/include/tri_util.h"
 #include "../libs/libtri/include/tri_tools.h"
 #include "globals.h"
 #include "intersection.h"
 
 using namespace std;
-using namespace trimesh;
+using namespace glm;
 
 // A Buffer which checks triangles against a bounding box, and writes them in batches to a given file/stream if they fit.
 class Buffer{
@@ -83,5 +83,3 @@ inline void Buffer::processTriangle(Triangle &t, const AABox<vec3> &bbox){
 		n_triangles++;
 	}
 }
-
-#endif // BUFFER_H_

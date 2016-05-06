@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 using namespace std;
-using namespace trimesh;
 
 // A class to read triangles from a .tridata file.
 class TriReader{
@@ -74,7 +73,7 @@ inline bool TriReader::hasNext(){
 }
 
 inline void TriReader::fillBuffer(){
-	size_t readcount = min(buffersize, n_triangles - n_read); // don't read more than there are
+	size_t readcount = glm::min(buffersize, n_triangles - n_read); // don't read more than there are
 	readTriangles(file,buffer[0],readcount); // read new triangles
 	n_read += readcount; // update the number of tri's we've read
 }

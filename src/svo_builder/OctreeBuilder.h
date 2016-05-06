@@ -1,7 +1,7 @@
-#ifndef OCTREE_BUILDER_H_
-#define OCTREE_BUILDER_H_
+#pragma once
 
 #include <stdio.h>
+#include <glm/glm.hpp>
 #include <fstream>
 #include <assert.h>
 #include "../libs/libtri/include/tri_util.h"
@@ -10,7 +10,7 @@
 #include "octree_io.h"
 
 using namespace std;
-using namespace trimesh;
+using namespace glm;
 
 // Octreebuilder class. You pass this class DataPoints, it builds an octree from them.
 class OctreeBuilder {
@@ -89,5 +89,3 @@ inline void OctreeBuilder::fastAddEmpty(const size_t budget){
 		r_budget = r_budget - budget_hit;
 	}
 }
-
-#endif // OCTREE_BUILDER_H_

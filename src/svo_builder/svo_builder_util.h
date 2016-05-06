@@ -4,11 +4,11 @@
 #include <time.h>
 #include <vector>
 #include <sstream>
-#include <TriMesh.h>
+#include <glm/glm.hpp>
 #include "timer.h"
 #include "../libs/libmorton/include/morton.h"
 
-using namespace trimesh;
+using namespace glm;
 using namespace std;
 
 // Various math/helper stuff
@@ -20,10 +20,10 @@ inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
 
-template <size_t D, class T>
-inline Vec<D,T> average3Vec(const Vec<D,T> v0, const Vec<D,T> v1, const Vec<D,T> v2){
-	Vec<D,T> answer;
-	for (size_t i = 0; i < D; i++){
+template <typename T>
+inline tvec3<T> average3Vec(const tvec3<T> v0, const tvec3<T> v1, const tvec3<T> v2){
+	tvec3<T> answer;
+	for (size_t i = 0; i < 3; i++){
 		answer[i] = (v0[i] + v1[i] + v2[i]) / 3.0f;
 	}
 	return answer;

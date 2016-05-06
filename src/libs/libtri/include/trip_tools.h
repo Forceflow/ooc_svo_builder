@@ -4,11 +4,11 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include "tri_tools.h"
 #include "file_tools.h"
 
 using namespace std;
-using namespace trimesh;
 
 struct TripInfo {
 	string base_filename;
@@ -16,10 +16,10 @@ struct TripInfo {
 	int geometry_only;
 	size_t gridsize;
 	AABox<vec3> mesh_bbox;
+	vector<size_t> part_tricounts;
 	size_t n_triangles;
 	size_t n_partitions;
-	vector<size_t> part_tricounts;
-
+	
 	// default constructor
 	TripInfo() : base_filename(""), version(1), geometry_only(0), gridsize(0), n_triangles(0), n_partitions(0), mesh_bbox(AABox<vec3>()) {} 
 	// construct from TriInfo

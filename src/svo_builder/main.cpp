@@ -1,4 +1,4 @@
-#include <TriMesh.h>
+#include <glm/glm.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -12,6 +12,7 @@
 #include "partitioner.h"
 
 using namespace std;
+using namespace glm;
 
 enum ColorType { COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL };
 

@@ -1,10 +1,10 @@
 #ifndef VOXELDATA_H_
 #define VOXELDATA_H_
 
-#include <TriMesh.h>
+#include <glm/glm.hpp>
 #include <stdint.h>
 
-using namespace trimesh;
+using namespace glm;
 using namespace std;
 
 // sizeof(VoxelData would work too)

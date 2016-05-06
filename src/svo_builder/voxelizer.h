@@ -3,13 +3,13 @@
 
 #include "../libs/libtri/include/tri_tools.h"
 #include "../libs/libtri/include/TriReader.h"
+#include "../libs/libmorton/include/morton.h"
 #include "globals.h"
 #include "intersection.h"
-#include "../libs/libmorton/include/morton.h"
 #include "VoxelData.h"
 
 // Voxelization-related stuff
-typedef Vec<3, unsigned int> uivec3;
+typedef uvec3 uivec3;
 using namespace std;
 
 #define EMPTY_VOXEL 0
