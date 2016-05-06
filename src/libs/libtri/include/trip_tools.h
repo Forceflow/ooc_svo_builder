@@ -15,13 +15,13 @@ struct TripInfo {
 	int version;
 	int geometry_only;
 	size_t gridsize;
-	AABox<vec3> mesh_bbox;
+	AABox<glm::vec3> mesh_bbox;
 	vector<size_t> part_tricounts;
 	size_t n_triangles;
 	size_t n_partitions;
 	
 	// default constructor
-	TripInfo() : base_filename(""), version(1), geometry_only(0), gridsize(0), n_triangles(0), n_partitions(0), mesh_bbox(AABox<vec3>()) {} 
+	TripInfo() : base_filename(""), version(1), geometry_only(0), gridsize(0), n_triangles(0), n_partitions(0), mesh_bbox(AABox<glm::vec3>()) {} 
 	// construct from TriInfo
 	TripInfo(const TriInfo &t) : base_filename(t.base_filename), version(t.version), geometry_only(t.geometry_only), gridsize(0), mesh_bbox(t.mesh_bbox), n_triangles(t.n_triangles), n_partitions(0) {} 
 

@@ -13,7 +13,7 @@ string version = "1.5";
 // Program parameters
 string filename = "";
 bool recompute_normals = false;
-vec3 fixed_color = vec3(1.0f, 1.0f, 1.0f);
+glm::vec3 fixed_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 void printInfo(){
 	cout << "-------------------------------------------------------------" << endl;
@@ -85,13 +85,13 @@ int main(int argc, char *argv[]){
 	themesh->need_normals(); // check if there are normals, and if not, recompute them
 	// TODO: Check for colors here, inform user about decision
 #endif
-	AABox<vec3> mesh_bbox = createMeshBBCube(themesh); // pad the mesh BBOX out to be a cube
+	AABox<glm::vec3> mesh_bbox = createMeshBBCube(themesh); // pad the mesh BBOX out to be a cube
 
 	// Moving mesh to origin
 	cout << "Moving mesh to origin ... "; 
 	Timer timer = Timer();
 	for(size_t i = 0; i < themesh->vertices.size() ; i++){
-		themesh->vertices[i] = themesh->vertices[i] - mesh_bbox.min;
+		themesh->vertices[i] = themesh->vertices[i] - toTriMesh(mesh_bbox.min);
 	}
 	cout << "done in " << timer.elapsed_time_milliseconds << " s." << endl;
 
@@ -106,15 +106,15 @@ int main(int argc, char *argv[]){
 	Triangle t = Triangle();
 	// Write all triangles to data file
 	for(size_t i = 0; i < themesh->faces.size(); i++){
-		t.v0 = themesh->vertices[themesh->faces[i][0]];
-		t.v1 = themesh->vertices[themesh->faces[i][1]];
-		t.v2 = themesh->vertices[themesh->faces[i][2]];
+		t.v0 = toGLM(themesh->vertices[themesh->faces[i][0]]);
+		t.v1 = toGLM(themesh->vertices[themesh->faces[i][1]]);
+		t.v2 = toGLM(themesh->vertices[themesh->faces[i][2]]);
 #ifndef BINARY_VOXELIZATION
 		// COLLECT VERTEX COLORS
 		if(!themesh->colors.empty()){ // if this mesh has colors, we're going to use them
-			t.v0_color = themesh->colors[themesh->faces[i][0]];
-			t.v1_color = themesh->colors[themesh->faces[i][1]];
-			t.v2_color = themesh->colors[themesh->faces[i][2]];
+			t.v0_color = toGLM(themesh->colors[themesh->faces[i][0]]);
+			t.v1_color = toGLM(themesh->colors[themesh->faces[i][1]]);
+			t.v2_color = toGLM(themesh->colors[themesh->faces[i][2]]);
 		} 
 		// COLLECT NORMALS
 		if(recompute_normals){
