@@ -1,5 +1,4 @@
-#ifndef UTIL_H_
-#define UTIL_H_
+#pragma once
 
 #include <TriMesh.h>
 #include <glm/glm.hpp>

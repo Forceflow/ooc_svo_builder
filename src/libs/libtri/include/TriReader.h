@@ -1,5 +1,5 @@
-#ifndef TRI_READER_H_
-#define TRI_READER_H_
+#pragma once
+
 #include "tri_tools.h"
 #include <stdio.h>
 
@@ -82,4 +82,3 @@ inline TriReader::~TriReader(){
 	delete buffer;
 	fclose(file);
 }
-#endif

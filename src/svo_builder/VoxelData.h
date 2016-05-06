@@ -1,5 +1,4 @@
-#ifndef VOXELDATA_H_
-#define VOXELDATA_H_
+#pragma once
 
 #include <glm/glm.hpp>
 #include <stdint.h>
@@ -28,5 +27,3 @@ struct VoxelData{
 		return morton < a.morton;
 	}
 };
-
-#endif // VOXELDATA_H_

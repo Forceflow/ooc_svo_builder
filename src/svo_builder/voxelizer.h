@@ -1,5 +1,4 @@
-#ifndef VOXELIZER_H_
-#define VOXELIZER_H_
+#pragma once
 
 #include "../libs/libtri/include/tri_tools.h"
 #include "../libs/libtri/include/TriReader.h"
@@ -32,5 +31,3 @@ void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, c
 //#else
 //void voxelize_partition3(TriReader &reader, const uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, char* voxels, vector<::uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled);
 //#endif
-
-#endif // VOXELIZER_H_

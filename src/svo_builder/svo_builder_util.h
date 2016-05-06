@@ -1,5 +1,4 @@
-#ifndef UTIL_H_
-#define UTIL_H_
+#pragma once
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -52,5 +51,3 @@ inline int isPowerOf2(unsigned int x){
 template <typename T> T clampval(const T& value, const T& low, const T& high) {
   return value < low ? low : (value > high ? high : value); 
 }
-
-#endif /* UTIL_H_ */
