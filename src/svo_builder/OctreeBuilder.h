@@ -18,8 +18,8 @@ public:
 	vector< vector< Node > > b_buffers;
 	size_t gridlength;
 	int b_maxdepth; // maximum octree depth
-	uint64_t b_current_morton; // current morton position
-	uint64_t b_max_morton; // maximum morton position
+	::uint64_t b_current_morton; // current morton position
+	::uint64_t b_max_morton; // maximum morton position
 	size_t b_data_pos; // current output data position (array index)
 	size_t b_node_pos; // current output node position (array index)
 
@@ -32,7 +32,7 @@ public:
 
 	OctreeBuilder(std::string base_filename, size_t gridlength, bool generate_levels);
 	void finalizeTree();
-	void addVoxel(const uint64_t morton_number);
+	void addVoxel(const ::uint64_t morton_number);
 	void addVoxel(const VoxelData& point);
 
 private:
@@ -76,7 +76,7 @@ inline int OctreeBuilder::computeBestFillBuffer(const size_t budget){
 	// if our current guess is already b_maxdepth, return that, no need to test further
 	if(budget_buffer_suggestion == b_maxdepth){return b_maxdepth;}
 	// best fill buffer is maximum of suggestion and highest non_empty buffer
-	return max(budget_buffer_suggestion, highestNonEmptyBuffer());
+	return std::max(budget_buffer_suggestion, highestNonEmptyBuffer());
 }
 
 // A method to quickly add empty nodes

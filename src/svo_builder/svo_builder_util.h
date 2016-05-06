@@ -1,10 +1,9 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include <time.h>
+#include <glm/glm.hpp>
 #include <vector>
 #include <sstream>
-#include <glm/glm.hpp>
 #include "timer.h"
 #include "../libs/libmorton/include/morton.h"
 
@@ -14,15 +13,14 @@ using namespace std;
 // Various math/helper stuff
 
 // helper method to convert morton number to RGB color, for debug coloring purposes
-inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
+inline vec3 mortonToRGB(const ::uint64_t morton_number, const size_t gridsize){
 	unsigned int x,y,z;
 	morton3D_64_decode(morton_number,z,y,x);
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
 
-template <typename T>
-inline tvec3<T> average3Vec(const tvec3<T> v0, const tvec3<T> v1, const tvec3<T> v2){
-	tvec3<T> answer;
+inline vec3 average3Vec(const vec3 v0, const vec3 v1, const vec3 v2){
+	vec3 answer;
 	for (size_t i = 0; i < 3; i++){
 		answer[i] = (v0[i] + v1[i] + v2[i]) / 3.0f;
 	}

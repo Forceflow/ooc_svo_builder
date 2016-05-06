@@ -106,7 +106,7 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 					float b0 = abs(dot(vec3(halfunit, 0.0f, 0.0f),S.normal));
 					float b1 = abs(dot(vec3(0.0f, halfunit, 0.0f),S.normal));
 					float b2 = abs(dot(vec3(0.0f, 0.0f, halfunit),S.normal));
-					float cosbeta = max(b0, max(b1, b2)) / (length(vec3(halfunit, 0.0f, 0.0f))*length(S.normal));
+					float cosbeta = std::max(b0, std::max(b1, b2)) / (length(vec3(halfunit, 0.0f, 0.0f))*length(S.normal));
 					float tc = (unitlength / 2.0f)*cosbeta;
 					//construct G and H and check if point is between these planes
 					if (isPointBetweenParallelPlanes(middle_point, Plane(S.normal, S.D + tc), Plane(S.normal, S.D - tc))){
@@ -223,9 +223,9 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			n_xy_e1 = -1.0f * n_xy_e1;
 			n_xy_e2 = -1.0f * n_xy_e2;
 		}
-		float d_xy_e0 = (-1.0f * dot(n_xy_e0,vec2(t.v0[X], t.v0[Y]))) + max(0.0f, unitlength*n_xy_e0[0]) + max(0.0f, unitlength*n_xy_e0[1]);
-		float d_xy_e1 = (-1.0f * dot(n_xy_e1,vec2(t.v1[X], t.v1[Y]))) + max(0.0f, unitlength*n_xy_e1[0]) + max(0.0f, unitlength*n_xy_e1[1]);
-		float d_xy_e2 = (-1.0f * dot(n_xy_e2,vec2(t.v2[X], t.v2[Y]))) + max(0.0f, unitlength*n_xy_e2[0]) + max(0.0f, unitlength*n_xy_e2[1]);
+		float d_xy_e0 = (-1.0f * dot(n_xy_e0,vec2(t.v0[X], t.v0[Y]))) + std::max(0.0f, unitlength*n_xy_e0[0]) + std::max(0.0f, unitlength*n_xy_e0[1]);
+		float d_xy_e1 = (-1.0f * dot(n_xy_e1,vec2(t.v1[X], t.v1[Y]))) + std::max(0.0f, unitlength*n_xy_e1[0]) + std::max(0.0f, unitlength*n_xy_e1[1]);
+		float d_xy_e2 = (-1.0f * dot(n_xy_e2,vec2(t.v2[X], t.v2[Y]))) + std::max(0.0f, unitlength*n_xy_e2[0]) + std::max(0.0f, unitlength*n_xy_e2[1]);
 		// YZ plane
 		vec2 n_yz_e0 = vec2(-1.0f*e0[Z], e0[Y]);
 		vec2 n_yz_e1 = vec2(-1.0f*e1[Z], e1[Y]);
@@ -235,9 +235,9 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			n_yz_e1 = -1.0f * n_yz_e1;
 			n_yz_e2 = -1.0f * n_yz_e2;
 		}
-		float d_yz_e0 = (-1.0f * dot(n_yz_e0,vec2(t.v0[Y], t.v0[Z]))) + max(0.0f, unitlength*n_yz_e0[0]) + max(0.0f, unitlength*n_yz_e0[1]);
-		float d_yz_e1 = (-1.0f * dot(n_yz_e1,vec2(t.v1[Y], t.v1[Z]))) + max(0.0f, unitlength*n_yz_e1[0]) + max(0.0f, unitlength*n_yz_e1[1]);
-		float d_yz_e2 = (-1.0f * dot(n_yz_e2,vec2(t.v2[Y], t.v2[Z]))) + max(0.0f, unitlength*n_yz_e2[0]) + max(0.0f, unitlength*n_yz_e2[1]);
+		float d_yz_e0 = (-1.0f * dot(n_yz_e0,vec2(t.v0[Y], t.v0[Z]))) + std::max(0.0f, unitlength*n_yz_e0[0]) + std::max(0.0f, unitlength*n_yz_e0[1]);
+		float d_yz_e1 = (-1.0f * dot(n_yz_e1,vec2(t.v1[Y], t.v1[Z]))) + std::max(0.0f, unitlength*n_yz_e1[0]) + std::max(0.0f, unitlength*n_yz_e1[1]);
+		float d_yz_e2 = (-1.0f * dot(n_yz_e2,vec2(t.v2[Y], t.v2[Z]))) + std::max(0.0f, unitlength*n_yz_e2[0]) + std::max(0.0f, unitlength*n_yz_e2[1]);
 		// ZX plane
 		vec2 n_zx_e0 = vec2(-1.0f*e0[X], e0[Z]);
 		vec2 n_zx_e1 = vec2(-1.0f*e1[X], e1[Z]);
@@ -247,9 +247,9 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			n_zx_e1 = -1.0f * n_zx_e1;
 			n_zx_e2 = -1.0f * n_zx_e2;
 		}
-		float d_xz_e0 = (-1.0f * dot(n_zx_e0,vec2(t.v0[Z], t.v0[X]))) + max(0.0f, unitlength*n_zx_e0[0]) + max(0.0f, unitlength*n_zx_e0[1]);
-		float d_xz_e1 = (-1.0f * dot(n_zx_e1,vec2(t.v1[Z], t.v1[X]))) + max(0.0f, unitlength*n_zx_e1[0]) + max(0.0f, unitlength*n_zx_e1[1]);
-		float d_xz_e2 = (-1.0f * dot(n_zx_e2,vec2(t.v2[Z], t.v2[X]))) + max(0.0f, unitlength*n_zx_e2[0]) + max(0.0f, unitlength*n_zx_e2[1]);
+		float d_xz_e0 = (-1.0f * dot(n_zx_e0,vec2(t.v0[Z], t.v0[X]))) + std::max(0.0f, unitlength*n_zx_e0[0]) + std::max(0.0f, unitlength*n_zx_e0[1]);
+		float d_xz_e1 = (-1.0f * dot(n_zx_e1,vec2(t.v1[Z], t.v1[X]))) + std::max(0.0f, unitlength*n_zx_e1[0]) + std::max(0.0f, unitlength*n_zx_e1[1]);
+		float d_xz_e2 = (-1.0f * dot(n_zx_e2,vec2(t.v2[Z], t.v2[X]))) + std::max(0.0f, unitlength*n_zx_e2[0]) + std::max(0.0f, unitlength*n_zx_e2[1]);
 
 		// test possible grid boxes for overlap
 		for (int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
@@ -289,7 +289,7 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 					if (use_data){ data.push_back(index); }
 #else
 					voxels[index - morton_start] = FULL_VOXEL;
-					data.push_back(VoxelData(index, t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color))); // we ignore data limits for colored voxelization
+					data.push_back(VoxelData(index, t.normal, average3Vec<float>(t.v0_color, t.v1_color, t.v2_color))); // we ignore data limits for colored voxelization
 #endif
 					nfilled++;
 					continue;

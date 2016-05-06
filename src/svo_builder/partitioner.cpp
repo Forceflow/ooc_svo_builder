@@ -10,7 +10,7 @@ using namespace glm;
 // Estimate the optimal amount of partitions we need, given the requested gridsize and the overall memory limit.
 size_t estimate_partitions(const size_t gridsize, const size_t memory_limit){
 	cout << "Estimating best partition count ..." << endl;
-	uint64_t required = (gridsize*gridsize*gridsize*sizeof(char)) / 1024 / 1024;
+	::uint64_t required = (gridsize*gridsize*gridsize*sizeof(char)) / 1024 / 1024;
 	cout << "  to do this in-core I would need " << required << " Mb of system memory" << endl;
 	if (required <= memory_limit){
 		cout << "  memory limit of " << memory_limit << " Mb allows that" << endl;
@@ -42,7 +42,7 @@ void removeTripFiles(const TripInfo &trip_info){
 void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize, vector<Buffer*> &buffers){
 	buffers.resize(n_partitions);
 	float unitlength = (tri_info.mesh_bbox.max[0] - tri_info.mesh_bbox.min[0]) / (float)gridsize;
-	uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
+	::uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
 
 	AABox<uivec3> bbox_grid;
 	AABox<vec3> bbox_world;
