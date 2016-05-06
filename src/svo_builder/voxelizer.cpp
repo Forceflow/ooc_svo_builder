@@ -11,10 +11,10 @@ using namespace glm;
 // Adapted for mortoncode -based subgrids
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
+void voxelize_huang_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
 	for (size_t i = 0; i < (morton_end - morton_start); i++){ voxels[i] = EMPTY_VOXEL; }
 #else
-void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
+void voxelize_huang_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
 	for (size_t i = 0; i < (morton_end - morton_start); i++){ voxels[i] = EMPTY_VOXEL; }
 	voxel_data.clear();
 #endif
@@ -66,7 +66,7 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 		for (unsigned int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
 			for (unsigned int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for (unsigned int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
-					uint64_t index = morton3D_64_encode(z, y, x);
+					::uint64_t index = morton3D_64_encode(z, y, x);
 
 					assert(index - morton_start < (morton_end - morton_start));
 
@@ -81,7 +81,7 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = true;
 #else
-						voxel_data.push_back(VoxelData(index, t.normal, average3Vec<float>(t.v0_color, t.v1_color, t.v2_color)));
+						voxel_data.push_back(VoxelData(index, t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
 #endif
 						nfilled++;
@@ -94,7 +94,7 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 #ifdef BINARY_VOXELIZATION
 						voxels[index - morton_start] = true;
 #else
-						voxel_data.push_back(VoxelData(index, t.normal, average3Vec<float>(t.v0_color, t.v1_color, t.v2_color)));
+						voxel_data.push_back(VoxelData(index, t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 						voxels[index - morton_start] = voxel_data.size() - 1;
 #endif
 						nfilled++;
@@ -117,7 +117,7 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 #ifdef BINARY_VOXELIZATION
 							voxels[index - morton_start] = true;
 #else
-							voxel_data.push_back(VoxelData(index, t.normal, average3Vec<float>(t.v0_color, t.v1_color, t.v2_color)));
+							voxel_data.push_back(VoxelData(index, t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color)));
 							voxels[index - morton_start] = voxel_data.size() - 1;
 #endif
 							nfilled++;
@@ -134,9 +134,9 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 // Adapted for mortoncode -based subgrids
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
+void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, char* voxels, vector<::uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
 #else
-void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<VoxelData> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
+void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, char* voxels, vector<VoxelData> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
 #endif
 	vox_algo_timer.start();
 	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(char));
@@ -151,9 +151,9 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 #ifdef BINARY_VOXELIZATION
 	size_t data_max_items;
 	if (use_data){
-		uint64_t max_bytes_data = (uint64_t) (((morton_end - morton_start)*sizeof(char)) * sparseness_limit);
+		::uint64_t max_bytes_data = (::uint64_t) (((morton_end - morton_start)*sizeof(char)) * sparseness_limit);
 
-		data_max_items = max_bytes_data / sizeof(uint64_t);
+		data_max_items = max_bytes_data / sizeof(::uint64_t);
 		data_max_items = max_bytes_data / sizeof(VoxelData);
 	}
 #endif
@@ -256,7 +256,7 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			for (int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for (int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
 
-					uint64_t index = morton3D_64_encode(x, y, z);
+					::uint64_t index = morton3D_64_encode(x, y, z);
 
 					if (voxels[index - morton_start] == FULL_VOXEL){ continue; } // already marked, continue
 
@@ -289,7 +289,7 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 					if (use_data){ data.push_back(index); }
 #else
 					voxels[index - morton_start] = FULL_VOXEL;
-					data.push_back(VoxelData(index, t.normal, average3Vec<float>(t.v0_color, t.v1_color, t.v2_color))); // we ignore data limits for colored voxelization
+					data.push_back(VoxelData(index, t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color))); // we ignore data limits for colored voxelization
 #endif
 					nfilled++;
 					continue;
