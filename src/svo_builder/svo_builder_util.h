@@ -20,7 +20,7 @@ inline vec3 mortonToRGB(const ::uint64_t morton_number, const size_t gridsize){
 
 inline vec3 average3Vec(const vec3 v0, const vec3 v1, const vec3 v2){
 	vec3 answer;
-	for (size_t i = 0; i < 3; i++){
+	for (unsigned int i = 0; i < 3; i++){
 		answer[i] = (v0[i] + v1[i] + v2[i]) / 3.0f;
 	}
 	return answer;
