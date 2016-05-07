@@ -1,29 +1,25 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <cassert>
-#include "../libs/libtri/include/tri_util.h"
 #include "geometry_primitives.h"
-
-#undef min
-#undef max
+#include "../libs/libtri/include/tri_util.h"
 
 // Intersection methods
 inline AABox<vec3> computeBoundingBox(const vec3 &v0, const vec3 &v1, const vec3 &v2){
 	AABox<vec3> answer; 
-	answer.min[0] = glm::min(v0[0],glm::min(v1[0],v2[0]));
-	answer.min[1] = glm::min(v0[1],glm::min(v1[1],v2[1]));
-	answer.min[2] = glm::min(v0[2],glm::min(v1[2],v2[2]));
-	answer.max[0] = glm::max(v0[0],glm::max(v1[0],v2[0]));
-	answer.max[1] = glm::max(v0[1],glm::max(v1[1],v2[1]));
-	answer.max[2] = glm::max(v0[2],glm::max(v1[2],v2[2]));
+	answer.min[0] = std::min(v0[0],std::min(v1[0],v2[0]));
+	answer.min[1] = std::min(v0[1],std::min(v1[1],v2[1]));
+	answer.min[2] = std::min(v0[2],std::min(v1[2],v2[2]));
+	answer.max[0] = std::max(v0[0],std::max(v1[0],v2[0]));
+	answer.max[1] = std::max(v0[1],std::max(v1[1],v2[1]));
+	answer.max[2] = std::max(v0[2],std::max(v1[2],v2[2]));
 	return answer;
 }
 
 inline bool isPointBetweenParallelPlanes(const vec3 &point, const Plane &a, const Plane &b){
 	// test if planes are parallel
 	assert((cross(a.normal, b.normal)) == vec3(0,0,0) && "These planes should be parallel.");
-	return ((dot(a.normal,point)) + a.D) * ((dot(b.normal,point)) + b.D) < 0.0;
+	return ((dot(a.normal,point)) + a.D) * ((dot(b.normal,point)) + b.D) < 0.0f;
 }
 
 inline bool isPointInSphere(const vec3 &point, const Sphere &sphere){

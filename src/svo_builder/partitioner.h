@@ -6,7 +6,7 @@
 #include "../libs/libtri/include/TriReader.h"
 #include "../libs/libmorton/include/morton.h"
 #include "globals.h"
-#include "Buffer.h"
+#include "BBoxBuffer.h"
 #include "voxelizer.h"
 
 // Partitioning-related stuff

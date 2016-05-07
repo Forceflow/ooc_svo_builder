@@ -39,7 +39,7 @@ void removeTripFiles(const TripInfo &trip_info){
 }
 
 // Create n Buffers for a total gridsize, store them in the given vector, use tri_info for filename information
-void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize, vector<Buffer*> &buffers){
+void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize, vector<BBoxBuffer*> &buffers){
 	buffers.resize(n_partitions);
 	float unitlength = (tri_info.mesh_bbox.max[0] - tri_info.mesh_bbox.min[0]) / (float)gridsize;
 	::uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
@@ -71,7 +71,7 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 		// create buffer for partition
 		filename = tri_info.base_filename + val_to_string(gridsize) + string("_") + val_to_string(n_partitions) + string("_") + val_to_string(i) + string(".tripdata");
-		buffers[i] = new Buffer(filename, bbox_world, output_buffersize);
+		buffers[i] = new BBoxBuffer(filename, bbox_world, output_buffersize);
 	}
 }
 
@@ -110,7 +110,7 @@ TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 	part_algo_timer.start(); // TIMING
 	// Create Mortonbuffers
-	vector<Buffer*> buffers;
+	vector<BBoxBuffer*> buffers;
 	createBuffers(tri_info, n_partitions, gridsize, buffers);
 
 	while (reader.hasNext()) {

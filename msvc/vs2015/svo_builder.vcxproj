@@ -142,7 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\svo_builder\Buffer.h" />
+    <ClInclude Include="..\..\src\svo_builder\BBoxBuffer.h" />
     <ClInclude Include="..\..\src\svo_builder\geometry_primitives.h" />
     <ClInclude Include="..\..\src\svo_builder\globals.h" />
     <ClInclude Include="..\..\src\svo_builder\intersection.h" />

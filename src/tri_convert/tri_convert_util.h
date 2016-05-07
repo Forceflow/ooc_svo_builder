@@ -16,7 +16,6 @@ inline trimesh::vec3 toTriMesh(glm::vec3 v) {
 	return trimesh::vec3(v[0], v[1], v[2]);
 }
 
-
 // create bounding cube around a mesh (pad if the bbox is not a cube)
 inline AABox<glm::vec3> createMeshBBCube(const trimesh::TriMesh *themesh){
 	glm::vec3 mesh_min = toGLM(themesh->bbox.min);
@@ -52,5 +51,3 @@ inline glm::vec3 getShadingFaceNormal(trimesh::TriMesh *themesh, size_t facenumb
 	to_normalize.z = (n0[2] + n1[2] + n2[2]) / 3.0f;
 	return glm::normalize(to_normalize);
 }
-
-#endif /* UTIL_H_ */
