@@ -13,11 +13,11 @@ struct Plane {
 	Plane(vec3 normal,  float D): normal(normal), D(D){}
 	Plane(vec3 p0, vec3 p1, vec3 p2){
 		normal = normalize(cross(p1 - p0, p2 - p1));
-		D = -1.0 * dot(normal, p0);
+		D = -1.0f * dot(normal, p0);
 	}
 	Plane(vec3 normal, vec3 pointonplane){
 		normal = normalize(normal);
-		D = -1.0 * dot(normal, pointonplane);
+		D = -1.0f * dot(normal, pointonplane);
 	}
 };
 
