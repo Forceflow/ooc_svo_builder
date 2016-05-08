@@ -28,7 +28,7 @@ public:
 
 // Default constructor
 inline Node::Node() : data(0), children_base(0), data_cache(VoxelData()){
-	memset(children_offset, (char) NOCHILD, 8);
+	memset(children_offset, static_cast<char>(NOCHILD), 8);
 }
 
 // Check if this Node has a child at position i
