@@ -1,29 +1,26 @@
-#ifndef UTIL_H_
-#define UTIL_H_
+#pragma once
 
-#include <time.h>
+#include <glm/glm.hpp>
 #include <vector>
 #include <sstream>
-#include <TriMesh.h>
 #include "timer.h"
 #include "../libs/libmorton/include/morton.h"
 
-using namespace trimesh;
+using namespace glm;
 using namespace std;
 
 // Various math/helper stuff
 
 // helper method to convert morton number to RGB color, for debug coloring purposes
-inline vec3 mortonToRGB(const uint64_t morton_number, const size_t gridsize){
+inline vec3 mortonToRGB(const ::uint64_t morton_number, const size_t gridsize){
 	unsigned int x,y,z;
 	morton3D_64_decode(morton_number,z,y,x);
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
 
-template <size_t D, class T>
-inline Vec<D,T> average3Vec(const Vec<D,T> v0, const Vec<D,T> v1, const Vec<D,T> v2){
-	Vec<D,T> answer;
-	for (size_t i = 0; i < D; i++){
+inline vec3 average3Vec(const vec3 v0, const vec3 v1, const vec3 v2){
+	vec3 answer;
+	for (unsigned int i = 0; i < 3; i++){
 		answer[i] = (v0[i] + v1[i] + v2[i]) / 3.0f;
 	}
 	return answer;
@@ -54,5 +51,3 @@ inline int isPowerOf2(unsigned int x){
 template <typename T> T clampval(const T& value, const T& low, const T& high) {
   return value < low ? low : (value > high ? high : value); 
 }
-
-#endif /* UTIL_H_ */

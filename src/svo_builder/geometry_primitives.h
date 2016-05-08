@@ -1,9 +1,8 @@
-#ifndef GEOMETRY_PRIMITIVES_H_
-#define GEOMETRY_PRIMITIVES_H_
-#include <TriMesh.h>
+#pragma once
+#include <glm/glm.hpp>
 
 using namespace std;
-using namespace trimesh;
+using namespace glm;
 
 // Several geometry primitives
 
@@ -13,16 +12,12 @@ struct Plane {
 
 	Plane(vec3 normal,  float D): normal(normal), D(D){}
 	Plane(vec3 p0, vec3 p1, vec3 p2){
-		vec3 v1 = p1-p0;
-		vec3 v2 = p2-p1;
-		// LINUX fix -- can't handle vec3 normal = normalize((vec3) v1 CROSS v2) FOR SOME MAD REASON
-		vec3 to_normalize = v1 CROSS v2; 
-		normal = normalize(to_normalize);
-		D = - (normal DOT p0);
+		normal = normalize(cross(p1 - p0, p2 - p1));
+		D = -1.0f * dot(normal, p0);
 	}
 	Plane(vec3 normal, vec3 pointonplane){
 		normal = normalize(normal);
-		D = - (normal DOT pointonplane);
+		D = -1.0f * dot(normal, pointonplane);
 	}
 };
 
@@ -43,8 +38,7 @@ struct Cylinder {
 
 	Cylinder(vec3 p1, vec3 p2, float radius): p1(p1), p2(p2){
 		radius_squared = radius*radius;
-		length_squared = len2( (vec3) p2-p1);
+		vec3 x = p2 - p1;
+		length_squared = dot(x,x);
 	}
 };
-
-#endif // GEOMETRY_PRIMITIVES_H_

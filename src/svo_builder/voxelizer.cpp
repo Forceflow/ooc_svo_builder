@@ -1,7 +1,7 @@
 #include "voxelizer.h"
 
 using namespace std;
-using namespace trimesh;
+using namespace glm;
 
 #define X 0
 #define Y 1
@@ -11,10 +11,10 @@ using namespace trimesh;
 // Adapted for mortoncode -based subgrids
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
+void voxelize_huang_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, bool* voxels, size_t &nfilled) {
 	for (size_t i = 0; i < (morton_end - morton_start); i++){ voxels[i] = EMPTY_VOXEL; }
 #else
-void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
+void voxelize_huang_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, size_t* voxels, vector<VoxelData>& voxel_data, size_t &nfilled) {
 	for (size_t i = 0; i < (morton_end - morton_start); i++){ voxels[i] = EMPTY_VOXEL; }
 	voxel_data.clear();
 #endif
@@ -66,7 +66,7 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 		for (unsigned int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
 			for (unsigned int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for (unsigned int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
-					uint64_t index = morton3D_64_encode(z, y, x);
+					::uint64_t index = morton3D_64_encode(z, y, x);
 
 					assert(index - morton_start < (morton_end - morton_start));
 
@@ -102,16 +102,17 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 					}
 					// TEST3 : using planes
 					//let's find beta
-					float b0 = abs(vec3(unitlength / 2.0f, 0.0f, 0.0f) DOT S.normal);
-					float b1 = abs(vec3(0.0f, unitlength / 2.0f, 0.0f) DOT S.normal);
-					float b2 = abs(vec3(0.0f, 0.0f, unitlength / 2.0f) DOT S.normal);
-					float cosbeta = max(b0, max(b1, b2)) / (len(vec3(unitlength / 2.0f, 0.0f, 0.0f))*len(S.normal));
+					float halfunit = unitlength / 2.0f;
+					float b0 = abs(dot(vec3(halfunit, 0.0f, 0.0f),S.normal));
+					float b1 = abs(dot(vec3(0.0f, halfunit, 0.0f),S.normal));
+					float b2 = abs(dot(vec3(0.0f, 0.0f, halfunit),S.normal));
+					float cosbeta = std::max(b0, std::max(b1, b2)) / (length(vec3(halfunit, 0.0f, 0.0f))*length(S.normal));
 					float tc = (unitlength / 2.0f)*cosbeta;
 					//construct G and H and check if point is between these planes
 					if (isPointBetweenParallelPlanes(middle_point, Plane(S.normal, S.D + tc), Plane(S.normal, S.D - tc))){
-						float s1 = (S.normal CROSS(t.v1 - t.v0)) DOT(middle_point - t.v0); // (normal of E1) DOT (vector middlepoint->point on surf)
-						float s2 = (S.normal CROSS(t.v2 - t.v1)) DOT(middle_point - t.v1);
-						float s3 = (S.normal CROSS(t.v0 - t.v2)) DOT(middle_point - t.v2);
+						float s1 = dot(cross(S.normal,t.v1-t.v0), middle_point-t.v0); // (normal of E1) DOT (vector middlepoint->point on surf)
+						float s2 = dot(cross(S.normal,t.v2-t.v1), middle_point-t.v1);
+						float s3 = dot(cross(S.normal,t.v0-t.v2), middle_point-t.v2);
 						if (((s1 <= 0) == (s2 <= 0)) && ((s2 <= 0) == (s3 <= 0))){
 #ifdef BINARY_VOXELIZATION
 							voxels[index - morton_start] = true;
@@ -133,9 +134,9 @@ void voxelize_huang_method(TriReader &reader, const uint64_t morton_start, const
 // Adapted for mortoncode -based subgrids
 
 #ifdef BINARY_VOXELIZATION
-void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
+void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, char* voxels, vector<::uint64_t> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
 #else
-void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, const uint64_t morton_end, const float unitlength, char* voxels, vector<VoxelData> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
+void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, const ::uint64_t morton_end, const float unitlength, char* voxels, vector<VoxelData> &data, float sparseness_limit, bool &use_data, size_t &nfilled) {
 #endif
 	vox_algo_timer.start();
 	memset(voxels, EMPTY_VOXEL, (morton_end - morton_start)*sizeof(char));
@@ -150,9 +151,9 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 #ifdef BINARY_VOXELIZATION
 	size_t data_max_items;
 	if (use_data){
-		uint64_t max_bytes_data = (uint64_t) (((morton_end - morton_start)*sizeof(char)) * sparseness_limit);
+		::uint64_t max_bytes_data = (::uint64_t) (((morton_end - morton_start)*sizeof(char)) * sparseness_limit);
 
-		data_max_items = max_bytes_data / sizeof(uint64_t);
+		data_max_items = max_bytes_data / sizeof(::uint64_t);
 		data_max_items = max_bytes_data / sizeof(VoxelData);
 	}
 #endif
@@ -204,15 +205,14 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 		vec3 e0 = t.v1 - t.v0;
 		vec3 e1 = t.v2 - t.v1;
 		vec3 e2 = t.v0 - t.v2;
-		vec3 to_normalize = (e0)CROSS(e1);
-		vec3 n = normalize(to_normalize); // triangle normal
+		vec3 n = normalize(cross(e0,e1)); // triangle normal
 		// PLANE TEST PROPERTIES
 		vec3 c = vec3(0.0f, 0.0f, 0.0f); // critical point
 		if (n[X] > 0) { c[X] = unitlength; }
 		if (n[Y] > 0) { c[Y] = unitlength; }
 		if (n[Z] > 0) { c[Z] = unitlength; }
-		float d1 = n DOT(c - t.v0);
-		float d2 = n DOT((delta_p - c) - t.v0);
+		float d1 = dot(n,c-t.v0);
+		float d2 = dot(n,(delta_p - c) - t.v0);
 		// PROJECTION TEST PROPERTIES
 		// XY plane
 		vec2 n_xy_e0 = vec2(-1.0f*e0[Y], e0[X]);
@@ -223,9 +223,9 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			n_xy_e1 = -1.0f * n_xy_e1;
 			n_xy_e2 = -1.0f * n_xy_e2;
 		}
-		float d_xy_e0 = (-1.0f * (n_xy_e0 DOT vec2(t.v0[X], t.v0[Y]))) + max(0.0f, unitlength*n_xy_e0[0]) + max(0.0f, unitlength*n_xy_e0[1]);
-		float d_xy_e1 = (-1.0f * (n_xy_e1 DOT vec2(t.v1[X], t.v1[Y]))) + max(0.0f, unitlength*n_xy_e1[0]) + max(0.0f, unitlength*n_xy_e1[1]);
-		float d_xy_e2 = (-1.0f * (n_xy_e2 DOT vec2(t.v2[X], t.v2[Y]))) + max(0.0f, unitlength*n_xy_e2[0]) + max(0.0f, unitlength*n_xy_e2[1]);
+		float d_xy_e0 = (-1.0f * dot(n_xy_e0,vec2(t.v0[X], t.v0[Y]))) + std::max(0.0f, unitlength*n_xy_e0[0]) + std::max(0.0f, unitlength*n_xy_e0[1]);
+		float d_xy_e1 = (-1.0f * dot(n_xy_e1,vec2(t.v1[X], t.v1[Y]))) + std::max(0.0f, unitlength*n_xy_e1[0]) + std::max(0.0f, unitlength*n_xy_e1[1]);
+		float d_xy_e2 = (-1.0f * dot(n_xy_e2,vec2(t.v2[X], t.v2[Y]))) + std::max(0.0f, unitlength*n_xy_e2[0]) + std::max(0.0f, unitlength*n_xy_e2[1]);
 		// YZ plane
 		vec2 n_yz_e0 = vec2(-1.0f*e0[Z], e0[Y]);
 		vec2 n_yz_e1 = vec2(-1.0f*e1[Z], e1[Y]);
@@ -235,9 +235,9 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			n_yz_e1 = -1.0f * n_yz_e1;
 			n_yz_e2 = -1.0f * n_yz_e2;
 		}
-		float d_yz_e0 = (-1.0f * (n_yz_e0 DOT vec2(t.v0[Y], t.v0[Z]))) + max(0.0f, unitlength*n_yz_e0[0]) + max(0.0f, unitlength*n_yz_e0[1]);
-		float d_yz_e1 = (-1.0f * (n_yz_e1 DOT vec2(t.v1[Y], t.v1[Z]))) + max(0.0f, unitlength*n_yz_e1[0]) + max(0.0f, unitlength*n_yz_e1[1]);
-		float d_yz_e2 = (-1.0f * (n_yz_e2 DOT vec2(t.v2[Y], t.v2[Z]))) + max(0.0f, unitlength*n_yz_e2[0]) + max(0.0f, unitlength*n_yz_e2[1]);
+		float d_yz_e0 = (-1.0f * dot(n_yz_e0,vec2(t.v0[Y], t.v0[Z]))) + std::max(0.0f, unitlength*n_yz_e0[0]) + std::max(0.0f, unitlength*n_yz_e0[1]);
+		float d_yz_e1 = (-1.0f * dot(n_yz_e1,vec2(t.v1[Y], t.v1[Z]))) + std::max(0.0f, unitlength*n_yz_e1[0]) + std::max(0.0f, unitlength*n_yz_e1[1]);
+		float d_yz_e2 = (-1.0f * dot(n_yz_e2,vec2(t.v2[Y], t.v2[Z]))) + std::max(0.0f, unitlength*n_yz_e2[0]) + std::max(0.0f, unitlength*n_yz_e2[1]);
 		// ZX plane
 		vec2 n_zx_e0 = vec2(-1.0f*e0[X], e0[Z]);
 		vec2 n_zx_e1 = vec2(-1.0f*e1[X], e1[Z]);
@@ -247,42 +247,42 @@ void voxelize_schwarz_method(TriReader &reader, const uint64_t morton_start, con
 			n_zx_e1 = -1.0f * n_zx_e1;
 			n_zx_e2 = -1.0f * n_zx_e2;
 		}
-		float d_xz_e0 = (-1.0f * (n_zx_e0 DOT vec2(t.v0[Z], t.v0[X]))) + max(0.0f, unitlength*n_zx_e0[0]) + max(0.0f, unitlength*n_zx_e0[1]);
-		float d_xz_e1 = (-1.0f * (n_zx_e1 DOT vec2(t.v1[Z], t.v1[X]))) + max(0.0f, unitlength*n_zx_e1[0]) + max(0.0f, unitlength*n_zx_e1[1]);
-		float d_xz_e2 = (-1.0f * (n_zx_e2 DOT vec2(t.v2[Z], t.v2[X]))) + max(0.0f, unitlength*n_zx_e2[0]) + max(0.0f, unitlength*n_zx_e2[1]);
+		float d_xz_e0 = (-1.0f * dot(n_zx_e0,vec2(t.v0[Z], t.v0[X]))) + std::max(0.0f, unitlength*n_zx_e0[0]) + std::max(0.0f, unitlength*n_zx_e0[1]);
+		float d_xz_e1 = (-1.0f * dot(n_zx_e1,vec2(t.v1[Z], t.v1[X]))) + std::max(0.0f, unitlength*n_zx_e1[0]) + std::max(0.0f, unitlength*n_zx_e1[1]);
+		float d_xz_e2 = (-1.0f * dot(n_zx_e2,vec2(t.v2[Z], t.v2[X]))) + std::max(0.0f, unitlength*n_zx_e2[0]) + std::max(0.0f, unitlength*n_zx_e2[1]);
 
 		// test possible grid boxes for overlap
 		for (int x = t_bbox_grid.min[0]; x <= t_bbox_grid.max[0]; x++){
 			for (int y = t_bbox_grid.min[1]; y <= t_bbox_grid.max[1]; y++){
 				for (int z = t_bbox_grid.min[2]; z <= t_bbox_grid.max[2]; z++){
 
-					uint64_t index = morton3D_64_encode(x, y, z);
+					::uint64_t index = morton3D_64_encode(x, y, z);
 
 					if (voxels[index - morton_start] == FULL_VOXEL){ continue; } // already marked, continue
 
 					// TRIANGLE PLANE THROUGH BOX TEST
 					vec3 p = vec3(x*unitlength, y*unitlength, z*unitlength);
-					float nDOTp = n DOT p;
+					float nDOTp = dot(n,p);
 					if ((nDOTp + d1) * (nDOTp + d2) > 0.0f){ continue; }
 
 					// PROJECTION TESTS
 					// XY
 					vec2 p_xy = vec2(p[X], p[Y]);
-					if (((n_xy_e0 DOT p_xy) + d_xy_e0) < 0.0f){ continue; }
-					if (((n_xy_e1 DOT p_xy) + d_xy_e1) < 0.0f){ continue; }
-					if (((n_xy_e2 DOT p_xy) + d_xy_e2) < 0.0f){ continue; }
+					if ((dot(n_xy_e0,p_xy) + d_xy_e0) < 0.0f){ continue; }
+					if ((dot(n_xy_e1,p_xy) + d_xy_e1) < 0.0f){ continue; }
+					if ((dot(n_xy_e2,p_xy) + d_xy_e2) < 0.0f){ continue; }
 
 					// YZ
 					vec2 p_yz = vec2(p[Y], p[Z]);
-					if (((n_yz_e0 DOT p_yz) + d_yz_e0) < 0.0f){ continue; }
-					if (((n_yz_e1 DOT p_yz) + d_yz_e1) < 0.0f){ continue; }
-					if (((n_yz_e2 DOT p_yz) + d_yz_e2) < 0.0f){ continue; }
+					if ((dot(n_yz_e0,p_yz) + d_yz_e0) < 0.0f){ continue; }
+					if ((dot(n_yz_e1,p_yz) + d_yz_e1) < 0.0f){ continue; }
+					if ((dot(n_yz_e2,p_yz) + d_yz_e2) < 0.0f){ continue; }
 
 					// XZ	
 					vec2 p_zx = vec2(p[Z], p[X]);
-					if (((n_zx_e0 DOT p_zx) + d_xz_e0) < 0.0f){ continue; }
-					if (((n_zx_e1 DOT p_zx) + d_xz_e1) < 0.0f){ continue; }
-					if (((n_zx_e2 DOT p_zx) + d_xz_e2) < 0.0f){ continue; }
+					if ((dot(n_zx_e0,p_zx) + d_xz_e0) < 0.0f){ continue; }
+					if ((dot(n_zx_e1,p_zx) + d_xz_e1) < 0.0f){ continue; }
+					if ((dot(n_zx_e2,p_zx) + d_xz_e2) < 0.0f){ continue; }
 
 #ifdef BINARY_VOXELIZATION
 					voxels[index - morton_start] = FULL_VOXEL;

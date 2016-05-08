@@ -1,7 +1,7 @@
 #include "partitioner.h"
 
 using namespace std;
-using namespace trimesh;
+using namespace glm;
 
 // Fiddle with buffer sizes here: these are defined as number of triangles
 #define input_buffersize 8192
@@ -10,7 +10,7 @@ using namespace trimesh;
 // Estimate the optimal amount of partitions we need, given the requested gridsize and the overall memory limit.
 size_t estimate_partitions(const size_t gridsize, const size_t memory_limit){
 	cout << "Estimating best partition count ..." << endl;
-	uint64_t required = (gridsize*gridsize*gridsize*sizeof(char)) / 1024 / 1024;
+	::uint64_t required = (gridsize*gridsize*gridsize*sizeof(char)) / 1024 / 1024;
 	cout << "  to do this in-core I would need " << required << " Mb of system memory" << endl;
 	if (required <= memory_limit){
 		cout << "  memory limit of " << memory_limit << " Mb allows that" << endl;
@@ -39,10 +39,10 @@ void removeTripFiles(const TripInfo &trip_info){
 }
 
 // Create n Buffers for a total gridsize, store them in the given vector, use tri_info for filename information
-void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize, vector<Buffer*> &buffers){
+void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize, vector<BBoxBuffer*> &buffers){
 	buffers.resize(n_partitions);
 	float unitlength = (tri_info.mesh_bbox.max[0] - tri_info.mesh_bbox.min[0]) / (float)gridsize;
-	uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
+	::uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
 
 	AABox<uivec3> bbox_grid;
 	AABox<vec3> bbox_world;
@@ -50,8 +50,8 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 	for (size_t i = 0; i < n_partitions; i++){
 		// compute world bounding box
-		morton3D_64_decode(morton_part*i, bbox_grid.min[2], bbox_grid.min[1], bbox_grid.min[0]);
-		morton3D_64_decode((morton_part*(i + 1)) - 1, bbox_grid.max[2], bbox_grid.max[1], bbox_grid.max[0]); // -1, because z-curve skips to first block of next partition
+		morton3D_64_decode(morton_part*i, bbox_grid.min[0], bbox_grid.min[1], bbox_grid.min[2]);
+		morton3D_64_decode((morton_part*(i + 1)) - 1, bbox_grid.max[0], bbox_grid.max[1], bbox_grid.max[2]); // -1, because z-curve skips to first block of next partition
 		bbox_world.min[0] = bbox_grid.min[0] * unitlength;
 		bbox_world.min[1] = bbox_grid.min[1] * unitlength;
 		bbox_world.min[2] = bbox_grid.min[2] * unitlength;
@@ -71,7 +71,7 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 		// create buffer for partition
 		filename = tri_info.base_filename + val_to_string(gridsize) + string("_") + val_to_string(n_partitions) + string("_") + val_to_string(i) + string(".tripdata");
-		buffers[i] = new Buffer(filename, bbox_world, output_buffersize);
+		buffers[i] = new BBoxBuffer(filename, bbox_world, output_buffersize);
 	}
 }
 
@@ -110,7 +110,7 @@ TripInfo partition(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 	part_algo_timer.start(); // TIMING
 	// Create Mortonbuffers
-	vector<Buffer*> buffers;
+	vector<BBoxBuffer*> buffers;
 	createBuffers(tri_info, n_partitions, gridsize, buffers);
 
 	while (reader.hasNext()) {

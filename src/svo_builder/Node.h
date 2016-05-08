@@ -1,6 +1,3 @@
-#ifndef NODE_H_
-#define NODE_H_
-
 #pragma once
 
 #include "VoxelData.h"
@@ -65,5 +62,3 @@ inline bool Node::isLeaf() const{
 inline bool Node::hasData() const{
 	return !(data == NODATA);
 }
-
-#endif /* NODE_H_ */

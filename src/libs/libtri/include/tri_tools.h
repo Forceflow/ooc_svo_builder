@@ -3,7 +3,7 @@
 
 #include <string>
 #include <fstream>
-#include <stdio.h>
+#include <iostream>
 #include "tri_util.h"
 #include "file_tools.h"
 
@@ -15,9 +15,9 @@ struct TriInfo{
 	int version;
 	int geometry_only;
 	size_t n_triangles;
-	AABox<vec3> mesh_bbox;
+	AABox<glm::vec3> mesh_bbox;
 
-	TriInfo() : base_filename(""), version(version), geometry_only(geometry_only), n_triangles(0), mesh_bbox(AABox<vec3>()) {} // default constructor
+	TriInfo() : base_filename(""), version(version), geometry_only(geometry_only), n_triangles(0), mesh_bbox(AABox<glm::vec3>()) {} // default constructor
 
 	// print out Tri information
 	void print() const{

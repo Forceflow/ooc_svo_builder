@@ -1,10 +1,8 @@
-#ifndef TRI_UTIL_H_
-#define TRI_UTIL_H_
-#include <TriMesh.h>
-#include <sstream>
+#pragma once 
 
-using namespace std;
-using namespace trimesh;
+#include <glm/glm.hpp>
+#include <sstream>
+#include <string>
 
 #ifdef BINARY_VOXELIZATION
 #define TRIANGLE_SIZE 9 // just the vertices
@@ -12,12 +10,10 @@ using namespace trimesh;
 #define TRIANGLE_SIZE 21 // vertices + normal + vertex colors
 #endif
 
-// Various helper methods / structs
-
 // Custom value to string method to avoid C++11 dependency causing fopenmp problems in OSX
 template <typename T>
-string val_to_string( T Number ) {
-	stringstream ss;
+std::string val_to_string( T Number ) {
+	std::stringstream ss;
 	ss << Number;
 	return ss.str();
 }
@@ -32,30 +28,28 @@ struct AABox {
 
 #ifdef BINARY_VOXELIZATION
 struct Triangle {
-	vec3 v0;
-	vec3 v1;
-	vec3 v2;
+	glm::vec3 v0;
+	glm::vec3 v1;
+	glm::vec3 v2;
 
-	Triangle(): v0(vec3()), v1(vec3()), v2(vec3()) {}
-	Triangle(vec3 v0, vec3 v1, vec3 v2): v0(v0), v1(v1), v2(v2) {}
+	Triangle(): v0(glm::vec3()), v1(glm::vec3()), v2(glm::vec3()) {}
+	Triangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2): v0(v0), v1(v1), v2(v2) {}
 };
 #else
 struct Triangle {
-	vec3 v0;
-	vec3 v1;
-	vec3 v2;
-	vec3 normal;
-	Color v0_color;
-	Color v1_color;
-	Color v2_color;
+	glm::vec3 v0;
+	glm::vec3 v1;
+	glm::vec3 v2;
+	glm::vec3 normal;
+	glm::vec3 v0_color;
+	glm::vec3 v1_color;
+	glm::vec3 v2_color;
 
 	// Default constructor
-	Triangle(): v0(vec3()), v1(vec3()), v2(vec3()), normal(vec3()), v0_color(Color()),v1_color(Color()),v2_color(Color()){}
+	Triangle(): v0(glm::vec3()), v1(glm::vec3()), v2(glm::vec3()), normal(glm::vec3()), v0_color(glm::vec3()),v1_color(glm::vec3()),v2_color(glm::vec3()){}
 
 	// Constructor with all fields
-	Triangle(vec3 v0, vec3 v1, vec3 v2, vec3 normal, Color v0_color, Color v1_color, Color v2_color): v0(v0), v1(v1), v2(v2), normal(normal),
+	Triangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, glm::vec3 normal, glm::vec3 v0_color, glm::vec3 v1_color, glm::vec3 v2_color): v0(v0), v1(v1), v2(v2), normal(normal),
 		v0_color(v0_color), v1_color(v1_color),v2_color(v2_color){}
 };
-#endif
-
 #endif

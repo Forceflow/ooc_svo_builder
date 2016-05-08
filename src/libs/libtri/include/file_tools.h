@@ -1,5 +1,4 @@
-#ifndef FILE_TOOLS_H_
-#define FILE_TOOLS_H_
+#pragma once
 
 #include <string>
 #include <stdio.h>
@@ -30,5 +29,3 @@ inline bool file_exists(const std::string& name) {
 		return false;
 	}   
 }
-
-#endif

@@ -4,11 +4,13 @@
   <PropertyGroup Label="UserMacros">
     <BINARY_OUTPUT_DIR>D:\jeroenb\Binaries\</BINARY_OUTPUT_DIR>
     <TRIMESH_DIR>C:\libs\trimesh2\</TRIMESH_DIR>
+	<GLM_DIR>C:\libs\glm\</GLM_DIR>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>$(TRIMESH_DIR)\include\;$(SolutionDir)\..\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
-    <_PropertySheetDisplayName>ooc_svo_builder_custom_includes</_PropertySheetDisplayName>
+    <IncludePath>$(GLM_DIR);$(TRIMESH_DIR)\include\;$(SolutionDir)\..\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
+    <_PropertySheetDisplayName>tri_convert_custom_includes</_PropertySheetDisplayName>
     <LibraryPath>$(TRIMESH_DIR)\lib.Win$(PlatformArchitecture).vs$(PlatformToolsetVersion);$(LibraryPath)</LibraryPath>
+    <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
@@ -18,6 +20,10 @@
     </BuildMacro>
     <BuildMacro Include="TRIMESH_DIR">
       <Value>$(TRIMESH_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+	<BuildMacro Include="GLM_DIR">
+      <Value>$(GLM_DIR)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

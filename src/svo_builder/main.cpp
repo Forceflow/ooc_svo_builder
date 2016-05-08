@@ -1,4 +1,4 @@
-#include <TriMesh.h>
+#include <glm/glm.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -12,11 +12,12 @@
 #include "partitioner.h"
 
 using namespace std;
+using namespace glm;
 
 enum ColorType { COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL };
 
 // Program version
-string version = "1.5";
+string version = "1.6 alpha";
 
 // Program parameters
 string filename = "";
@@ -302,11 +303,11 @@ int main(int argc, char *argv[]) {
 
 	// General voxelization calculations (stuff we need throughout voxelization process)
 	float unitlength = (trip_info.mesh_bbox.max[0] - trip_info.mesh_bbox.min[0]) / (float)trip_info.gridsize;
-	uint64_t morton_part = (trip_info.gridsize * trip_info.gridsize * trip_info.gridsize) / trip_info.n_partitions;
+	::uint64_t morton_part = (trip_info.gridsize * trip_info.gridsize * trip_info.gridsize) / trip_info.n_partitions;
 
 	char* voxels = new char[(size_t)morton_part]; // Storage for voxel on/off
 #ifdef BINARY_VOXELIZATION
-	vector<uint64_t> data; // Dynamic storage for morton codes
+	vector<::uint64_t> data; // Dynamic storage for morton codes
 #else
 	vector<VoxelData> data; // Dynamic storage for voxel data
 #endif 
@@ -326,12 +327,12 @@ int main(int argc, char *argv[]) {
 		vox_total_timer.start(); // TIMING
 		cout << "Voxelizing partition " << i << " ..." << endl;
 		// morton codes for this partition
-		uint64_t start = i * morton_part;
-		uint64_t end = (i + 1) * morton_part;
+		::uint64_t start = i * morton_part;
+		::uint64_t end = (i + 1) * morton_part;
 		// open file to read triangles
 		vox_io_in_timer.start(); // TIMING
 		std::string part_data_filename = trip_info.base_filename + string("_") + val_to_string(i) + string(".tripdata");
-		TriReader reader = TriReader(part_data_filename, trip_info.part_tricounts[i], min(trip_info.part_tricounts[i], input_buffersize));
+		TriReader reader = TriReader(part_data_filename, trip_info.part_tricounts[i], std::min(trip_info.part_tricounts[i], input_buffersize));
 		if (verbose) { cout << "  reading " << trip_info.part_tricounts[i] << " triangles from " << part_data_filename << endl; }
 		vox_io_in_timer.stop(); // TIMING
 		// voxelize partition
@@ -347,12 +348,12 @@ int main(int argc, char *argv[]) {
 #ifdef BINARY_VOXELIZATION
 		if (use_data){ // use array of morton codes to build the SVO
 			sort(data.begin(), data.end()); // sort morton codes
-			for (std::vector<uint64_t>::iterator it = data.begin(); it != data.end(); ++it){
+			for (std::vector<::uint64_t>::iterator it = data.begin(); it != data.end(); ++it){
 				builder.addVoxel(*it);
 			}
 		}
 		else { // morton array overflowed : using slower way to build SVO
-			uint64_t morton_number;
+			::uint64_t morton_number;
 			for (size_t j = 0; j < morton_part; j++) {
 				if (!voxels[j] == EMPTY_VOXEL) {
 					morton_number = start + j;

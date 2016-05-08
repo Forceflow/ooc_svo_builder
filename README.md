@@ -1,10 +1,10 @@
-# Out-Of-Core SVO Builder v1.5
+# Out-Of-Core SVO Builder v1.6
 
 This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, Out Of Core Construction of Sparse Voxel Octrees. The project was subsequently updated after the article was also published in Computer Graphics Forum 2014. The paper and additional material can be found on the [project page](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/).
 
 There are two tools distributed in this release, both are required to convert a model into a Sparse Voxel Octree representation:
 
-* **tri_convert:** A tool to convert any model file to a simple, streamable .tri format, described in this manual.
+* **tri_convert:** A tool to convert any model file to a simple, streamable .tri format, described in this manual. You can use this tool, or format your model files yourself.
 * **svo_builder:** Out-Of-Core SVO Builder: Partitioning, voxelizing and SVO Building rolled into one executable, needs a .tri file as input
 
 ## Building / Dependencies
@@ -13,7 +13,7 @@ The current **ooc_svo_builder** release consists of:
 * Precompiled binaries for Win64
 * Visual Studio project files
   * VS 2015 Community Edition (which is free) recommended
-  * You can configurate the location of the libraries in the */msvc/vs2015/ooc_svo_builder_custom_includes.props*.
+  * You can configure the location of the external libraries (see dependencies) in the */msvc/vs2015/svo_builder_custom_includes.props* and */msvc/vs2015/tri_convert_custom_includes.props*. Without configuring these simple XML-based files, you will have trouble building the project.
 * Linux build scripts (sh) for gcc/clang
 * Cmake files for OSX
 
@@ -21,7 +21,8 @@ Library dependencies are
 
  * [**libmorton**](https://github.com/Forceflow/libmorton) (header-only, included in src/libs)
  * [**libtri**](https://github.com/Forceflow/libtri) (header-only, included in src/libs)
- * [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not included. This library was originally developed by [Szymon Rusinkiewicz](http://gfx.cs.princeton.edu/proj/trimesh2/), but I'm maintaining my own, updated version in [this repo](https://github.com/Forceflow/trimesh2).
+ * [**glm**](https://github.com/g-truc/glm) (header-only, not included)
+ * For the tri_convert tool: [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not included. This library was originally developed by [Szymon Rusinkiewicz](http://gfx.cs.princeton.edu/proj/trimesh2/), but I'm maintaining my own, updated version in [this repo](https://github.com/Forceflow/trimesh2).
 
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
