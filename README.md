@@ -1,5 +1,7 @@
 # Out-Of-Core SVO Builder v1.6
 
+**NOTICE:** SInce 1.6 alpha this tool uses GLM for easy vector math. Also, an important bug with partitioning was fixed - although I'm still testing out 1.6, I heartily recommend switching to the newer codebase.
+
 This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, Out Of Core Construction of Sparse Voxel Octrees. The project was subsequently updated after the article was also published in Computer Graphics Forum 2014. The paper and additional material can be found on the [project page](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/).
 
 There are two tools distributed in this release, both are required to convert a model into a Sparse Voxel Octree representation:
