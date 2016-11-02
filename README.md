@@ -9,6 +9,8 @@ There are two tools distributed in this release, both are required to convert a 
 * **tri_convert:** A tool to convert any model file to a simple, streamable .tri format, described in this manual. You can use this tool, or format your model files yourself.
 * **svo_builder:** Out-Of-Core SVO Builder: Partitioning, voxelizing and SVO Building rolled into one executable, needs a .tri file as input
 
+![teaser_image](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/teaser2.png "teaser_image")
+
 ## Building / Dependencies
 The current **ooc_svo_builder** release consists of:
 
