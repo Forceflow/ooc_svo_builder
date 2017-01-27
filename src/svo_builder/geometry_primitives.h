@@ -1,7 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
 
-using namespace std;
 using namespace glm;
 
 // Several geometry primitives

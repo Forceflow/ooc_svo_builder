@@ -1,9 +1,8 @@
 #pragma once
 
 #include <stdio.h>
+#include <algorithm>
 #include <glm/glm.hpp>
-#include <fstream>
-#include <assert.h>
 #include "../libs/libtri/include/tri_util.h"
 #include "globals.h"
 #include "svo_builder_util.h"

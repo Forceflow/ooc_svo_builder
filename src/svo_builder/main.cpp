@@ -2,6 +2,9 @@
 #define WINDOWS_LEAN_AND_MEAN
 #endif
 
+// If you have a CPU which supports BMI2 / AVX2, compile using this flag to speed up Morton encoding/decoding
+// #define __BMI2__
+
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
@@ -9,7 +12,6 @@
 #include "globals.h"
 #include "../libs/libtri/include/trip_tools.h"
 #include "../libs/libtri/include/TriReader.h"
-#include <algorithm>
 
 #include "voxelizer.h"
 #include "OctreeBuilder.h"

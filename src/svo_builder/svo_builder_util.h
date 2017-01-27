@@ -2,12 +2,10 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include <sstream>
 #include "timer.h"
 #include "../libs/libmorton/include/morton.h"
 
 using namespace glm;
-using namespace std;
 
 // Various math/helper stuff
 
