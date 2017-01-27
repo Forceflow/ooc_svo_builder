@@ -2,7 +2,6 @@
 
 #include "../libs/libtri/include/tri_tools.h"
 #include "../libs/libtri/include/trip_tools.h"
-#include "../libs/libtri/include/file_tools.h"
 #include "../libs/libtri/include/TriReader.h"
 #include "../libs/libmorton/include/morton.h"
 #include "globals.h"

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <algorithm>
 #include "geometry_primitives.h"
 #include "../libs/libtri/include/tri_util.h"
 
