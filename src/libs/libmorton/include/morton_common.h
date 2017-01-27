@@ -1,5 +1,7 @@
 #pragma once
 
+// Libmorton - Common helper methods needed in Morton encoding/decoding
+
 #include <stdint.h>
 #if _MSC_VER
 #include <intrin.h>
@@ -10,7 +12,7 @@ inline bool findFirstSetBit(const morton x, unsigned long* firstbit_location) {
 #if _MSC_VER && !_WIN64
 	// 32 BIT on 32 BIT
 	if (sizeof(morton) <= 4) {
-		return _BitScanReverse(firstbit_location, x);
+		return _BitScanReverse(firstbit_location, x) != 0;
 	}
 	// 64 BIT on 32 BIT
 	else {
@@ -19,11 +21,11 @@ inline bool findFirstSetBit(const morton x, unsigned long* firstbit_location) {
 			firstbit_location += 32;
 			return true;
 		}
-		return _BitScanReverse(firstbit_location, (x & 0xFFFFFFFF));
+		return _BitScanReverse(firstbit_location, (x & 0xFFFFFFFF)) != 0;
 	}
 #elif  _MSC_VER && _WIN64
 	// 32 or 64 BIT on 64 BIT
-	return _BitScanReverse64(firstbit_location, x);
+	return _BitScanReverse64(firstbit_location, x) != 0;
 #elif __GNUC__
 	if (x == 0) {
 		return false;
