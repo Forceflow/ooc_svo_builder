@@ -122,6 +122,9 @@ The current payload contains a morton code, normal vector and color information.
 * **color:** (3 * 32 bit float = 96 bits) RGB color, three float values between 0 and 1.
 * **normal vector:** (3 * 32 bit float = 96 bits) x, y and z components of normal vector of this voxel payload.
 
+## Visualizing the result
+The generated .octree files and data packages can be visualized using this [CPU Voxel Raycaster](https://github.com/Forceflow/cpu_voxel_raycaster). Mind you: this is an old version, I'm actively developing a newer, more modern viewer. Things will break.
+
 ## Acknowledgements
 I would like to thank Ares Lagae and Philip Dutre for their continuing great input and co-authorship. We would also like to thank the anonymous reviewers for their remarks and comments. Jeroen Baert is funded by the Agency for Innovation by Science and Technology in Flanders (IWT). Ares Lagae is a postdoctoral fellow of the Research Foundation - Flanders (FWO).
 I would also like to thank all people who've contributed fixes to this repository over the years.
