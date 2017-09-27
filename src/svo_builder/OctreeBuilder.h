@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <stdio.h>
 #include <algorithm>
 #include <glm/glm.hpp>
@@ -17,8 +18,8 @@ public:
 	vector< vector< Node > > b_buffers;
 	size_t gridlength;
 	int b_maxdepth; // maximum octree depth
-	::uint64_t b_current_morton; // current morton position
-	::uint64_t b_max_morton; // maximum morton position
+	uint_fast64_t b_current_morton; // current morton position
+	uint_fast64_t b_max_morton; // maximum morton position
 	size_t b_data_pos; // current output data position (array index)
 	size_t b_node_pos; // current output node position (array index)
 
@@ -31,7 +32,7 @@ public:
 
 	OctreeBuilder(std::string base_filename, size_t gridlength, bool generate_levels);
 	void finalizeTree();
-	void addVoxel(const ::uint64_t morton_number);
+	void addVoxel(const uint_fast64_t morton_number);
 	void addVoxel(const VoxelData& point);
 
 private:
