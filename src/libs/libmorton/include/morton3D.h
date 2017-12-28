@@ -8,6 +8,9 @@
 #include "morton3D_LUTs.h"
 #include "morton_common.h"
 
+#define EIGHTBITMASK (morton) 0x000000FF
+#define NINEBITMASK (morton) 0x000001FF
+
 using namespace std;
 
 // AVAILABLE METHODS FOR ENCODING
@@ -32,7 +35,6 @@ template<typename morton, typename coord> inline void m3D_d_for_ET(const morton 
 template<typename morton, typename coord>
 inline morton m3D_e_sLUT(const coord x, const coord y, const coord z) {
 	morton answer = 0;
-	const static morton EIGHTBITMASK = 0x000000FF;
 	for (unsigned int i = sizeof(coord); i > 0; --i) {
 		unsigned int shift = (i - 1) * 8;
 		answer =
@@ -48,7 +50,6 @@ inline morton m3D_e_sLUT(const coord x, const coord y, const coord z) {
 template<typename morton, typename coord>
 inline morton m3D_e_LUT(const coord x, const coord y, const coord z) {
 	morton answer = 0;
-	const static morton EIGHTBITMASK = 0x000000FF;
 	for (unsigned int i = sizeof(coord); i > 0; --i) {
 		unsigned int shift = (i - 1) * 8;
 		answer =
@@ -63,11 +64,10 @@ inline morton m3D_e_LUT(const coord x, const coord y, const coord z) {
 // HELPER METHOD for ET LUT encode
 template<typename morton, typename coord>
 inline morton compute3D_ET_LUT_encode(const coord c, const coord *LUT) {
-	const static morton EIGHTBITMASK = 0x000000FF;
 	unsigned long maxbit = 0;
-	morton answer = 0;
 	if (findFirstSetBit<coord>(c, &maxbit) == 0) { return 0; }
-	for (int i = ceil((maxbit + 1) / 8.0f) ; i >= 0; --i){
+	morton answer = 0;
+	for (int i = (int) ceil((maxbit + 1) / 8.0f) ; i >= 0; --i){
 		unsigned int shift = i* 8;
 		answer = answer << 24 | (LUT[(c >> shift) & EIGHTBITMASK]);
 	}
@@ -99,13 +99,13 @@ inline morton m3D_e_LUT_ET(const coord x, const coord y, const coord z) {
 // HELPER METHOD: Magic bits encoding (helper method)
 template<typename morton, typename coord>
 static inline morton morton3D_SplitBy3bits(const coord a) {
-	const morton* masks = (sizeof(morton) <= 4) ? reinterpret_cast<const morton*>(magicbit3D_masks32) : reinterpret_cast<const morton*>(magicbit3D_masks64);
-	morton x = a;
-	x = x & masks[0];
-	x = (x | x << 16) & masks[1];
-	x = (x | x << 8)  & masks[2];
-	x = (x | x << 4)  & masks[3];
-	x = (x | x << 2)  & masks[4];
+	const morton* masks = (sizeof(morton) <= 4) ? reinterpret_cast<const morton*>(magicbit3D_masks32_encode) : reinterpret_cast<const morton*>(magicbit3D_masks64_encode);
+	morton x = ((morton) a) & masks[0];
+	if (sizeof(morton) == 8) {x = (x | (uint_fast64_t) x << 32) & masks[1];} // for 64-bit case
+	x = (x | x << 16) & masks[2];
+	x = (x | x << 8)  & masks[3];
+	x = (x | x << 4)  & masks[4];
+	x = (x | x << 2)  & masks[5];
 	return x;
 }
 
@@ -159,7 +159,6 @@ inline morton m3D_e_for_ET(const coord x, const coord y, const coord z) {
 template<typename morton, typename coord>
 inline coord morton3D_DecodeCoord_LUT256(const morton m, const uint_fast8_t *LUT, const unsigned int startshift) {
 	morton a = 0;
-	morton NINEBITMASK = 0x000001ff;
 	unsigned int loops = (sizeof(morton) <= 4) ? 4 : 7; // ceil for 32bit, floor for 64bit
 	for (unsigned int i = 0; i < loops; ++i){
 		a |= (LUT[(m >> ((i * 9) + startshift)) & NINEBITMASK] << (3 * i));
@@ -187,7 +186,6 @@ inline void m3D_d_LUT(const morton m, coord& x, coord& y, coord& z) {
 template<typename morton, typename coord>
 inline void m3D_d_sLUT_ET(const morton m, coord& x, coord& y, coord& z){
 	x = 0; y = 0; z = 0;
-	morton NINEBITMASK = 0x000001ff;
 	unsigned long firstbit_location = 0;
 	if (!findFirstSetBit<morton>(m, &firstbit_location)) { return; }
 	unsigned int i = 0;
@@ -207,7 +205,6 @@ inline void m3D_d_sLUT_ET(const morton m, coord& x, coord& y, coord& z){
 template<typename morton, typename coord>
 inline void m3D_d_LUT_ET(const morton m, coord& x, coord& y, coord& z){
 	x = 0; y = 0; z = 0;
-	morton NINEBITMASK = 0x000001ff;
 	unsigned long firstbit_location = 0;
 	if (!findFirstSetBit<uint_fast64_t>(m, &firstbit_location)) { return; }
 	unsigned int i = 0;
@@ -225,12 +222,13 @@ inline void m3D_d_LUT_ET(const morton m, coord& x, coord& y, coord& z){
 // HELPER METHOD for Magic bits decoding
 template<typename morton, typename coord>
 static inline coord morton3D_GetThirdBits(const morton m) {
-	morton* masks = (sizeof(morton) <= 4) ? reinterpret_cast<morton*>(magicbit3D_masks32) : reinterpret_cast<morton*>(magicbit3D_masks64);
-	morton x = m & masks[4];
-	x = (x ^ (x >> 2)) & masks[3];
-	x = (x ^ (x >> 4)) & masks[2];
-	x = (x ^ (x >> 8)) & masks[1];
-	x = (x ^ (x >> 16)) & masks[0];
+	morton* masks = (sizeof(morton) <= 4) ? reinterpret_cast<morton*>(magicbit3D_masks32_decode) : reinterpret_cast<morton*>(magicbit3D_masks64_decode);
+	morton x = m & masks[5];
+	x = (x ^ (x >> 2)) & masks[4];
+	x = (x ^ (x >> 4)) & masks[3];
+	x = (x ^ (x >> 8)) & masks[2];
+	x = (x ^ (x >> 16)) & masks[1];
+	if (sizeof(morton) > 4) {x = (x ^ ((uint_fast64_t) x >> 32)) & masks[0];}
 	return static_cast<coord>(x);
 }
 
@@ -262,9 +260,9 @@ inline void m3D_d_for(const morton m, coord& x, coord& y, coord& z){
 template<typename morton, typename coord>
 inline void m3D_d_for_ET(const morton m, coord& x, coord& y, coord& z) {
 	x = 0; y = 0; z = 0;
-	float defaultbits = floor((sizeof(morton) * 8.0f / 3.0f));
 	unsigned long firstbit_location = 0;
 	if(!findFirstSetBit<morton>(m, &firstbit_location)) return;
+	float defaultbits = floor((sizeof(morton) * 8.0f / 3.0f));
 	unsigned int checkbits = static_cast<unsigned int>(min(defaultbits, firstbit_location / 3.0f));
 	for (unsigned int i = 0; i <= checkbits; ++i) {
 		morton selector = 1;

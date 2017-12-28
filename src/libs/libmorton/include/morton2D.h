@@ -8,6 +8,8 @@
 #include "morton2D_LUTs.h"
 #include "morton_common.h"
 
+#define EIGHTBITMASK (morton) 0x000000FF
+
 using namespace std;
 
 // Encode methods
@@ -31,7 +33,6 @@ template<typename morton, typename coord> inline void m2D_d_for(const morton m, 
 template<typename morton, typename coord>
 inline morton m2D_e_sLUT(const coord x, const coord y) {
 	morton answer = 0;
-	const static morton EIGHTBITMASK = 0x000000FF;
 	for (unsigned int i = sizeof(coord); i > 0; --i) {
 		unsigned int shift = (i - 1) * 8;
 		answer =
@@ -46,7 +47,6 @@ inline morton m2D_e_sLUT(const coord x, const coord y) {
 template<typename morton, typename coord>
 inline morton m2D_e_LUT(const coord x, const coord y) {
 	morton answer = 0;
-	const static morton EIGHTBITMASK = 0x000000FF;
 	for (unsigned int i = sizeof(coord); i > 0; --i) {
 		unsigned int shift = (i - 1) * 8; 
 		answer =
@@ -60,10 +60,9 @@ inline morton m2D_e_LUT(const coord x, const coord y) {
 // HELPER METHOD for Early Termination LUT Encode
 template<typename morton, typename coord>
 inline morton compute2D_ET_LUT_encode(const coord c, const coord *LUT) {
-	const static morton EIGHTBITMASK = 0x000000FF;
 	unsigned long maxbit = 0;
-	morton answer = 0;
 	if (findFirstSetBit<coord>(c, &maxbit) == 0) { return 0; }
+	morton answer = 0;
 	unsigned int i = 0;
 	while (maxbit >= i) {
 		answer |= (LUT[(c >> i) & EIGHTBITMASK]) << i * 2;
@@ -95,7 +94,7 @@ template<typename morton, typename coord>
 inline morton morton2D_SplitBy2Bits(const coord a) {
 	const morton* masks = (sizeof(morton) <= 4) ? reinterpret_cast<const morton*>(magicbit2D_masks32) : reinterpret_cast<const morton*>(magicbit2D_masks64);
 	morton x = a;
-	if (sizeof(morton) > 4) { x = (x | x << 32) & masks[0]; }
+	if (sizeof(morton) > 4) { x = (x | (uint_fast64_t) x << 32) & masks[0]; }
 	x = (x | x << 16) & masks[1];
 	x = (x | x << 8) & masks[2];
 	x = (x | x << 4) & masks[3];
@@ -114,7 +113,7 @@ inline morton m2D_e_magicbits(const coord x, const coord y) {
 template<typename morton, typename coord>
 inline morton m2D_e_for(const coord x, const coord y){
 	morton answer = 0;
-	unsigned int checkbits = floor(sizeof(morton) * 4.0f);
+	unsigned int checkbits = (unsigned int) floor(sizeof(morton) * 4.0f);
 	for (unsigned int i = 0; i <= checkbits; ++i) {
 		morton mshifted = static_cast<morton>(0x1) << i; // Here we need to cast 0x1 to 64bits, otherwise there is a bug when morton code is larger than 32 bits
 		unsigned int shift = 2 * i;
@@ -147,7 +146,6 @@ inline morton m2D_e_for_ET(const coord x, const coord y) {
 template<typename morton, typename coord>
 inline coord morton2D_DecodeCoord_LUT256(const morton m, const uint_fast8_t *LUT, const unsigned int startshift) {
 	morton a = 0;
-	morton EIGHTBITMASK = 0x000000ff;
 	unsigned int loops = sizeof(morton);
 	for (unsigned int i = 0; i < loops; ++i) {
 		a |= (LUT[(m >> ((i * 8) + startshift)) & EIGHTBITMASK] << (4 * i));
@@ -173,7 +171,6 @@ inline void m2D_d_LUT(const morton m, coord& x, coord& y) {
 template<typename morton, typename coord>
 inline void m2D_d_sLUT_ET(const morton m, coord& x, coord& y) {
 	x = 0; y = 0;
-	morton EIGHTBITMASK = 0x000000ff;
 	unsigned long firstbit_location = 0;
 	if (!findFirstSetBit<morton>(m, &firstbit_location)) { return; }
 	unsigned int i = 0;
@@ -191,7 +188,6 @@ inline void m2D_d_sLUT_ET(const morton m, coord& x, coord& y) {
 template<typename morton, typename coord>
 inline void m2D_d_LUT_ET(const morton m, coord& x, coord& y) {
 	x = 0; y = 0;
-	morton EIGHTBITMASK = 0x000000ff;
 	unsigned long firstbit_location = 0;
 	if (!findFirstSetBit<morton>(m, &firstbit_location)) { return; }
 	unsigned int i = 0;
@@ -243,9 +239,9 @@ inline void m2D_d_for(const morton m, coord& x, coord& y) {
 template<typename morton, typename coord>
 inline void m2D_d_for_ET(const morton m, coord& x, coord& y) {
 	x = 0; y = 0;
-	float defaultbits = sizeof(morton) * 4;
 	unsigned long firstbit_location = 0;
 	if (!findFirstSetBit<morton>(m, &firstbit_location)) return;
+	float defaultbits = sizeof(morton) * 4;
 	unsigned int checkbits = static_cast<unsigned int>(min(defaultbits, firstbit_location / 2.0f));
 	for (unsigned int i = 0; i <= checkbits; ++i) {
 		morton selector = 1;
