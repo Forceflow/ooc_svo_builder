@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="libtri">
+      <UniqueIdentifier>{5ffa4d2e-7d48-4157-8bfa-be7811373c40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\tri_convert\tri_convert.cpp">
@@ -22,6 +25,21 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\tri_convert\tri_convert_util.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libs\libtri\include\file_tools.h">
+      <Filter>libtri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libs\libtri\include\tri_tools.h">
+      <Filter>libtri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libs\libtri\include\tri_util.h">
+      <Filter>libtri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libs\libtri\include\trip_tools.h">
+      <Filter>libtri</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\libs\libtri\include\TriReader.h">
+      <Filter>libtri</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
