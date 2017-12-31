@@ -293,9 +293,9 @@ void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, c
 					voxels[index - morton_start] = FULL_VOXEL;
 
 					glm::vec3 barycentric = ComputeBarycentricCoords( t, n, x / unit_div, y / unit_div, z / unit_div );
-					glm::vec3 color = ComputeBarycentricValue( barycentric, t.v0_color, t.v1_color, t.v2_color );
+					glm::vec3 voxelColor = ComputeBarycentricValue( barycentric, t.v0_color, t.v1_color, t.v2_color );
 
-					data.push_back(VoxelData(index, t.normal, color)); // we ignore data limits for colored voxelization
+					data.push_back(VoxelData(index, t.normal, voxelColor)); // we ignore data limits for colored voxelization
 #endif
 					nfilled++;
 					continue;
