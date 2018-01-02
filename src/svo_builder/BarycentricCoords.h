@@ -6,9 +6,9 @@
 
 // ================================ //
 //
-glm::vec3			ComputeBarycentricValue			( const glm::vec3& barycentric, glm::vec3 vert1Val, glm::vec3 vert2Val, glm::vec3 vert3Val )
+glm::vec3			InterpolateValue				( const glm::vec3& barycentric, glm::vec3 vert1Val, glm::vec3 vert2Val, glm::vec3 vert3Val )
 {
-	return barycentric.x * vert1Val + barycentric.y * vert2Val, barycentric.z * vert3Val;
+	return barycentric.x * vert1Val + barycentric.y * vert2Val + barycentric.z * vert3Val;
 }
 
 
