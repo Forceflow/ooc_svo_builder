@@ -36,7 +36,7 @@ glm::vec3			ComputeBarycentricCoords		( const Triangle& triangle, const glm::vec
 	float coeffD = -glm::dot( triangle.v0, norm );
 
 	// Our goal is to find point p such that p + k*n = (voxelX, voxelY, voxelZ).
-	float k = -( glm::dot( voxel, norm ) + coeffD ) / ( norm.x * norm.x + norm.y * norm.y + norm.z * norm.z );
+	float k = ( glm::dot( voxel, norm ) + coeffD ) / ( norm.x * norm.x + norm.y * norm.y + norm.z * norm.z );
 	glm::vec3 point = voxel - k * norm;
 
 	return ComputeBarycentricCoords( triangle, point );
