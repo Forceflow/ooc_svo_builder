@@ -148,6 +148,11 @@
     <ClCompile Include="..\..\src\tri_convert\tri_convert.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\libs\libtri\include\file_tools.h" />
+    <ClInclude Include="..\..\src\libs\libtri\include\trip_tools.h" />
+    <ClInclude Include="..\..\src\libs\libtri\include\TriReader.h" />
+    <ClInclude Include="..\..\src\libs\libtri\include\tri_tools.h" />
+    <ClInclude Include="..\..\src\libs\libtri\include\tri_util.h" />
     <ClInclude Include="..\..\src\tri_convert\tri_convert_util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

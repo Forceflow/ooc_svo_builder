@@ -2,21 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <BINARY_OUTPUT_DIR>D:\jeroenb\Binaries\</BINARY_OUTPUT_DIR>
-    <GLM_DIR>C:\libs\glm\</GLM_DIR>
+    <BINARY_OUTPUT_DIR>$(ProjectDir)..\..\build\</BINARY_OUTPUT_DIR>
   </PropertyGroup>
   <PropertyGroup>
     <IncludePath>$(GLM_DIR);$(SolutionDir)\..\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
+	 <IntDir>$(BINARY_OUTPUT_DIR)/temp/svo_builder/</IntDir>
     <OutDir>$(BINARY_OUTPUT_DIR)</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
     <BuildMacro Include="BINARY_OUTPUT_DIR">
       <Value>$(BINARY_OUTPUT_DIR)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-    <BuildMacro Include="GLM_DIR">
-      <Value>$(GLM_DIR)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

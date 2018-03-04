@@ -1,5 +1,7 @@
 #include "voxelizer.h"
 
+#include "BarycentricCoords.h"
+
 using namespace std;
 using namespace glm;
 
@@ -289,7 +291,12 @@ void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, c
 					if (use_data){ data.push_back(index); }
 #else
 					voxels[index - morton_start] = FULL_VOXEL;
-					data.push_back(VoxelData(index, t.normal, average3Vec(t.v0_color, t.v1_color, t.v2_color))); // we ignore data limits for colored voxelization
+
+					glm::vec3 barycentric = ComputeBarycentricCoords( t, n, x / unit_div, y / unit_div, z / unit_div );
+					glm::vec3 voxelColor = InterpolateValue( barycentric, t.v0_color, t.v1_color, t.v2_color );
+					//glm::vec3 voxelColor = average3Vec( t.v0_color, t.v1_color, t.v2_color );
+
+					data.push_back(VoxelData(index, t.normal, voxelColor)); // we ignore data limits for colored voxelization
 #endif
 					nfilled++;
 					continue;
