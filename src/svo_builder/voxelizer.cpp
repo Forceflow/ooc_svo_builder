@@ -1,5 +1,4 @@
 #include "voxelizer.h"
-
 #include "BarycentricCoords.h"
 
 using namespace std;
