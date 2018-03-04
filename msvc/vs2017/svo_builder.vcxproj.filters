@@ -74,5 +74,8 @@
     <ClInclude Include="..\..\src\svo_builder\voxelizer.h">
       <Filter>Header Files\Voxelizer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\svo_builder\BarycentricCoords.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
