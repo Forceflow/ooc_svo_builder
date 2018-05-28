@@ -1,12 +1,13 @@
 #!/bin/bash
 
 ## SPECIFY TRIMESH LOCATION HERE (and do a make there first)
-TRIMESH_DIR=/home/jeroen/development/trimesh2
+TRIMESH_DIR=/home/jeroen/dev/trimesh2
 SOURCE_DIR=../src/svo_builder/
+GLM_DIR=/home/jeroen/dev/glm
 
 ## COMPILE AND LINK DEFINITIONS
-COMPILE="g++ -g -c -O3 -I../src/libs/tri_tools/include/ -I ${TRIMESH_DIR}/include/"
-COMPILE_BINARY="g++ -c -O3 -I../src/libs/tri_tools/include/ -I ${TRIMESH_DIR}/include/ -D BINARY_VOXELIZATION"
+COMPILE="g++ -g -c -m64 -O3 -I../src/libs/tri_tools/include/ -I ${TRIMESH_DIR}/include/ -I ${GLM_DIR}"
+COMPILE_BINARY="${COMPILE} -D BINARY_VOXELIZATION"
 LINK="g++ -g -o svo_builder"
 LINK_BINARY="g++ -g -o svo_builder_binary"
 
