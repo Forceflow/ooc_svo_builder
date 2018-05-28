@@ -6,7 +6,7 @@ SOURCE_DIR=../src/svo_builder/
 GLM_DIR=/home/jeroen/dev/glm
 
 ## COMPILE AND LINK DEFINITIONS
-COMPILE="g++ -g -c -m64 -O3 -I../src/libs/tri_tools/include/ -I ${TRIMESH_DIR}/include/ -I ${GLM_DIR}"
+COMPILE="g++ -g -c -m64 -O3 -I../src/libs/libtri/include/ -I ${TRIMESH_DIR}/include/ -I ${GLM_DIR}"
 COMPILE_BINARY="${COMPILE} -D BINARY_VOXELIZATION"
 LINK="g++ -g -o svo_builder"
 LINK_BINARY="g++ -g -o svo_builder_binary"

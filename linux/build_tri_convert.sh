@@ -5,8 +5,8 @@ TRIMESH_DIR=/home/jeroen/development/trimesh2
 SOURCE_DIR=../src/tri_convert/
 
 ## COMPILE AND LINK DEFINITIONS
-COMPILE="g++ -c -O3 -I../src/tri_tools/include/ -I ${TRIMESH_DIR}/include/"
-COMPILE_BINARY="g++ -O3 -c -I../src/tri_tools/include/ -I ${TRIMESH_DIR}/include/ -D BINARY_VOXELIZATION"
+COMPILE="g++ -c -O3 -I../src/libtri/include/ -I ${TRIMESH_DIR}/include/"
+COMPILE_BINARY="${COMPILE} -D BINARY_VOXELIZATION"
 LINK="g++ -o tri_convert"
 LINK_BINARY="g++ -o tri_convert_binary"
 LINK_OPTS="-L${TRIMESH_DIR}/lib.Linux64 -ltrimesh -fopenmp -static"
