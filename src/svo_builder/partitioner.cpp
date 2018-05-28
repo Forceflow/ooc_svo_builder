@@ -42,7 +42,7 @@ void removeTripFiles(const TripInfo &trip_info){
 void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const size_t gridsize, vector<BBoxBuffer*> &buffers){
 	buffers.resize(n_partitions);
 	float unitlength = (tri_info.mesh_bbox.max[0] - tri_info.mesh_bbox.min[0]) / (float)gridsize;
-	::uint64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
+	uint_fast64_t morton_part = (gridsize*gridsize*gridsize) / n_partitions;
 
 	AABox<uivec3> bbox_grid;
 	AABox<vec3> bbox_world;
@@ -50,8 +50,8 @@ void createBuffers(const TriInfo& tri_info, const size_t n_partitions, const siz
 
 	for (size_t i = 0; i < n_partitions; i++){
 		// compute world bounding box
-		morton3D_64_decode(morton_part*i, bbox_grid.min[0], bbox_grid.min[1], bbox_grid.min[2]);
-		morton3D_64_decode((morton_part*(i + 1)) - 1, bbox_grid.max[0], bbox_grid.max[1], bbox_grid.max[2]); // -1, because z-curve skips to first block of next partition
+		morton3D_64_decode(morton_part*i, (uint_fast32_t&) bbox_grid.min[0], (uint_fast32_t&) bbox_grid.min[1], (uint_fast32_t&) bbox_grid.min[2]);
+		morton3D_64_decode((morton_part*(i + 1)) - 1, (uint_fast32_t&) bbox_grid.max[0], (uint_fast32_t&) bbox_grid.max[1], (uint_fast32_t&) bbox_grid.max[2]); // -1, because z-curve skips to first block of next partition
 		bbox_world.min[0] = bbox_grid.min[0] * unitlength;
 		bbox_world.min[1] = bbox_grid.min[1] * unitlength;
 		bbox_world.min[2] = bbox_grid.min[2] * unitlength;

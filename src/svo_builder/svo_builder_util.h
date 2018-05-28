@@ -10,8 +10,8 @@ using namespace glm;
 // Various math/helper stuff
 
 // helper method to convert morton number to RGB color, for debug coloring purposes
-inline vec3 mortonToRGB(const ::uint64_t morton_number, const size_t gridsize){
-	unsigned int x,y,z;
+inline vec3 mortonToRGB(const uint_fast64_t morton_number, const size_t gridsize){
+	uint_fast32_t x,y,z;
 	morton3D_64_decode(morton_number,z,y,x);
 	return vec3((float)x/gridsize, (float)y/gridsize, (float)z/gridsize);
 }
