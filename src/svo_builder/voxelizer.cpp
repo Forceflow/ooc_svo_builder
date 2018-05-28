@@ -21,8 +21,8 @@ void voxelize_huang_method(TriReader &reader, const ::uint64_t morton_start, con
 #endif
 	// compute partition min and max in grid coords
 	AABox<uivec3> p_bbox_grid;
-	morton3D_64_decode(morton_start, p_bbox_grid.min[2], p_bbox_grid.min[1], p_bbox_grid.min[0]);
-	morton3D_64_decode(morton_end - 1, p_bbox_grid.max[2], p_bbox_grid.max[1], p_bbox_grid.max[0]);
+	morton3D_64_decode(morton_start, (uint_fast32_t&) p_bbox_grid.min[2], (uint_fast32_t&) p_bbox_grid.min[1], (uint_fast32_t&) p_bbox_grid.min[0]);
+	morton3D_64_decode(morton_end - 1, (uint_fast32_t&) p_bbox_grid.max[2], (uint_fast32_t&) p_bbox_grid.max[1], (uint_fast32_t&) p_bbox_grid.max[0]);
 	// misc calc
 	float unit_div = 1.0f / unitlength;
 	float radius = unitlength / 2.0f;
@@ -145,8 +145,8 @@ void voxelize_schwarz_method(TriReader &reader, const ::uint64_t morton_start, c
 
 	// compute partition min and max in grid coords
 	AABox<uivec3> p_bbox_grid;
-	morton3D_64_decode(morton_start, p_bbox_grid.min[0], p_bbox_grid.min[1], p_bbox_grid.min[2]); // note: flipped inputs here 0, 1, 2 vs 2, 1, 0
-	morton3D_64_decode(morton_end - 1, p_bbox_grid.max[0], p_bbox_grid.max[1], p_bbox_grid.max[2]); // note: flipped inputs here 0, 1, 2 vs 2, 1, 0
+	morton3D_64_decode(morton_start, (uint_fast32_t&) p_bbox_grid.min[0], (uint_fast32_t&) p_bbox_grid.min[1], (uint_fast32_t&) p_bbox_grid.min[2]); // note: flipped inputs here 0, 1, 2 vs 2, 1, 0
+	morton3D_64_decode(morton_end - 1, (uint_fast32_t&) p_bbox_grid.max[0], (uint_fast32_t&) p_bbox_grid.max[1], (uint_fast32_t&) p_bbox_grid.max[2]); // note: flipped inputs here 0, 1, 2 vs 2, 1, 0
 
 	// compute maximum grow size for data array
 #ifdef BINARY_VOXELIZATION
