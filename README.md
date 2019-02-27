@@ -126,6 +126,10 @@ The generated .octree files and data packages can be visualized using this [CPU 
 I would like to thank Ares Lagae and Philip Dutre for their continuing great input and co-authorship. We would also like to thank the anonymous reviewers for their remarks and comments. Jeroen Baert is funded by the Agency for Innovation by Science and Technology in Flanders (IWT). Ares Lagae is a postdoctoral fellow of the Research Foundation - Flanders (FWO).
 I would also like to thank all people who've contributed fixes to this repository over the years.
 
+## See also
+Over the years, there have been a few papers building on this codebase:
+* Pätzold & Kolb, 2015 - _Grid-free out-of-core voxelization to sparse voxel octrees on GPU_ ([PDF](https://www.researchgate.net/profile/Andreas_Kolb2/publication/281089729_Grid-free_out-of-core_voxelization_to_sparse_voxel_octrees_on_GPU/links/55d5cba408aeb38e8a80c7d5/Grid-free-out-of-core-voxelization-to-sparse-voxel-octrees-on-GPU.pdf))
+
 ## Contact
 Feel free to contact me with questions/suggestions at jeroen.baert (at) cs.kuleuven.be
 
