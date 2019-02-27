@@ -127,8 +127,10 @@ I would like to thank Ares Lagae and Philip Dutre for their continuing great inp
 I would also like to thank all people who've contributed fixes to this repository over the years.
 
 ## See also
-Over the years, there have been a few papers building on this codebase:
+Over the years, there have been a few papers building on this codebase. Feel free to check them for improvements and ideas:
 * Pätzold & Kolb, 2015 - _Grid-free out-of-core voxelization to sparse voxel octrees on GPU_ ([PDF](https://www.researchgate.net/profile/Andreas_Kolb2/publication/281089729_Grid-free_out-of-core_voxelization_to_sparse_voxel_octrees_on_GPU/links/55d5cba408aeb38e8a80c7d5/Grid-free-out-of-core-voxelization-to-sparse-voxel-octrees-on-GPU.pdf))
+* Matsuda, Furuya, Ohbuchi, 2015 - _Lightweight binary voxel shape features for 3D data matching and retrieval_ ([PDF](https://www.researchgate.net/profile/Ryutarou_Ohbuchi2/publication/282956424_Lightweight_Binary_Voxel_Shape_Features_for_3D_Data_Matching_and_Retrieval/links/562ae13c08ae04c2aeb1d854/Lightweight-Binary-Voxel-Shape-Features-for-3D-Data-Matching-and-Retrieval.pdf))
+* 
 
 ## Contact
 Feel free to contact me with questions/suggestions at jeroen.baert (at) cs.kuleuven.be
