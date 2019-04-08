@@ -9,33 +9,34 @@ There are two tools distributed in this release, both are required to convert a 
 
 ![teaser_image](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/teaser2.png "teaser_image")
 
-## Building / Dependencies
-The current **ooc_svo_builder** release consists of:
+## Building
+The current **ooc_svo_builder** can be built on:
 
-* Precompiled binaries for Win64 (see releases)
-* Visual Studio project files for VS2015, VS2017 and VS2019 (recommended)
-  * **Important:** You have to configure the location of the external libraries (see dependencies) in the supplied props files. Without configuring these simple XML-based files, you will have trouble building the project. You can configure where VS should copy the compiled binaries too and where it can find your [trimesh2](https://github.com/Forceflow/trimesh2) and [glm](https://github.com/g-truc/glm) libraries.
-  
+* **Windows:**
+ * Precompiled binaries for Win64 (see releases)
+ * Visual Studio project files for VS2015, VS2017 and VS2019 (recommended)
+* **Linux** through build scripts (sh) for gcc/clang
+* **OSX** through Cmake file
+
+# Dependencies
+Library dependencies are
+
+ * [**glm**](https://github.com/g-truc/glm) (header-only, not included)
+ * For the tri_convert tool: [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not included.
+
+For the Windows build, you have to configure the location of the external libraries (see dependencies) in the supplied props files. Without configuring these simple XML-based files, you will have trouble building the project. You can configure where VS should copy the compiled binaries too and where it can find your [trimesh2](https://github.com/Forceflow/trimesh2) and [glm](https://github.com/g-truc/glm) libraries.
+ 
 */msvc/vs2017/svo_builder_custom_includes.props* : 
 ```
 <BINARY_OUTPUT_DIR>C:\Binaries\</BINARY_OUTPUT_DIR>
 <GLM_DIR>C:\libs\glm\</GLM_DIR>
 ```
-
 */msvc/vs2017/tri_convert_custom_includes.props* : 
 ```
 <BINARY_OUTPUT_DIR>C:\Binaries\</BINARY_OUTPUT_DIR>
 <TRIMESH_DIR>C:\libs\trimesh2\</TRIMESH_DIR>
 <GLM_DIR>C:\libs\glm\</GLM_DIR>
 ```
-  
-* Linux build scripts (sh) for gcc/clang
-* Cmake files for OSX
-
-Library dependencies are
-
- * [**glm**](https://github.com/g-truc/glm) (header-only, not included)
- * For the tri_convert tool: [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not included.
 
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
