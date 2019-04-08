@@ -13,16 +13,16 @@ There are two tools distributed in this release, both are required to convert a 
 The current **ooc_svo_builder** can be built on:
 
 * **Windows:**
- * Precompiled binaries for Win64 (see releases)
- * Visual Studio project files for VS2015, VS2017 and VS2019 (recommended)
+  * Visual Studio project files for VS2015, VS2017 and VS2019 (tested on Community Editions)
+  * Precompiled binaries for Win64 (see releases)
 * **Linux** through build scripts (sh) for gcc/clang
 * **OSX** through Cmake file
 
 # Dependencies
-Library dependencies are
+Additional library dependencies are:
 
- * [**glm**](https://github.com/g-truc/glm) (header-only, not included)
- * For the tri_convert tool: [**trimesh2**](https://github.com/Forceflow/trimesh2) (binary, external) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself, it's not included.
+ * [**glm**](https://github.com/g-truc/glm) (header-only)
+ * For the tri_convert tool: [**trimesh2**](https://github.com/Forceflow/trimesh2) (static library) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself or download a binary release.
 
 For the Windows build, you have to configure the location of the external libraries (see dependencies) in the supplied props files. Without configuring these simple XML-based files, you will have trouble building the project. You can configure where VS should copy the compiled binaries too and where it can find your [trimesh2](https://github.com/Forceflow/trimesh2) and [glm](https://github.com/g-truc/glm) libraries.
  
