@@ -4,13 +4,13 @@ This is a proof of concept implementation of the algorithm explained in our HPG 
 
 There are two tools distributed in this release, both are required to convert a model into a Sparse Voxel Octree representation:
 
-* **tri_convert:** A tool to convert any model file to a simple, streamable .tri format, described in this manual. You can use this tool, or format your model files yourself.
-* **svo_builder:** Out-Of-Core SVO Builder: Partitioning, voxelizing and SVO Building rolled into one executable, needs a .tri file as input
+* `tri_convert`: A tool to convert any model file to a simple, streamable .tri format, described in this manual. You can use this tool, or format your model files yourself.
+* `svo_builder`: Out-Of-Core SVO Builder: Partitioning, voxelizing and SVO Building rolled into one executable, needs a .tri file as input
 
 ![teaser_image](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/teaser2.png "teaser_image")
 
 ## Building
-The current **ooc_svo_builder** can be built on:
+The current `ooc_svo_builder` can be built on:
 
 * **Windows:**
   * Visual Studio project files for VS2015, VS2017 and VS2019 (tested on Community Editions)
@@ -21,17 +21,17 @@ The current **ooc_svo_builder** can be built on:
 # Dependencies
 Additional library dependencies are:
 
- * [**glm**](https://github.com/g-truc/glm) (header-only)
- * For the tri_convert tool: [**trimesh2**](https://github.com/Forceflow/trimesh2) (static library) Used for input/output of triangle meshes and the vector math. You will have to compile this for yourself or download a binary release.
+ * [**glm**](https://github.com/g-truc/glm). Used for vector math.
+ * [**trimesh2**](https://github.com/Forceflow/trimesh2). Used for input/output of triangle meshes in the `tri_convert` tool. I maintain my [own fork](https://github.com/Forceflow/trimesh2) which is compatible.
 
-For the Windows build, you have to configure the location of the external libraries (see dependencies) in the supplied props files. Without configuring these simple XML-based files, you will have trouble building the project. You can configure where VS should copy the compiled binaries too and where it can find your [trimesh2](https://github.com/Forceflow/trimesh2) and [glm](https://github.com/g-truc/glm) libraries.
+For the Windows build, you have to configure the location of the external libraries (see dependencies) in the supplied props files. You can configure where VS should copy the compiled binaries to and where the build process can find the required [trimesh2](https://github.com/Forceflow/trimesh2) and [glm](https://github.com/g-truc/glm) libraries.
  
-*/msvc/vs2017/svo_builder_custom_includes.props* : 
+*/msvc/vs2019/svo_builder_custom_includes.props* : 
 ```
 <BINARY_OUTPUT_DIR>C:\Binaries\</BINARY_OUTPUT_DIR>
 <GLM_DIR>C:\libs\glm\</GLM_DIR>
 ```
-*/msvc/vs2017/tri_convert_custom_includes.props* : 
+*/msvc/vs2019/tri_convert_custom_includes.props* : 
 ```
 <BINARY_OUTPUT_DIR>C:\Binaries\</BINARY_OUTPUT_DIR>
 <TRIMESH_DIR>C:\libs\trimesh2\</TRIMESH_DIR>
@@ -41,17 +41,19 @@ For the Windows build, you have to configure the location of the external librar
 ## Usage / Examples
 ### Modes: Geometry-only / With-payload voxelization
 This release supports two modes of SVO building:
-  * **Binary-only:** SVO building (only geometry, the default mode presented in the paper). The result will be an SVO with all leaf nodes referencing the same, white default voxel. The data part of the SVO will only be a couple of bytes.
+  * **Binary-only:** SVO building (only geometry, the default mode presented in the paper). The result will be an SVO with all leaf nodes referencing the same, white default voxel. The data part of the SVO will only be a couple of bytes. 
   * **Payload:** SVO building with a (normal vector + vertex colors) payload per voxel. The result will be an SVO with all leaf nodes referencing their own sampled voxel payload.
+  
+**Please note how "binary" is used as a description of the content of the SVO. Binary as in: either a voxel present or not. I know this is confusing with the programming-related usage of "binary". What can I say? It be like dat sometimes.**
 
-Throughout all executables, the tools for binary voxelization are postfixed with _binary. During compilation, you can define the preprocessor directive #BINARY_VOXELIZATION to generate the binary-only SVO construction version.
+Throughout all executables, the tools for binary voxelization are postfixed with `_binary`. During compilation, you can define the preprocessor directive #BINARY_VOXELIZATION to generate the binary-only SVO construction version.
 
 ### tri_convert: Converting a model to .tri format
-The builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model you have, you've got to convert it to the .tri format using the *tri_convert* tool. For more info about the .tri file format, check [**libtri**](https://github.com/Forceflow/libtri).
+The builder uses a simple binary format for triangles and their information. Before you can build an SVO from a 3d model you have, you've got to convert it to the .tri format using the `tri_convert` tool. For more info about the .tri file format, check [**libtri**](https://github.com/Forceflow/libtri).
 
-The bounding box of the model will be padded to be cubical. Tri_convert accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only .tri file generation, use *tri_convert_binary*, for .tri file generation with a normal vector payload, use tri_convert.
+The bounding box of the model will be padded to be cubical. `tri_convert` accepts .ply, .off, .3ds, .obj, .sm or .ray files. For geometry_only .tri file generation, use `tri_convert_binary`, for .tri file generation with a normal vector payload, use `tri_convert`.
 
-**Syntax:** tri_convert(_binary) -f (path to model file)
+**Syntax:** `tri_convert(_binary) -f (path to model file)`
 
 **Example:** 
 ```
@@ -64,21 +66,21 @@ The SVO builder takes a .tri file as input and performs the three steps (partiti
 
 Since v1.2, side-buffer of configurable maximum size is also used to speed up SVO generation. This is especially interesting for sparse models (voxelizations of thin models).
 
-To build an octree for a geometry-only file, use svo_builder_binary. For building an octree for files with a normal vector payload, use svo_builder. The tools will slap you with a trout if you try to run them with the wrong type of file.
+To build an octree for a geometry-only file, use `svo_builder_binary`. For building an octree for files with a normal vector payload, use `svo_builder`. The tools will slap you with a trout if you try to run them with the wrong type of file.
 
 **Syntax:** svo_builder(_binary) -options
 
-* **-f** (path to .tri file) : The path to the .tri file you want to build an SVO from. (Required)
-* **-s** (gridsize) : The grid size resolution for the SVO. Should be a power of 2. (Default: 1024)
-* **-l** (memory limit) : The memory limit for the SVO builder, in Mb. This is where the out-of-core part kicks in, of course. The tool will automatically select the most optimal partition size depending on the given memory limit. (Default: 2048)
-* **-d** (percentage sparseness) : How many percent (between 0.00 and 1.00) of the memory limit the process can use extra to speed up SVO generation in the case of Sparse Models. (Default: 0.10)
-* **-levels** Generate intermediare SVO levels' voxel payloads by averaging data from lower levels (which is a quick and dirty way to do low-cost Level-Of-Detail hierarchies). If this option is not specified, only the leaf nodes have an actual payload. (Default: off)
-* **-c** (color_mode) Generate colors for the voxels. Keep in mind that when you're using the geometry-only version of the tool (svo_builder_binary), all the color options will be ignored and the voxels will just get a fixed white color. Options for color mode: (Default: model) 
- * **model** : Give all voxels the color which is embedded in the .tri file. (Which will be white if the original model contained no vertex color information).
- * **linear** : Give voxels a linear RGB color related to their position in the grid.
- * **normal** : Get colors for voxels from sample normals of original triangles.
- * **fixed** : Give voxels a fixed color, configurable in the source code.
-* **-v** Be very verbose, for debugging purposes. Switch this on if you're running into problems.
+- **-f** (path to .tri file) : The path to the .tri file you want to build an SVO from. (Required)
+- **-s** (gridsize) : The grid size resolution for the SVO. Should be a power of 2. (Default: 1024)
+- **-l** (memory limit) : The memory limit for the SVO builder, in Mb. This is where the out-of-core part kicks in, of course. The tool will automatically select the most optimal partition size depending on the given memory limit. (Default: 2048)
+- **-d** (percentage sparseness) : How many percent (between 0.00 and 1.00) of the memory limit the process can use extra to speed up SVO generation in the case of Sparse Models. (Default: 0.10)
+- **-levels** Generate intermediare SVO levels' voxel payloads by averaging data from lower levels (which is a quick and dirty way to do low-cost Level-Of-Detail hierarchies). If this option is not specified, only the leaf nodes have an actual payload. (Default: off)
+- **-c** (color_mode) Generate colors for the voxels. Keep in mind that when you're using the geometry-only version of the tool (svo_builder_binary), all the color options will be ignored and the voxels will just get a fixed white color. Options for color mode: (Default: model) 
+    - **model** : Give all voxels the color which is embedded in the .tri file. (Which will be white if the original model contained no vertex color information).
+    - **linear** : Give voxels a linear RGB color related to their position in the grid.
+    - **normal** : Get colors for voxels from sample normals of original triangles.
+    - **fixed** : Give voxels a fixed color, configurable in the source code.
+- **-v** Be very verbose, for debugging purposes. Switch this on if you're running into problems.
 
 **Examples**
 ````
@@ -93,6 +95,8 @@ Will generate a SVO file bunny.octree for a 2048^3 grid, using 1024 Mb of system
 ## Octree File Format
 
 The .octree file format is a very simple straightforward format. It is not optimized for GPU streaming or compact storage, but is easy to parse and convert to whatever you need in your SVO adventures.
+
+_Please note that I am reworking this format in the [liboctree](https://github.com/Forceflow/liboctree) repository. Currently, these repositories are not compatible, so don't mix them. Keep using the provided headers included in the `ooc_svo_builder` repository._
 
 It consists of a text-based header (extension .octree) containing the relevant SVO info and two binary data files, with extensions .octreenodes and .octreedata, containing the octree nodes and actual node data payload respectively. This seperation of the SVO from the actual data is done to seperate hot (tree itself) from cold (payload) data, since the payload of course grows quickly when you store more properties in a voxel.
 
