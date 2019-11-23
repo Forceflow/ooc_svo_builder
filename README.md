@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Forceflow/ooc_svo_builder.svg?branch=master)](https://travis-ci.org/Forceflow/ooc_svo_builder) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=4JAUNWWYUVRN4&currency_code=EUR&source=url)
+
 # Out-Of-Core SVO Builder v1.6.1
 
 This is a proof of concept implementation of the algorithm explained in our HPG 2013 paper, Out Of Core Construction of Sparse Voxel Octrees. The project was subsequently updated after the article was also published in Computer Graphics Forum 2014. The paper and additional material can be found on the [project page](http://graphics.cs.kuleuven.be/publications/BLD14OCCSVO/).
@@ -15,8 +17,8 @@ The current `ooc_svo_builder` can be built on:
 * **Windows:**
   * Visual Studio project files for VS2015, VS2017 and VS2019 (tested on Community Editions)
   * Precompiled binaries for Win64 (see releases)
-* **Linux** through build scripts (sh) for gcc/clang
-* **OSX** through Cmake file
+* **Linux** through Cmake or build scripts in `linux` folder. Also, see the travis.yml for how the automated build is made.
+* **OSX** through Cmake
 
 # Dependencies
 Additional library dependencies are:
