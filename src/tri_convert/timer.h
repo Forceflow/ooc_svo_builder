@@ -58,6 +58,10 @@ struct Timer { // High performance timer using standard c++11 chrono
 		t2 = high_resolution_clock::now();
 		elapsed_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 	}
+
+	inline void reset() {
+		elapsed_time_milliseconds = 0.0;
+	}
 };
 #endif
 
