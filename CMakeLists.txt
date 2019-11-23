@@ -31,16 +31,16 @@ ELSE ()
 ENDIF (MSVC)
 
 INCLUDE_DIRECTORIES (
-  ./src/ooc_svo_builder/tri_convert
-  ./src/ooc_svo_builder/tri_tools/include
+  ./src/libs/libtri/include
+  ./src/libs/libmorton/include
   )
 
 
 SET(SVO_BUILDER_SRCS
-  ./src/ooc_svo_builder/svo_builder/main.cpp
-  ./src/ooc_svo_builder/svo_builder/OctreeBuilder.cpp
-  ./src/ooc_svo_builder/svo_builder/partitioner.cpp
-  ./src/ooc_svo_builder/svo_builder/voxelizer.cpp
+  ./src/svo_builder/main.cpp
+  ./src/svo_builder/OctreeBuilder.cpp
+  ./src/svo_builder/partitioner.cpp
+  ./src/svo_builder/voxelizer.cpp
 )
 ADD_EXECUTABLE ( svo_builder ${SVO_BUILDER_SRCS} )
 ADD_EXECUTABLE ( svo_builder_binary ${SVO_BUILDER_SRCS} )
@@ -50,7 +50,7 @@ SET_TARGET_PROPERTIES(svo_builder_binary PROPERTIES
 
 
 SET(TRI_CONVERT_SRCS
-  ./src/ooc_svo_builder/tri_convert/tri_convert.cpp
+  ./src/tri_convert/tri_convert.cpp
 )
 ADD_EXECUTABLE ( tri_convert ${TRI_CONVERT_SRCS} )
 ADD_EXECUTABLE ( tri_convert_binary ${TRI_CONVERT_SRCS} )
