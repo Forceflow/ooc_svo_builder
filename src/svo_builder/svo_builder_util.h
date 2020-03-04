@@ -6,6 +6,7 @@
 #include "../libs/libmorton/include/morton.h"
 
 using namespace glm;
+using namespace libmorton;
 
 // Various math/helper stuff
 

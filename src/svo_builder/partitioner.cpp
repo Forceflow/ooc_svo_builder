@@ -2,6 +2,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace libmorton;
 
 // Fiddle with buffer sizes here: these are defined as number of triangles
 #define input_buffersize 8192

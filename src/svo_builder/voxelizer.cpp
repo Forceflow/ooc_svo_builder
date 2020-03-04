@@ -3,6 +3,7 @@
 
 using namespace std;
 using namespace glm;
+using namespace libmorton;
 
 #define X 0
 #define Y 1

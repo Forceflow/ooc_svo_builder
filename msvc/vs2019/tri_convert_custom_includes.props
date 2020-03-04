@@ -2,9 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <BINARY_OUTPUT_DIR>D:\jeroenb\Binaries\</BINARY_OUTPUT_DIR>
-    <TRIMESH_DIR>C:\libs\trimesh2\</TRIMESH_DIR>
-	<GLM_DIR>C:\libs\glm\</GLM_DIR>
+    <BINARY_OUTPUT_DIR>D:\dev\Binaries\</BINARY_OUTPUT_DIR>
+    <TRIMESH_DIR>D:\dev\libs\trimesh2\</TRIMESH_DIR>
+	<GLM_DIR>D:\dev\libs\glm\</GLM_DIR>
   </PropertyGroup>
   <PropertyGroup>
     <IncludePath>$(GLM_DIR);$(TRIMESH_DIR)\include\;$(SolutionDir)\..\..\src\libs\libtri\include\;$(IncludePath)</IncludePath>
