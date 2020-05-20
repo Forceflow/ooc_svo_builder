@@ -7,7 +7,6 @@
 #if _MSC_VER
 #define NOMINMAX
 #include <Windows.h>
-#undef NOMINMAX
 #elif __GNUC__
 #include <ctime>
 #include <chrono>
