@@ -94,7 +94,8 @@ int main(int argc, char *argv[]){
 	// Moving mesh to origin
 	cout << "Moving mesh to origin ... "; 
 	Timer timer = Timer();
-	for(size_t i = 0; i < themesh->vertices.size() ; i++){
+#pragma omp parallel for
+	for(int64_t i = 0; i < (int64_t) themesh->vertices.size() ; i++){
 		themesh->vertices[i] = themesh->vertices[i] - toTriMesh(mesh_bbox.min);
 	}
 	cout << "done in " << timer.elapsed_time_milliseconds << " s." << endl;
