@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include "VoxelData.h"
 
 #define NOCHILD -1
