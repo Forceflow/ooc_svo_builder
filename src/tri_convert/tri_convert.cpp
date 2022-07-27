@@ -12,7 +12,7 @@ using namespace std;
 using namespace trimesh;
 
 // Program version
-string version = "1.6 alpha";
+string version = "1.6.4";
 
 // Program parameters
 string filename = "";
