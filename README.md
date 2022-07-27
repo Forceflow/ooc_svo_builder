@@ -17,7 +17,7 @@ The current `ooc_svo_builder` can be built on:
 * **Windows:**
   * Visual Studio project files for VS2015, VS2017, VS2019 and VS2022 (tested on Community Editions)
   * Precompiled binaries for Win64 (see releases)
-* **Linux** through Cmake or build scripts in `linux` folder. Also, see the travis.yml for how the automated build is made.
+* **Linux** through Cmake or build scripts in `linux` folder. Also, see the [github action config file](https://github.com/Forceflow/ooc_svo_builder/blob/main/.github/workflows/build_cmake.yml) for more info.
 * **OSX** through Cmake
 
 # Dependencies
