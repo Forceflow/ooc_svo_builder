@@ -15,7 +15,7 @@ There are two tools distributed in this release, both are required to convert a 
 The current `ooc_svo_builder` can be built on:
 
 * **Windows:**
-  * Visual Studio project files for VS2015, VS2017 and VS2019 (tested on Community Editions)
+  * Visual Studio project files for VS2015, VS2017, VS2019 and VS2022 (tested on Community Editions)
   * Precompiled binaries for Win64 (see releases)
 * **Linux** through Cmake or build scripts in `linux` folder. Also, see the travis.yml for how the automated build is made.
 * **OSX** through Cmake
@@ -28,12 +28,12 @@ Additional library dependencies are:
 
 For the Windows build, you have to configure the location of the external libraries (see dependencies) in the supplied props files. You can configure where VS should copy the compiled binaries to and where the build process can find the required [trimesh2](https://github.com/Forceflow/trimesh2) and [glm](https://github.com/g-truc/glm) libraries.
  
-*/msvc/vs2019/svo_builder_custom_includes.props* : 
+*/msvc/vs2022/svo_builder_custom_includes.props* : 
 ```
 <BINARY_OUTPUT_DIR>C:\Binaries\</BINARY_OUTPUT_DIR>
 <GLM_DIR>C:\libs\glm\</GLM_DIR>
 ```
-*/msvc/vs2019/tri_convert_custom_includes.props* : 
+*/msvc/vs2022/tri_convert_custom_includes.props* : 
 ```
 <BINARY_OUTPUT_DIR>C:\Binaries\</BINARY_OUTPUT_DIR>
 <TRIMESH_DIR>C:\libs\trimesh2\</TRIMESH_DIR>
