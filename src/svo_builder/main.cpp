@@ -23,7 +23,7 @@ using namespace glm;
 enum ColorType { COLOR_FROM_MODEL, COLOR_FIXED, COLOR_LINEAR, COLOR_NORMAL };
 
 // Program version
-string version = "1.6 alpha";
+string version = "1.6.4";
 
 // Program parameters
 string filename = "";
