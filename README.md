@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Forceflow/ooc_svo_builder.svg?branch=master)](https://travis-ci.org/Forceflow/ooc_svo_builder) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=4JAUNWWYUVRN4&currency_code=EUR&source=url)
+[![CMake](https://github.com/Forceflow/ooc_svo_builder/actions/workflows/build_cmake.yml/badge.svg?branch=main)](https://github.com/Forceflow/ooc_svo_builder/actions/workflows/build_cmake.yml) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=4JAUNWWYUVRN4&currency_code=EUR&source=url)
 
 # Out-Of-Core SVO Builder v1.6.4
 
