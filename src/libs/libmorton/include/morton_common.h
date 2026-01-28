@@ -3,14 +3,14 @@
 // Libmorton - Common helper methods needed in Morton encoding/decoding
 
 #include <stdint.h>
-#if _MSC_VER
+#if defined(_MSC_VER)
 #include <intrin.h>
 #endif
 
 namespace libmorton {
 	template<typename morton>
 	inline bool findFirstSetBitZeroIdx(const morton x, unsigned long* firstbit_location) {
-#if _MSC_VER && !_WIN64
+#if defined(_MSC_VER) && !defined(_WIN64)
 		// 32 BIT on 32 BIT
 		if (sizeof(morton) <= 4) {
 			return _BitScanReverse(firstbit_location, x) != 0;
@@ -24,15 +24,15 @@ namespace libmorton {
 			}
 			return _BitScanReverse(firstbit_location, (x & 0xFFFFFFFF)) != 0;
 		}
-#elif  _MSC_VER && _WIN64
+#elif defined(_MSC_VER) && defined(_WIN64)
 		// 32 or 64 BIT on 64 BIT
 		return _BitScanReverse64(firstbit_location, x) != 0;
-#elif __GNUC__
+#elif defined(__GNUC__)
 		if (x == 0) {
 			return false;
 		}
 		else {
-			*firstbit_location = static_cast<unsigned long>((sizeof(morton) * 8) - __builtin_clzll(x) - 1);
+			*firstbit_location = static_cast<unsigned long>((sizeof(unsigned long long) * 8) - __builtin_clzll(x) - 1);
 			return true;
 		}
 #endif
